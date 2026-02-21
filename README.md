@@ -73,6 +73,7 @@ Both guides use the same commands and system behavior; only language/presentatio
 - [Shop catalog](shop/catalog.json)
 - [Dashboard app](docs/index.html)
 - [Quartermaster automation](items/quartermaster/README.md)
+- [OpenClaw ecosystem references](references/openclaw-ecosystem.md)
 - [Agent contract](AGENTS.md)
 - [Agent doctrine](agent-doctrine.yml)
 - [Telemetry contract](docs/TELEMETRY.md)
@@ -83,5 +84,7 @@ Both guides use the same commands and system behavior; only language/presentatio
 ---
 
 ## Protected by the [Seven Shadows](https://github.com/VontaJamal/seven-shadow-system)
+
+[Explore the Vault ->](https://github.com/VontaJamal/shadow-vault)
 
 Part of [Sovereign](https://github.com/VontaJamal) - The Shadow Dominion.
