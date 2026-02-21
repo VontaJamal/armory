@@ -547,8 +547,22 @@ function Invoke-ArmoryRefresh {
         }
     }
 
-    $output = & $git.Source -C $ArmoryRepoRoot pull --ff-only 2>&1 | Out-String
-    $ok = ($LASTEXITCODE -eq 0)
+    $nativePrefExists = $null -ne (Get-Variable -Name PSNativeCommandUseErrorActionPreference -Scope Global -ErrorAction SilentlyContinue)
+    $nativePrefOriginal = $null
+    if ($nativePrefExists) {
+        $nativePrefOriginal = $global:PSNativeCommandUseErrorActionPreference
+        $global:PSNativeCommandUseErrorActionPreference = $false
+    }
+
+    try {
+        $output = & $git.Source -C $ArmoryRepoRoot pull --ff-only 2>&1 | Out-String
+        $exitCode = $LASTEXITCODE
+    } finally {
+        if ($nativePrefExists) {
+            $global:PSNativeCommandUseErrorActionPreference = $nativePrefOriginal
+        }
+    }
+    $ok = ($exitCode -eq 0)
 
     return [PSCustomObject]@{
         success = $ok
