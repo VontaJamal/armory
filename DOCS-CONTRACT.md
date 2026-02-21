@@ -32,12 +32,16 @@ Use this contract for every tool README in the Armory.
 - State exactly what `0` and `1` mean for exit codes.
 - Include one "if this fails" section with concrete fixes.
 - Keep themed words in headings or flavor lines, not in core instructions.
+- For dispatcher commands, document a welcoming alias and mention mode-sensitive behavior (`mode=saga|civ`) in `Quick Start` and `Migration Notes`.
+- State platform compatibility explicitly (cross-platform preferred; platform-specific is acceptable with clear constraints and future-extension notes).
+- When output text changes by mode, show both Crystal Saga and Civilian examples.
 
 ## Command Examples
 
 - Show PowerShell 5.1 commands for Windows first.
 - Use fully-qualified script names when confusion is possible.
 - Avoid placeholders without an example value.
+- If examples include validation/testing, only reference real executable scripts/functions in this repo.
 
 ## Migration Rules
 

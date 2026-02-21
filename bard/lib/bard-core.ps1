@@ -50,9 +50,9 @@ function Initialize-BardConfig {
         [string]$RepoRoot
     )
 
-    $home = Get-BardHome
-    if (-not (Test-Path $home)) {
-        New-Item -ItemType Directory -Path $home -Force | Out-Null
+    $bardHome = Get-BardHome
+    if (-not (Test-Path $bardHome)) {
+        New-Item -ItemType Directory -Path $bardHome -Force | Out-Null
     }
 
     $configPath = Get-BardConfigPath

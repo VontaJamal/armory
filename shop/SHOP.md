@@ -4,6 +4,8 @@ This repository is the shopfront. Every useful Final Fantasy-themed tool can be 
 
 Use this file as the human-readable shelf and [`catalog.json`](catalog.json) as the machine-readable source.
 
+For agent-first no-clone usage, use [`../docs/data/armory-manifest.v1.json`](../docs/data/armory-manifest.v1.json).
+
 ## Browse The Catalog
 
 ```powershell
@@ -21,6 +23,9 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format json
 
 # Markdown output for docs or PR comments
 powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
+
+# Civilian wording view
+powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Mode civ
 ```
 
 ## How To Add Something
@@ -31,11 +36,23 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
 
 ## Active Highlights
 
+## Alexander (Summon)
+
+- Plain description: Read-only local release preflight gate that runs Armory validation commands and reports pass/fail.
+- Flavor line: A fortress gate that tests your readiness before deployment.
+- Script: [`../summons/alexander/alexander.ps1`](../summons/alexander/alexander.ps1)
+
 ## Chronicle (Spell)
 
 - Plain description: Cross-repo git intelligence with branch status, ahead/behind, dirty state, and recent commits.
 - Flavor line: A living record of every front in your codebase.
 - Script: [`../spells/chronicle/chronicle.ps1`](../spells/chronicle/chronicle.ps1)
+
+## Remedy (Item)
+
+- Plain description: Read-only environment health checker for Armory config, wrappers, scripts, CI files, remotes, and dependencies.
+- Flavor line: A field medicine kit for your local toolchain.
+- Script: [`../items/remedy/remedy.ps1`](../items/remedy/remedy.ps1)
 
 ## Current Idea Shelf
 
@@ -59,4 +76,6 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
 `materia-forge.ps1` appends or updates short catalog stub lines in this section.
 
 - `chronicle` (spell/active): Cross-repo git intelligence with branch status, ahead/behind, dirty state, and recent commits.
+- `alexander` (summon/active): Read-only local release preflight gate that runs Armory validation commands and reports pass/fail.
+- `remedy` (item/active): Read-only environment health checker for Armory config, wrappers, scripts, CI files, remotes, and dependencies.
 - `mognet` (idea/idea): Unified notification relay for tool outputs, with channel routing, retries, and digest formatting.

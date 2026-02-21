@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "modeKey": "mode",
+  "values": ["saga", "civ"],
+  "labels": {
+    "saga": "Crystal Saga Mode",
+    "civ": "Civilian Mode"
+  },
+  "copyMap": [
+    {
+      "id": "header_title",
+      "saga": "The Armory Shopfront",
+      "civ": "Armory Tool Catalog"
+    },
+    {
+      "id": "checkout_cta",
+      "saga": "Approve Loadout",
+      "civ": "Approve Install Plan"
+    },
+    {
+      "id": "equip_success",
+      "saga": "Loadout equipped. The party is battle-ready.",
+      "civ": "Install complete. Tooling is ready."
+    },
+    {
+      "id": "pull_failure",
+      "saga": "The Armory gates are sealed. I could not refresh the shop list.",
+      "civ": "Armory refresh failed. I could not update the catalog."
+    }
+  ],
+  "normalization": {
+    "lore": "saga",
+    "crystal": "saga"
+  }
+}

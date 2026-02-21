@@ -1,0 +1,69 @@
+version: 1
+mode_contract:
+  key: mode
+  allowed:
+    - saga
+    - civ
+  default: saga
+  normalization:
+    lore: saga
+    crystal: saga
+
+agent_flow:
+  - step: refresh_armory
+    required: true
+    command: git -C <armoryRepoRoot> pull --ff-only
+    on_failure: stop_and_report
+  - step: scout
+    required: true
+    output: shortlist
+  - step: approval
+    required: true
+    rule: no_install_without_explicit_human_approval
+  - step: equip
+    required: true
+    dependency_resolution: required
+  - step: report
+    required: true
+    tone: mode_aware
+
+seven_shadow:
+  expected_path: governance/seven-shadow-system
+  required_if_present: true
+  on_missing: report_and_continue
+  domains:
+    - security
+    - accessibility
+    - testing
+    - execution
+    - scales
+    - value
+    - aesthetics
+
+test_policy:
+  real_behavior_only: true
+  prohibit_fabricated_helpers: true
+  require_existing_executable_functions: true
+
+report_templates:
+  civ:
+    status: plain
+    style_rule: no_lore_phrasing
+  saga:
+    status: themed
+    style_rule: final_fantasy_voice
+
+telemetry:
+  enabled_by_default: true
+  opt_out:
+    - installer_flag: -NoTelemetry
+    - env: ARMORY_TELEMETRY=off
+  payload_required:
+    - eventName
+    - installId
+    - sessionId
+    - source
+    - toolIds
+    - mode
+    - manifestRef
+    - timestamp
