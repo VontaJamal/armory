@@ -80,7 +80,9 @@ function Get-ReposFromAllowlist {
 
         Write-Host "Created starter repos file: $filePath" -ForegroundColor Yellow
         Write-Host "Add repo paths under repos[] and rerun Chronicle." -ForegroundColor Yellow
-        return @()
+        # Preserve an actual empty array object for callers; plain return @() can collapse to $null.
+        Write-Output -NoEnumerate @()
+        return
     }
 
     try {
