@@ -1,48 +1,67 @@
-﻿# ðŸ›¡ï¸ Protect
+# Protect (Scheduled Security Scan)
 
-**Scheduled security audit that runs automatically.**
+## What This Does
 
-Protect casts Scan on a schedule â€” checking your repos for leaked secrets, exposed environment files, and security drift. You don't have to remember to audit. It remembers for you.
+Runs security scan logic on a schedule-friendly path with quiet output and clear exit codes.
 
-## What It Does
+## Who This Is For
 
-- Runs the Scan weapon automatically on a schedule
-- Checks all repos for accidentally committed secrets
-- Verifies `.env` files aren't tracked in public repos
-- Alerts you immediately if anything is exposed
+- You need automated secret scanning.
+- You want cron/task integration with alerting when findings appear.
 
-## Setup (OpenClaw Cron)
+## Quick Start
 
-```json
-{
-  "name": "Protect â€” Security Audit",
-  "enabled": true,
-  "schedule": { "cron": "0 7 * * *" },
-  "sessionTarget": "isolated",
-  "payload": {
-    "kind": "agentTurn",
-    "message": "Run a security audit. Scan all git repos for leaked secrets (API keys, tokens, passwords). Check if any .env files are tracked in public repos. Check for exposed credentials in recent commits. Report findings.",
-    "deliver": true,
-    "channel": "telegram",
-    "to": "channel:YOUR_CHANNEL_ID"
-  }
-}
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\protect\protect.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\spells\protect\protect.ps1 -Verbose
 ```
 
-## Schedule
+## Common Tasks
 
-- `0 7 * * *` â€” Daily at 7 AM (catch overnight mistakes)
-- `0 7 * * 1` â€” Weekly Monday (lighter touch)
+```powershell
+# Scan specific directories
+powershell -ExecutionPolicy Bypass -File .\spells\protect\protect.ps1 -Dirs "D:\Code Repos,D:\Infra"
 
-## Pairs With
+# Alert via Telegram
+powershell -ExecutionPolicy Bypass -File .\spells\protect\protect.ps1 -Telegram
+```
 
-**Scan** (Weapon) â€” Scan is the manual audit. Protect is the automated version.
+## Flags
 
-## Why Both?
+| Flag | Default | Description |
+|---|---|---|
+| `-Dirs <a,b,c>` | configured defaults | Directories to scan |
+| `-Telegram` | off | Send findings summary to Telegram |
+| `-Verbose` | off | Print output even when no findings |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-Scan is for when you want to check RIGHT NOW. Protect is the safety net that catches what you forgot. Belt and suspenders. You want both.
+## Config
 
----
+Top config block contains scan dirs, ignore patterns, and Telegram defaults.
 
-*Prevention beats recovery. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+## Output And Exit Codes
 
+- `0`: clean scan.
+- `1`: findings detected or fatal failure.
+
+## Troubleshooting
+
+- Too many false positives: tune ignore patterns.
+- Scan too slow: narrow configured directories.
+
+## Automation Examples
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\protect\protect.ps1 -Dirs "D:\Code Repos"
+```
+
+## FAQ
+
+**How is this different from Scan?**
+Scan is manual and quick. Protect is automation-focused and quiet by default.
+
+## Migration Notes
+
+No rename for this tool.

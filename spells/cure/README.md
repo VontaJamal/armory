@@ -1,46 +1,67 @@
-﻿# ðŸ’š Cure
+# Cure (Backup Verification)
 
-**Automated weekly backup verification.**
+## What This Does
 
-Cure checks that your backups are actually working â€” not just running, but producing valid, recent archives. Because a backup you never tested is just a prayer.
+Checks whether backups are recent, non-empty, and restorable.
 
-## What It Checks
+## Who This Is For
 
-- Backup files exist in the expected location
-- Most recent backup is less than 48 hours old
-- Archive is not empty or corrupted (size check)
-- Rotation is working (old backups being cleaned up)
+- You need confidence that backups are usable.
+- You want scheduler-friendly health checks with strict exit codes.
 
-## Setup (OpenClaw Cron)
+## Quick Start
 
-```json
-{
-  "name": "Cure â€” Backup Verification",
-  "enabled": true,
-  "schedule": { "cron": "0 6 * * 0" },
-  "sessionTarget": "isolated",
-  "payload": {
-    "kind": "agentTurn",
-    "message": "Verify backups are working. Check that backup files exist, the most recent one is less than 48 hours old, file sizes are reasonable (not empty), and old backups are being rotated. Report any issues.",
-    "deliver": true,
-    "channel": "telegram",
-    "to": "channel:YOUR_CHANNEL_ID"
-  }
-}
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1
 ```
 
-## Schedule
+## Common Tasks
 
-Runs every Sunday at 6 AM by default. Adjust to your preference:
-- `0 6 * * 0` â€” Sunday 6 AM
-- `0 6 * * 1` â€” Monday 6 AM
-- `0 6 * * *` â€” Daily (if you're paranoid, and you should be)
+```powershell
+# Check custom backup directory
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1 -Dir "D:\Backups"
 
-## Pairs With
+# Alert via Telegram when stale/corrupt
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1 -Telegram
+```
 
-**backup** (Weapon) â€” backup creates the backups, Cure makes sure they're actually working.
+## Flags
 
----
+| Flag | Default | Description |
+|---|---|---|
+| `-Dir <path>` | `%USERPROFILE%\.openclaw\backups` | Backup directory override |
+| `-Telegram` | off | Send alert when backup is stale/corrupt |
+| `-MaxAgeHours <n>` | `24` | Staleness threshold |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-*Trust but verify. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+## Config
 
+Top config block contains Telegram defaults and expected backup pattern.
+
+## Output And Exit Codes
+
+- `0`: backup healthy.
+- `1`: missing/stale/corrupt backup or fatal runtime failure.
+
+## Troubleshooting
+
+- No backups found: verify path and backup file naming.
+- Integrity test fails: recreate backup and retest.
+
+## Automation Examples
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1 -Dir "D:\Backups"
+```
+
+## FAQ
+
+**Does Cure create backups?**
+No. Phoenix Down creates backups; Cure verifies them.
+
+## Migration Notes
+
+No rename for this tool.

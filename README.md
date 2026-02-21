@@ -1,102 +1,79 @@
-# The Armory ⚔️
+# The Armory
 
-Battle-tested terminal tools for developers. API key management, system diagnostics, encrypted backups, service monitoring, and more.
+Practical command-line tools for backups, security checks, service health, system diagnostics, and scheduled automation.
 
-Works with any terminal setup. Extra features for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI users, but everything here stands on its own.
+Themed names are kept for personality, but every tool below includes a plain-language purpose.
 
----
+## Pick The Right Tool
 
-## 🐉 Summons
+| You Need To... | Use This Tool | Why |
+|---|---|---|
+| Set up a command word like `faye` | [`awakening.ps1`](awakening.ps1) | One-time setup for command routing and PATH |
+| Save encrypted backups | [`weapons/phoenix-down/phoenix-down.ps1`](weapons/phoenix-down/phoenix-down.ps1) | Creates encrypted backup archives |
+| Bootstrap backup automation | [`weapons/phoenix-down/save-point.ps1`](weapons/phoenix-down/save-point.ps1) | Sets up recurring backup + restore command |
+| Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Detects stale/corrupt backups and returns clear exit codes |
+| Check services now | [`weapons/aegis/aegis.ps1`](weapons/aegis/aegis.ps1) | Service monitor with optional Telegram alerts |
+| Scan repos for leaked secrets | [`weapons/scan/scan.ps1`](weapons/scan/scan.ps1) | Fast manual security scan |
+| Run deeper secret scan | [`weapons/truesight/truesight.ps1`](weapons/truesight/truesight.ps1) | Broader and deeper security checks |
+| Schedule security scans | [`spells/protect/protect.ps1`](spells/protect/protect.ps1) | Quiet cron-friendly scanner |
+| Get a daily ops report | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Operations health summary (not secret scanning) |
+| Get a morning briefing | [`spells/regen/regen.ps1`](spells/regen/regen.ps1) | Weather + key daily status summary |
+| Spawn/recover OpenClaw setups | Summons in [`summons/`](summons) | Purpose-built setup and diagnostics commands |
+| Add optional sound cues | [`bard/bard.ps1`](bard/bard.ps1) | Start/success/fail cues across tools |
 
-Full systems deployed with one command.
+## Tools By Category
 
-| Summon | Flavor | What It Does |
-|--------|--------|-------------|
-| [**Bahamut**](summons/bahamut/) | *Megaflare* | Full empire deployment — every agent, every config, every channel, restored from one backup |
-| [**Ifrit**](summons/ifrit/) | *Hellfire* | Spawn a fully configured AI agent — workspace, personality, memory, config, ready for orders |
-| [**Odin**](summons/odin/) | *Zantetsuken* | One-slash system cleanup — zombie processes, stale sessions, bloated logs, all cut |
-| [**Ramuh**](summons/ramuh/) | *Judgment Bolt* | Full system diagnostic — network, services, API keys, disk space, all checked in seconds |
-| [**Shiva**](summons/shiva/) | *Diamond Dust* | Freeze your system state into a snapshot. Compare snapshots to see what changed |
+## Summons (full workflows)
 
-## ⚔️ Weapons
+- [`summons/bahamut/`](summons/bahamut/) - restore a full environment from encrypted backup.
+- [`summons/ifrit/`](summons/ifrit/) - create and register a new specialist agent.
+- [`summons/odin/`](summons/odin/) - run cleanup for stale logs/temp/session files.
+- [`summons/ramuh/`](summons/ramuh/) - run an all-in-one system diagnostic.
+- [`summons/shiva/`](summons/shiva/) - capture and compare machine snapshots.
 
-Standalone tools you wield yourself.
+## Weapons (manual tools)
 
-| Weapon | Flavor | What It Does |
-|--------|--------|-------------|
-| [**Masamune**](weapons/masamune/) | *The One Cut* | Vault and hot-swap AI provider API keys with one command |
-| [**Phoenix Down**](weapons/phoenix-down/) | *Rise Again* | Encrypted backup + 3-command restore for your entire setup |
-| [**Sentinel**](weapons/sentinel/) | *The Watch* | Service health monitoring with Telegram alerts |
-| [**Scan**](weapons/scan/) | *Know Thy Enemy* | Security audit — find leaked secrets across all your repos |
+- [`weapons/masamune/`](weapons/masamune/) - manage and swap provider API keys.
+- [`weapons/phoenix-down/`](weapons/phoenix-down/) - create encrypted backups and setup restore flows.
+- [`weapons/aegis/`](weapons/aegis/) - service health checks.
+- [`weapons/scan/`](weapons/scan/) - fast security scan.
+- [`weapons/truesight/`](weapons/truesight/) - deep security scan.
+- [`weapons/jutsu/`](weapons/jutsu/) - macOS zsh key-swap and gateway helper.
 
-## 🔮 Spells
+## Spells (scheduled automation)
 
-Automations that cast themselves on a schedule.
+- [`spells/libra/`](spells/libra/) - daily operations report.
+- [`spells/cure/`](spells/cure/) - backup verification.
+- [`spells/protect/`](spells/protect/) - scheduled security scan.
+- [`spells/regen/`](spells/regen/) - morning briefing.
 
-| Spell | Flavor | What It Does |
-|-------|--------|-------------|
-| [**Libra**](spells/libra/) | *Read the Field* | Daily system report — health, storage, GitHub activity, delivered to Telegram |
-| [**Cure**](spells/cure/) | *Trust but Verify* | Weekly check that your backups are actually working |
-| [**Protect**](spells/protect/) | *Shield Wall* | Scheduled security scan — catches leaked secrets automatically |
-| [**Regen**](spells/regen/) | *New Day* | Morning summary — weather, calendar, agent activity, today's priorities |
+## Audio Layer
 
-## 🧪 Items
+- [`bard/`](bard/) - optional sound effects and themes.
 
-Guides and reference docs that save you hours.
+## Quick Start (Windows PowerShell 5.1)
 
-| Item | Flavor | What You'll Learn |
-|------|--------|-----------------|
-| [**Teleport**](items/teleport/) | *Be in Two Places* | Run one agent across two machines — setup, sync, and common pitfalls |
-| [**Cron Scheduling**](items/cron-scheduling/) | *Time Magic* | Every scheduling gotcha that'll waste your time (so you don't have to) |
-| [**Telegram Setup**](items/telegram-setup/) | *Open Comms* | Chat IDs, channel routing, group config, bot permissions |
-| [**NSSM Services**](items/nssm-services/) | *Undying* | Register any process as a Windows service that survives reboots |
-| [**Agent Comms**](items/agent-comms/) | *Party Chat* | Set up multiple agents that communicate and coordinate |
+```powershell
+# 1) Pick your command word and install dispatcher
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1
 
----
+# 2) Create a backup
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1
 
-## How to Use
+# 3) Run a service health check
+powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1
 
-**Summons:** Run the script. It builds everything for you.
-
-**Weapons:** Copy the script, run it. Each one is self-contained with its own README.
-
-**Spells:** Copy the cron config into your OpenClaw setup. They run themselves after that.
-
-**Items:** Read the guide, follow the steps. Most things are solved in under 5 minutes.
-
-## Custom Command Word
-
-Instead of typing `armory swap`, `armory reload`, etc. — pick a short alias that feels like yours:
-
-```
-armory init
-
-  ⚔️  Armory Setup
-
-  Pick a command name. This is the word you'll type
-  to run any Armory tool from your terminal.
-
-  Examples: armory, ops, forge, faye, kit
-
-  Command name: faye
-
-  ✓ Alias created.
-
-  You can now run:
-    faye swap anthropic work    Swap an API key
-    faye reload                 Restart your gateway
-    faye list                   Show stored keys
-    faye help                   See all commands
+# 4) Run a security scan
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
 ```
 
-Don't like your name? Run `armory init` again anytime.
+## Compatibility Aliases (One Release)
+
+- `init.ps1` -> `awakening.ps1`
+- `weapons/sentinel/sentinel.ps1` -> `weapons/aegis/aegis.ps1`
+- `weapons/scan/deep-scan.ps1` -> `weapons/truesight/truesight.ps1`
+- `weapons/phoenix-down/setup-rebirth.ps1` -> `weapons/phoenix-down/save-point.ps1`
 
 ## Contributing
 
-Built something? Open a PR. Keep it practical, keep it tested, keep it documented.
-
-If you don't like the names, you don't gotta use it.
-
----
-
-*Arm your terminal.*
+Use [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md) for all tool README updates.

@@ -1,55 +1,52 @@
-﻿# ðŸ›¡ï¸ healthcheck
+# Sentinel (Legacy Alias For Aegis)
 
-**Automated service health monitoring with Telegram alerts.**
+## What This Does
 
-healthcheck watches your services so you don't have to. If something goes down, you know immediately.
+Compatibility wrapper documentation for teams still calling `sentinel.ps1`.
 
-## What It Does
+## Who This Is For
 
-- Checks Windows services (NSSM or native) via `sc query`
-- Sends Telegram alerts when a service is stopped or missing
-- Runs on a schedule (cron job, Task Scheduler, or OpenClaw cron)
-- Reports all-clear or lists exactly what's down
+- You have existing scripts or schedulers using Sentinel name.
 
-## Usage
+## Quick Start
 
 ```powershell
-# Check services and alert if anything is down
-.\healthcheck.ps1
+powershell -ExecutionPolicy Bypass -File .\weapons\sentinel\sentinel.ps1 -Help
 ```
 
-## Configuration
+## Common Tasks
 
-Edit the script to set your services and Telegram details:
+Use Aegis directly for new setups:
 
 ```powershell
-$services = @("CryptoPipeline", "OpenClawGateway", "YourService")
-$telegramToken = "your-bot-token"
-$chatId = "your-chat-id"
+powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1
 ```
 
-## Recommended Schedule
+## Flags
 
-Run every 15-30 minutes via OpenClaw cron:
+Sentinel forwards all flags to Aegis.
 
-```json
-{
-  "name": "healthcheck Health Check",
-  "enabled": true,
-  "schedule": { "cron": "*/30 * * * *" },
-  "payload": {
-    "kind": "agentTurn",
-    "message": "Run service health check"
-  }
-}
-```
+## Config
 
-## Requirements
+Use Aegis config in `weapons/aegis/aegis.ps1`.
 
-- Windows with services registered (NSSM or native)
-- Telegram bot token + chat ID for alerts
+## Output And Exit Codes
 
----
+Matches Aegis behavior.
 
-*Always watching. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+## Troubleshooting
 
+If wrapper cannot locate Aegis, pull latest repo and verify `weapons/aegis/aegis.ps1` exists.
+
+## Automation Examples
+
+Prefer migrating scheduler targets to Aegis path.
+
+## FAQ
+
+**Is Sentinel removed?**
+Not yet. It remains as a one-release alias.
+
+## Migration Notes
+
+- Primary tool is now Aegis.

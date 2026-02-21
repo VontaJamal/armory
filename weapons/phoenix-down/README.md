@@ -1,57 +1,74 @@
-﻿# ðŸ”¥ backup
+# Phoenix Down (Encrypted Backups)
 
-**Encrypted backup and one-command restore for your entire OpenClaw setup.**
+## What This Does
 
-Your system died? Use a backup. Three commands and you're back.
+Creates encrypted backup archives and provides companion setup for restore workflows.
 
-## What It Backs Up
+## Who This Is For
 
-- `openclaw.json` (your full config)
-- Secrets and credentials
-- All agent configs and workspaces
-- Scripts, cron jobs, LaunchAgents
-- Sync scripts, custom tools
-- Everything that makes your setup YOUR setup
+- You want reliable encrypted local backups.
+- You need quick recovery with predictable scripts.
 
-## How It Works
-
-```
-# First time â€” set your encryption password
-.\setup-rebirth.ps1
-
-# Runs automatically every 2 hours, keeps last 5 backups
-# Or run manually:
-.\backup.ps1
-```
-
-## Restore (3 Commands)
+## Quick Start
 
 ```powershell
-# 1. Decrypt
-7z x backup.7z.enc -p"your-password"
-
-# 2. Extract
-7z x backup.7z -o"C:\Users\you\.openclaw"
-
-# 3. Run restore
-.\RESTORE.ps1
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1 -List
 ```
 
-That's it. Full setup restored â€” configs, secrets, agents, everything.
+## Common Tasks
 
-## Security
+```powershell
+# Verify latest backup integrity
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1 -Verify
 
-- AES-256 encryption via 7-Zip
-- Password never stored in the script
-- Backups rotate automatically (keeps last 5)
-- Exclude from version control
+# Setup restore command and scheduler
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\save-point.ps1 -Name "faye"
+```
 
-## Requirements
+## Flags
 
-- Windows with 7-Zip installed (`choco install 7zip`)
-- PowerShell 5.1+
+| Flag | Default | Description |
+|---|---|---|
+| `-BackupSource <path>` | `%USERPROFILE%\.openclaw` | Source directory to back up |
+| `-BackupDest <path>` | `%USERPROFILE%\.openclaw\backups` | Backup output directory |
+| `-PasswordFile <path>` | `%USERPROFILE%\.openclaw\secrets\backup-password.txt` | Password file |
+| `-MaxBackups <n>` | `10` | Rotation count |
+| `-List` | off | List existing backups |
+| `-Verify` | off | Validate latest backup integrity |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
----
+## Config
 
-*Never lose your setup again. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+No separate config file required. Uses flags and environment defaults.
 
+## Output And Exit Codes
+
+- `0`: backup/list/verify succeeded.
+- `1`: backup, verify, or dependency failure.
+
+## Troubleshooting
+
+- 7-Zip missing: install `choco install 7zip`.
+- Password file missing: create file and rerun.
+- Verify failed: test with `7z t <file>` and inspect archive source.
+
+## Automation Examples
+
+```powershell
+# Daily backup task
+powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1 -BackupSource "D:\Work" -BackupDest "D:\Backups"
+```
+
+## FAQ
+
+**Can I back up non-OpenClaw folders?**
+Yes, use `-BackupSource` and `-BackupDest`.
+
+## Migration Notes
+
+- New bootstrap name: `save-point.ps1`
+- Legacy alias retained: `setup-rebirth.ps1` (one release)

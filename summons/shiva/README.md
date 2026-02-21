@@ -1,90 +1,67 @@
-# ❄️ Shiva
+# Shiva (Snapshot And Diff)
 
-***Diamond Dust***
+## What This Does
 
-**Freeze your system state into a snapshot. Compare snapshots to see what changed.**
+Captures a machine state snapshot and compares snapshots to show what changed over time.
 
-Something broke between yesterday and today? Take snapshots, diff them, find the ghost.
+## Who This Is For
 
-## What It Captures
+- You need before/after visibility during incident response.
+- You want quick diffs for services, ports, and resource changes.
 
-- **Services** — name, status, start type for all registered services
-- **Processes** — running process names and memory usage
-- **Ports** — all listening TCP ports and their owning processes
-- **Disk** — free space, total space, percent free per drive
-- **Environment** — variable names (not values) that are set
-- **Network** — active interfaces, IPs, gateway
-- **System** — hostname, OS version, uptime, last boot time
-
-## Works Anywhere
-
-**No OpenClaw required.** Shiva works on any Windows machine with PowerShell 5.1+. Pure system introspection.
-
-## Usage
+## Quick Start
 
 ```powershell
-# Take a snapshot (saved to ~/.shiva/snapshots/)
-.\shiva.ps1
-
-# Compare the last two snapshots
-.\shiva.ps1 --diff
-
-# Compare two specific snapshots
-.\shiva.ps1 --diff snapshot1.json snapshot2.json
-
-# List all snapshots
-.\shiva.ps1 --list
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1 --diff
 ```
 
-## Output
+## Common Tasks
 
-```
-  ❄️ Diamond Dust
+```powershell
+# List snapshots
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1 --list
 
-  Snapshot saved: ~/.shiva/snapshots/2026-02-21_00-30-00.json
-  Captured: 47 services, 112 processes, 23 ports, 3 drives
-```
-
-### Diff Output
-
-```
-  ❄️ Diamond Dust — Diff
-
-  Comparing: 2026-02-20_22-00-00 → 2026-02-21_00-30-00
-
-  SERVICES
-    + CryptoPipeline          STOPPED → RUNNING
-    - TradingDashboard        RUNNING → STOPPED
-
-  PORTS
-    + :8420                   now listening (node.exe)
-    - :3000                   no longer listening
-
-  DISK
-    C:  12.1 GB → 11.3 GB    (-0.8 GB)
-
-  PROCESSES
-    + 3 new: node, python, sshd
-    - 2 gone: chrome, explorer
+# Diff specific files
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1 --diff "C:\Users\you\.shiva\snapshots\a.json" "C:\Users\you\.shiva\snapshots\b.json"
 ```
 
-## Configuration
+## Flags
 
-No config needed. Shiva reads the system directly.
+| Flag | Default | Description |
+|---|---|---|
+| `--list` | off | List saved snapshots |
+| `--diff [a b]` | off | Compare last two snapshots or provided files |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-Snapshots stored at `~/.shiva/snapshots/` — clean them up when you want.
+## Config
 
-## Pairs With
+Snapshots are stored under `%USERPROFILE%\.shiva\snapshots`.
 
-- **Ramuh** (Summon) — Ramuh checks if things work. Shiva records what things look like.
-- **Odin** (Summon) — Diff to find bloat, then Odin cleans it.
-- **Sentinel** (Weapon) — Sentinel alerts on change. Shiva shows you the full before/after.
+## Output And Exit Codes
 
-## Requirements
+- `0`: Snapshot/diff completed.
+- `1`: Invalid diff request or fatal failure.
 
-- PowerShell 5.1+
-- No admin rights needed (some service details may be limited)
+## Troubleshooting
 
----
+- Need at least two snapshots for diff mode.
+- If JSON parse fails, delete corrupted snapshot and create a new one.
 
-*"Time stands still." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+## Automation Examples
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\summons\shiva\shiva.ps1
+```
+
+## FAQ
+
+**Does this modify services?**
+No. Shiva is read-only state capture and comparison.
+
+## Migration Notes
+
+No rename for this tool.

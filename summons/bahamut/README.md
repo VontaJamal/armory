@@ -1,93 +1,75 @@
-# 🐉 Bahamut
+# Bahamut (Full Environment Restore)
 
-***Megaflare***
+## What This Does
 
-**Full empire deployment. One command. Everything stands up.**
+Restores an OpenClaw-style environment from an encrypted backup archive, including workspace folders, config, and related setup artifacts.
 
-New machine? Fresh install? Disaster recovery? Summon Bahamut. Your entire multi-agent setup — every agent, every workspace, every config, every channel, every cron job — deployed from a single script.
+## Who This Is For
 
-Ifrit summons one agent. Bahamut summons the kingdom.
+- You are moving to a new machine.
+- You need disaster recovery after a crash.
+- You want to recover quickly from a known-good backup.
 
-## What It Deploys
-
-- **OpenClaw configuration** — full `openclaw.json` with all providers, models, and settings
-- **All agents** — each with their own workspace, SOUL.md, AGENTS.md, MEMORY.md, IDENTITY.md
-- **Agent-to-agent communication** — session keys, allow lists, relay protocols
-- **Telegram channels** — bot config, group routing, DM policies
-- **Cron jobs** — every scheduled automation restored
-- **Gateway service** — registered as NSSM service (Windows) or LaunchAgent (Mac)
-- **Sync scripts** — workspace sync between machines configured and running
-- **Secrets** — API keys restored from encrypted vault (requires your Phoenix Down backup)
-- **Custom CLI** — your command word and all weapons available from any terminal
-
-## Usage
+## Quick Start
 
 ```powershell
-# Full deployment from backup
-.\bahamut.ps1 -BackupPath "C:\path\to\phoenix-down-backup.7z" -Password "your-encryption-password"
-
-# Interactive mode
-.\bahamut.ps1
-
-  Summoning Bahamut...
-
-  Backup archive: C:\backups\openclaw-2026-02-20.7z
-  Encryption password: ********
-
-  [1/8] Extracting archive...           done
-  [2/8] Restoring openclaw.json...      done
-  [3/8] Restoring secrets vault...      done
-  [4/8] Deploying agent workspaces...   4 agents restored
-  [5/8] Registering gateway service...  done
-  [6/8] Configuring Telegram...         done
-  [7/8] Restoring cron jobs...          7 jobs registered
-  [8/8] Setting up sync scripts...      done
-
-  🐉 Megaflare.
-
-  Agents:    Faye, Cipher, Poly, Kai
-  Gateway:   RUNNING (port 18789)
-  Telegram:  connected
-  Cron jobs: 7 active
-  Sync:      Mac → Windows (60s interval)
-
-  Your empire is restored. Restart the gateway to go live.
+powershell -ExecutionPolicy Bypass -File .\summons\bahamut\bahamut.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\summons\bahamut\bahamut.ps1 -BackupPath "C:\Backups\openclaw-backup-2026-02-20.7z"
 ```
 
-## Prerequisites
+## Common Tasks
 
-- A **Phoenix Down** backup archive (encrypted .7z)
-- 7-Zip installed (`choco install 7zip` on Windows)
-- Node.js and OpenClaw installed
-- Telegram bot token (stored in your encrypted backup)
+```powershell
+# Interactive restore
+powershell -ExecutionPolicy Bypass -File .\summons\bahamut\bahamut.ps1
 
-## How It Works
+# Non-interactive restore
+powershell -ExecutionPolicy Bypass -File .\summons\bahamut\bahamut.ps1 -BackupPath "C:\Backups\latest.7z" -Password "example-password"
+```
 
-Bahamut is built on top of the other summons and weapons:
-1. Uses **Phoenix Down** to decrypt and extract your full backup
-2. Calls **Ifrit** for each agent that needs to be restored
-3. Runs **Sentinel** to verify all services are healthy after deployment
-4. Casts **Protect** to run an immediate security audit on the fresh deploy
+## Flags
 
-The summons chain together. That's the power of the Armory.
+| Flag | Default | Description |
+|---|---|---|
+| `-BackupPath <path>` | none | Path to encrypted backup archive |
+| `-Password <text>` | none | Archive password for non-interactive restore |
+| `-Sound` | off | Enable start/success/fail sound cues |
+| `-NoSound` | off | Explicitly disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-## When to Summon Bahamut
+## Config
 
-- New machine or fresh OS install
-- Migrating to a new server
-- Disaster recovery after a crash
-- Setting up a second deployment (home + office, etc.)
-- Onboarding someone else to your exact setup
+No config file is required. Script uses:
 
-## Pairs With
+- `C:\Program Files\7-Zip\7z.exe`
+- `%USERPROFILE%\.openclaw`
 
-- **Phoenix Down** (Weapon) — creates the backup that Bahamut restores from
-- **Ifrit** (Summon) — Bahamut calls Ifrit internally for each agent
-- **Sentinel** (Weapon) — post-deploy health verification
-- **Protect** (Spell) — post-deploy security audit
+## Output And Exit Codes
 
----
+- `0`: Restore completed or help printed.
+- `1`: Restore failed (archive missing, bad password, dependencies missing, or copy failure).
 
-*"The king of summons. The dragon god. When Bahamut answers, everything changes."*
+## Troubleshooting
 
-*Part of [The Armory](https://github.com/VontaJamal/armory)*
+- `7-Zip required`: install with `choco install 7zip`.
+- `Backup not found`: verify `-BackupPath` exists and is accessible.
+- `Wrong password`: rerun with correct `-Password` or use interactive mode.
+
+## Automation Examples
+
+```powershell
+# Example nightly verification after backup creation
+powershell -ExecutionPolicy Bypass -File .\summons\bahamut\bahamut.ps1 -BackupPath "C:\Backups\nightly.7z" -Password "***"
+```
+
+## FAQ
+
+**Does this restore every external dependency?**
+No. It restores local files and config; external installs (Node, OpenClaw, 7-Zip) must exist.
+
+**Can I run this without OpenClaw installed?**
+You can extract files, but service registration and runtime checks may be limited.
+
+## Migration Notes
+
+No rename for this tool.
