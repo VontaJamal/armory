@@ -547,38 +547,56 @@ function Invoke-ArmoryRefresh {
         }
     }
 
-    $stdoutPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stdout-" + [Guid]::NewGuid().ToString("N") + ".log")
-    $stderrPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stderr-" + [Guid]::NewGuid().ToString("N") + ".log")
-    $exitCode = 1
-    $output = ""
+    function Invoke-GitCapture {
+        param(
+            [string]$GitPath,
+            [string[]]$Args
+        )
 
-    try {
-        $proc = Start-Process `
-            -FilePath $git.Source `
-            -ArgumentList @("-C", $ArmoryRepoRoot, "pull", "--ff-only") `
-            -NoNewWindow `
-            -Wait `
-            -PassThru `
-            -RedirectStandardOutput $stdoutPath `
-            -RedirectStandardError $stderrPath
+        $stdoutPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stdout-" + [Guid]::NewGuid().ToString("N") + ".log")
+        $stderrPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stderr-" + [Guid]::NewGuid().ToString("N") + ".log")
 
-        $exitCode = $proc.ExitCode
+        try {
+            $proc = Start-Process `
+                -FilePath $GitPath `
+                -ArgumentList $Args `
+                -NoNewWindow `
+                -Wait `
+                -PassThru `
+                -RedirectStandardOutput $stdoutPath `
+                -RedirectStandardError $stderrPath
 
-        $stdout = ""
-        $stderr = ""
-        if (Test-Path $stdoutPath) {
-            $stdout = Get-Content -Path $stdoutPath -Raw -ErrorAction SilentlyContinue
+            $stdout = ""
+            $stderr = ""
+            if (Test-Path $stdoutPath) {
+                $stdout = Get-Content -Path $stdoutPath -Raw -ErrorAction SilentlyContinue
+            }
+            if (Test-Path $stderrPath) {
+                $stderr = Get-Content -Path $stderrPath -Raw -ErrorAction SilentlyContinue
+            }
+
+            return [PSCustomObject]@{
+                exitCode = $proc.ExitCode
+                output = (@($stdout, $stderr) -join "`n").Trim()
+            }
+        } finally {
+            Remove-Item -Path $stdoutPath -ErrorAction SilentlyContinue
+            Remove-Item -Path $stderrPath -ErrorAction SilentlyContinue
         }
-        if (Test-Path $stderrPath) {
-            $stderr = Get-Content -Path $stderrPath -Raw -ErrorAction SilentlyContinue
-        }
-
-        $output = @($stdout, $stderr) -join "`n"
-    } finally {
-        Remove-Item -Path $stdoutPath -ErrorAction SilentlyContinue
-        Remove-Item -Path $stderrPath -ErrorAction SilentlyContinue
     }
-    $ok = ($exitCode -eq 0)
+
+    $pullResult = Invoke-GitCapture -GitPath $git.Source -Args @("-C", $ArmoryRepoRoot, "pull", "--ff-only")
+    $ok = ($pullResult.exitCode -eq 0)
+    $output = $pullResult.output
+
+    if (-not $ok -and $output -match "You are not currently on a branch") {
+        $fetchResult = Invoke-GitCapture -GitPath $git.Source -Args @("-C", $ArmoryRepoRoot, "fetch", "--all", "--prune")
+        if ($fetchResult.exitCode -eq 0) {
+            $ok = $true
+            $commandText = "$commandText (detached-head fallback: git -C <armoryRepoRoot> fetch --all --prune)"
+            $output = @($pullResult.output, "[detached HEAD fallback succeeded]", $fetchResult.output) -join "`n"
+        }
+    }
 
     return [PSCustomObject]@{
         success = $ok
