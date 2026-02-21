@@ -1,0 +1,5 @@
+telegram_token = 123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+api_key = sk_test_key_that_should_trigger_detection_1234567890
+-----BEGIN PRIVATE KEY-----
+fixture-data
+-----END PRIVATE KEY-----

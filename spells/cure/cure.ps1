@@ -6,6 +6,8 @@
 param(
     [string]$Dir = "$env:USERPROFILE\.openclaw\backups",
     [int]$MaxAgeHours = 24,
+    [string]$SevenZipPath = "C:\Program Files\7-Zip\7z.exe",
+    [string]$PasswordFile = "$env:USERPROFILE\.openclaw\secrets\backup-password.txt",
     [switch]$Telegram,
     [switch]$Help,
     [switch]$Sound,
@@ -30,8 +32,8 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 $config = @{
     telegramBotToken = $env:TELEGRAM_BOT_TOKEN
     telegramChatId = $env:TELEGRAM_CHAT_ID
-    sevenZip = "C:\Program Files\7-Zip\7z.exe"
-    passwordFile = "$env:USERPROFILE\.openclaw\secrets\backup-password.txt"
+    sevenZip = $SevenZipPath
+    passwordFile = $PasswordFile
 }
 
 function Show-Help {
@@ -43,6 +45,7 @@ function Show-Help {
     Write-Host "    .\\cure.ps1"
     Write-Host "    .\\cure.ps1 -Dir D:\\Backups"
     Write-Host "    .\\cure.ps1 -Telegram"
+    Write-Host "    .\\cure.ps1 -SevenZipPath \"C:\\Program Files\\7-Zip\\7z.exe\" -PasswordFile \"$env:USERPROFILE\\.openclaw\\secrets\\backup-password.txt\""
     Write-Host ""
 }
 

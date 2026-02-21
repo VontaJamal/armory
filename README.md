@@ -1,24 +1,25 @@
 # The Armory
 
-Practical command-line tools for backups, security checks, service health, system diagnostics, and scheduled automation.
+Practical command-line tools for backups, security checks, service health, diagnostics, and scheduled automation.
 
-Themed names are kept for personality, but every tool below includes a plain-language purpose.
+Themed names are for personality. Instructions are plain-language first.
+
+[![Armory CI](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml/badge.svg)](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml)
 
 ## Pick The Right Tool
 
-| You Need To... | Use This Tool | Why |
+| You need to... | Use this tool | Why |
 |---|---|---|
 | Set up a command word like `faye` | [`awakening.ps1`](awakening.ps1) | One-time setup for command routing and PATH |
 | Save encrypted backups | [`weapons/phoenix-down/phoenix-down.ps1`](weapons/phoenix-down/phoenix-down.ps1) | Creates encrypted backup archives |
 | Bootstrap backup automation | [`weapons/phoenix-down/save-point.ps1`](weapons/phoenix-down/save-point.ps1) | Sets up recurring backup + restore command |
-| Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Detects stale/corrupt backups and returns clear exit codes |
-| Check services now | [`weapons/aegis/aegis.ps1`](weapons/aegis/aegis.ps1) | Service monitor with optional Telegram alerts |
+| Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Detects stale/corrupt backups and returns strict exit codes |
+| Check services now | [`weapons/aegis/aegis.ps1`](weapons/aegis/aegis.ps1) | Service monitor with optional alerts |
 | Scan repos for leaked secrets | [`weapons/scan/scan.ps1`](weapons/scan/scan.ps1) | Fast manual security scan |
-| Run deeper secret scan | [`weapons/truesight/truesight.ps1`](weapons/truesight/truesight.ps1) | Broader and deeper security checks |
+| Run deeper security scan | [`weapons/truesight/truesight.ps1`](weapons/truesight/truesight.ps1) | Broader and deeper security checks |
 | Schedule security scans | [`spells/protect/protect.ps1`](spells/protect/protect.ps1) | Quiet cron-friendly scanner |
-| Get a daily ops report | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Operations health summary (not secret scanning) |
+| Get daily ops intelligence | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Operations health summary (not secret scanning) |
 | Get a morning briefing | [`spells/regen/regen.ps1`](spells/regen/regen.ps1) | Weather + key daily status summary |
-| Spawn/recover OpenClaw setups | Summons in [`summons/`](summons) | Purpose-built setup and diagnostics commands |
 | Add optional sound cues | [`bard/bard.ps1`](bard/bard.ps1) | Start/success/fail cues across tools |
 
 ## Tools By Category
@@ -51,21 +52,61 @@ Themed names are kept for personality, but every tool below includes a plain-lan
 ## Audio Layer
 
 - [`bard/`](bard/) - optional sound effects and themes.
-
 ## Quick Start (Windows PowerShell 5.1)
 
 ```powershell
-# 1) Pick your command word and install dispatcher
+# Install command dispatcher
 powershell -ExecutionPolicy Bypass -File .\awakening.ps1
 
-# 2) Create a backup
-powershell -ExecutionPolicy Bypass -File .\weapons\phoenix-down\phoenix-down.ps1
+# Browse shop catalog
+powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1
 
-# 3) Run a service health check
-powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1
+# Run a backup check
+powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1
+```
 
-# 4) Run a security scan
-powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
+## Shopfront And Contribution Path
+
+This repository is the shopfront.
+
+1. Browse catalog docs: [`shop/SHOP.md`](shop/SHOP.md)
+2. Browse catalog data: [`shop/catalog.json`](shop/catalog.json)
+3. Add new entries: [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md)
+4. Scaffold a new tool: `powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1`
+
+Examples:
+
+```powershell
+# Table view
+powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1
+
+# JSON output for automation
+powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format json
+
+# Scaffold a weapon tool
+powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category weapon -Name "Aero Guard" -Description "Monitors service restarts"
+
+# Add an idea-only entry
+powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Name "Mognet" -Description "Unified notification relay for tool outputs" -FlavorLine "A reliable message network for operational updates."
+```
+
+## CI And Validation
+
+CI runs three required checks:
+
+1. `shop/catalog.json` validation (`scripts/validate_shop_catalog.py`)
+2. PowerShell help-smoke checks (`scripts/ci/help-smoke.ps1`)
+3. Fixture tests for `scan`, `truesight`, and `cure` (`scripts/ci/run-fixture-tests.ps1`)
+
+Local commands:
+
+```bash
+python3 scripts/validate_shop_catalog.py
+```
+
+```powershell
+pwsh -File .\scripts\ci\help-smoke.ps1
+pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
 ```
 
 ## Compatibility Aliases (One Release)
@@ -75,16 +116,18 @@ powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
 - `weapons/scan/deep-scan.ps1` -> `weapons/truesight/truesight.ps1`
 - `weapons/phoenix-down/setup-rebirth.ps1` -> `weapons/phoenix-down/save-point.ps1`
 
-## Armory Shopfront
+Deprecation lifecycle is documented in [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md) and tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
-The whole repository is the shopfront.
+## Tool Categories
 
-- Use [`shop/SHOP.md`](shop/SHOP.md) to browse the catalog.
-- Use [`shop/catalog.json`](shop/catalog.json) for machine-readable entries.
-- Use [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md) to add a full tool or an idea-only entry.
+- Summons: [`summons/`](summons/) - full workflows and orchestration commands.
+- Weapons: [`weapons/`](weapons/) - direct-use operational and security utilities.
+- Spells: [`spells/`](spells/) - scheduler-friendly recurring checks.
+- Items: [`items/`](items/) - practical reference guides.
+- Audio: [`bard/`](bard/) - optional sound themes.
 
-## Contributing
+## Contributor Docs
 
-Use [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full contribution flow.
-
-Use [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md) for all tool README updates.
+- Contribution workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- README contract for each tool: [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md)
+- Deprecation lifecycle policy: [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)

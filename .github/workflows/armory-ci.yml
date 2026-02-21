@@ -1,0 +1,58 @@
+name: Armory CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  catalog-validate:
+    name: Validate shop catalog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate catalog schema and paths
+        run: python3 scripts/validate_shop_catalog.py
+
+  powershell-smoke:
+    name: PowerShell help smoke
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run help smoke checks
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/help-smoke.ps1
+
+  fixture-tests:
+    name: Fixture tests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure 7-Zip is available
+        shell: pwsh
+        run: |
+          $candidatePaths = @(
+            'C:\Program Files\7-Zip\7z.exe',
+            'C:\Program Files (x86)\7-Zip\7z.exe'
+          )
+          $sevenZipPath = $candidatePaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if (-not $sevenZipPath) {
+            choco install 7zip -y --no-progress
+            $sevenZipPath = $candidatePaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+
+          if (-not $sevenZipPath) {
+            throw '7-Zip install failed or executable path not found.'
+          }
+
+          "SEVEN_ZIP_PATH=$sevenZipPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Run fixture tests
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/run-fixture-tests.ps1 -SevenZipPath "$env:SEVEN_ZIP_PATH"
