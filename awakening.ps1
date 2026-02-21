@@ -66,8 +66,8 @@ $cmdLines = @(
     "setlocal",
     "set \"ARMORY_ROOT=$repoRoot\"",
     "set \"ACTION=%~1\"",
-    "set \"CIVS_ON=1\"",
-    "for /f %%I in ('powershell -NoProfile -ExecutionPolicy Bypass -Command \"`$cfg=Join-Path `$env:USERPROFILE ''.armory\\config.json''; if (Test-Path `$cfg) { try { `$obj=Get-Content -Raw -Path `$cfg | ConvertFrom-Json; if (`$obj.PSObject.Properties.Name -contains ''civilianAliases'') { if ([bool]`$obj.civilianAliases) { ''1'' } else { ''0'' } } else { ''1'' } } catch { ''1'' } } else { ''1'' }\"') do set \"CIVS_ON=%%I\"",
+    "set \"CIVS_ON=0\"",
+    "for /f %%I in ('powershell -NoProfile -ExecutionPolicy Bypass -Command \"`$cfg=Join-Path `$env:USERPROFILE ''.armory\\config.json''; if (Test-Path `$cfg) { try { `$obj=Get-Content -Raw -Path `$cfg | ConvertFrom-Json; `$mode=''saga''; if (`$obj.PSObject.Properties.Name -contains ''mode'') { `$raw=[string]`$obj.mode; if (`$raw -eq ''civ'') { `$mode=''civ'' } elseif (`$raw -in @(''saga'',''lore'',''crystal'')) { `$mode=''saga'' } } elseif (`$obj.PSObject.Properties.Name -contains ''civilianAliases'') { if ([bool]`$obj.civilianAliases) { `$mode=''civ'' } }; if (`$mode -eq ''civ'') { ''1'' } else { ''0'' } } catch { ''0'' } } else { ''0'' }\"') do set \"CIVS_ON=%%I\"",
     "if \"%ACTION%\"==\"\" goto :help",
     "shift",
     "if /I \"%ACTION%\"==\"help\" goto :help",
@@ -138,7 +138,7 @@ $cmdLines = @(
     "if /I \"%CIVS_ON%\"==\"1\" goto :%CIV_TARGET%",
     "goto :civsDisabled",
     ":civsDisabled",
-    "echo Civilian aliases are OFF. Run %~n0 civs on to enable them.",
+    "echo Civilian Mode aliases are OFF because Crystal Saga Mode is active. Run %~n0 civs on to switch.",
     "exit /b 1",
     ":swap",
     "powershell -ExecutionPolicy Bypass -File \"%ARMORY_ROOT%\\weapons\\masamune\\masamune.ps1\" %*",
@@ -270,22 +270,34 @@ if (-not (Test-Path $armoryDir)) {
 }
 
 $configPath = Join-Path $armoryDir "config.json"
-$civilianAliases = $true
+$modeValue = "saga"
 if (Test-Path $configPath) {
     try {
         $existingConfig = Get-Content -Path $configPath -Raw | ConvertFrom-Json
-        if ($existingConfig.PSObject.Properties.Name -contains "civilianAliases") {
-            $civilianAliases = [bool]$existingConfig.civilianAliases
+        if ($existingConfig.PSObject.Properties.Name -contains "mode") {
+            $rawMode = [string]$existingConfig.mode
+            if ($rawMode -eq "civ") {
+                $modeValue = "civ"
+            } elseif ($rawMode -in @("saga", "lore", "crystal")) {
+                $modeValue = "saga"
+            }
+        } elseif ($existingConfig.PSObject.Properties.Name -contains "civilianAliases") {
+            if ([bool]$existingConfig.civilianAliases) {
+                $modeValue = "civ"
+            } else {
+                $modeValue = "saga"
+            }
         }
     } catch {
-        $civilianAliases = $true
+        $modeValue = "saga"
     }
 }
 $config = [ordered]@{
     commandWord = $CommandWord
     installDir = $InstallDir
     repoRoot = $repoRoot
-    civilianAliases = $civilianAliases
+    mode = $modeValue
+    civilianAliases = ($modeValue -eq "civ")
 }
 $config | ConvertTo-Json -Depth 5 | Set-Content -Path $configPath -Encoding UTF8
 
