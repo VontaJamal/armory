@@ -550,7 +550,7 @@ function Invoke-ArmoryRefresh {
     function Invoke-GitCapture {
         param(
             [string]$GitPath,
-            [string[]]$Args
+            [string[]]$GitArgs
         )
 
         $stdoutPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stdout-" + [Guid]::NewGuid().ToString("N") + ".log")
@@ -559,7 +559,7 @@ function Invoke-ArmoryRefresh {
         try {
             $proc = Start-Process `
                 -FilePath $GitPath `
-                -ArgumentList $Args `
+                -ArgumentList $GitArgs `
                 -NoNewWindow `
                 -Wait `
                 -PassThru `
@@ -585,12 +585,12 @@ function Invoke-ArmoryRefresh {
         }
     }
 
-    $pullResult = Invoke-GitCapture -GitPath $git.Source -Args @("-C", $ArmoryRepoRoot, "pull", "--ff-only")
+    $pullResult = Invoke-GitCapture -GitPath $git.Source -GitArgs @("-C", $ArmoryRepoRoot, "pull", "--ff-only")
     $ok = ($pullResult.exitCode -eq 0)
     $output = $pullResult.output
 
     if (-not $ok -and $output -match "You are not currently on a branch") {
-        $fetchResult = Invoke-GitCapture -GitPath $git.Source -Args @("-C", $ArmoryRepoRoot, "fetch", "--all", "--prune")
+        $fetchResult = Invoke-GitCapture -GitPath $git.Source -GitArgs @("-C", $ArmoryRepoRoot, "fetch", "--all", "--prune")
         if ($fetchResult.exitCode -eq 0) {
             $ok = $true
             $commandText = "$commandText (detached-head fallback: git -C <armoryRepoRoot> fetch --all --prune)"
