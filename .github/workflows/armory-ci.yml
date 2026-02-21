@@ -5,6 +5,16 @@ on:
   pull_request:
 
 jobs:
+  docs-validate:
+    name: docs-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate README selector hub and companion parity
+        run: python3 scripts/ci/validate_readmes.py
+
   catalog-validate:
     name: catalog-validate
     runs-on: ubuntu-latest
