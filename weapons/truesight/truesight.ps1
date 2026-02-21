@@ -13,6 +13,22 @@ param(
 
 $ErrorActionPreference = "Continue"
 
+# Some runners invoke scripts through wrappers that can leave named args in $args.
+# Backfill RepoPath from raw args when it was not bound through the param block.
+if (-not $PSBoundParameters.ContainsKey("RepoPath") -and $args.Count -gt 0) {
+    for ($i = 0; $i -lt $args.Count; $i++) {
+        $token = [string]$args[$i]
+        if ($token -ieq "-RepoPath" -and ($i + 1) -lt $args.Count) {
+            $RepoPath = [string]$args[$i + 1]
+            break
+        }
+        if ($token -like "-RepoPath:*") {
+            $RepoPath = $token.Substring(10)
+            break
+        }
+    }
+}
+
 $hookCandidates = @(
     (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
     (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
