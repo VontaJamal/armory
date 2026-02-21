@@ -45,6 +45,16 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/check_remote_url.ps1
 
+  seven-shadow-trust-guard:
+    name: seven-shadow-trust-guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate trust store placeholders in bundle mode
+        run: python3 scripts/ci/validate_trust_store.py
+
   powershell-smoke:
     name: powershell-smoke
     runs-on: windows-latest
