@@ -1,53 +1,53 @@
-﻿# The Armory âš”ï¸
+# The Armory ⚔️
 
 Battle-tested tools and guides for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI setups.
 
-Everything here was built solving real problems in production. No theory. No tutorials. Just tools that work.
+Everything here was built solving real problems in production. No theory. No tutorials. Just weapons.
 
 ---
 
-## ðŸ‰ Summons
+## 🐉 Summons
 
 Full systems deployed with one command.
 
-| Name | What It Does |
-|------|-------------|
-| [**spawn**](summons/spawn/) | Create a fully configured AI agent â€” workspace, personality, memory, config, ready to go |
-| [**cleanup**](summons/cleanup/) | One-command system cleanup â€” zombie processes, stale sessions, bloated logs, temp files |
+| Summon | Flavor | What It Does |
+|--------|--------|-------------|
+| [**Ifrit**](summons/ifrit/) | *Hellfire* | Spawn a fully configured AI agent — workspace, personality, memory, config, ready for orders |
+| [**Odin**](summons/odin/) | *Zantetsuken* | One-slash system cleanup — zombie processes, stale sessions, bloated logs, all cut |
 
-## âš”ï¸ Weapons
+## ⚔️ Weapons
 
-Standalone tools you run yourself.
+Standalone tools you wield yourself.
 
-| Name | What It Does |
-|------|-------------|
-| [**swap**](weapons/swap/) | Vault and hot-swap AI provider API keys with one command |
-| [**backup**](weapons/backup/) | Encrypted backup + 3-command restore for your entire setup |
-| [**healthcheck**](weapons/healthcheck/) | Service health monitoring with Telegram alerts |
-| [**scan**](weapons/scan/) | Security audit â€” find leaked secrets across all your repos |
+| Weapon | Flavor | What It Does |
+|--------|--------|-------------|
+| [**Masamune**](weapons/masamune/) | *The One Cut* | Vault and hot-swap AI provider API keys with one command |
+| [**Phoenix Down**](weapons/phoenix-down/) | *Rise Again* | Encrypted backup + 3-command restore for your entire setup |
+| [**Sentinel**](weapons/sentinel/) | *The Watch* | Service health monitoring with Telegram alerts |
+| [**Scan**](weapons/scan/) | *Know Thy Enemy* | Security audit — find leaked secrets across all your repos |
 
-## ðŸ”® Spells
+## 🔮 Spells
 
-Automations that run themselves on a schedule.
+Automations that cast themselves on a schedule.
 
-| Name | What It Does |
-|------|-------------|
-| [**intel**](spells/intel/) | Daily system report â€” health, storage, GitHub activity, delivered to Telegram |
-| [**verify-backup**](spells/verify-backup/) | Weekly check that your backups are actually working |
-| [**auto-audit**](spells/auto-audit/) | Scheduled security scan â€” catches leaked secrets automatically |
-| [**briefing**](spells/briefing/) | Morning summary â€” weather, calendar, agent activity, today's priorities |
+| Spell | Flavor | What It Does |
+|-------|--------|-------------|
+| [**Libra**](spells/libra/) | *Read the Field* | Daily system report — health, storage, GitHub activity, delivered to Telegram |
+| [**Cure**](spells/cure/) | *Trust but Verify* | Weekly check that your backups are actually working |
+| [**Protect**](spells/protect/) | *Shield Wall* | Scheduled security scan — catches leaked secrets automatically |
+| [**Regen**](spells/regen/) | *New Day* | Morning summary — weather, calendar, agent activity, today's priorities |
 
-## ðŸ§ª Items
+## 🧪 Items
 
 Guides and reference docs that save you hours.
 
-| Name | What You'll Learn |
-|------|-----------------|
-| [**multi-machine**](items/multi-machine/) | Run one agent across two machines â€” setup, sync, and common pitfalls |
-| [**cron-scheduling**](items/cron-scheduling/) | Every scheduling gotcha that'll waste your time (so you don't have to) |
-| [**telegram-setup**](items/telegram-setup/) | Chat IDs, channel routing, group config, bot permissions |
-| [**nssm-services**](items/nssm-services/) | Register any process as a Windows service that survives reboots |
-| [**multi-agent**](items/multi-agent/) | Set up multiple agents that communicate and coordinate |
+| Item | Flavor | What You'll Learn |
+|------|--------|-----------------|
+| [**Teleport**](items/teleport/) | *Be in Two Places* | Run one agent across two machines — setup, sync, and common pitfalls |
+| [**Cron Scheduling**](items/cron-scheduling/) | *Time Magic* | Every scheduling gotcha that'll waste your time (so you don't have to) |
+| [**Telegram Setup**](items/telegram-setup/) | *Open Comms* | Chat IDs, channel routing, group config, bot permissions |
+| [**NSSM Services**](items/nssm-services/) | *Undying* | Register any process as a Windows service that survives reboots |
+| [**Agent Comms**](items/agent-comms/) | *Party Chat* | Set up multiple agents that communicate and coordinate |
 
 ---
 
@@ -55,7 +55,7 @@ Guides and reference docs that save you hours.
 
 **Summons:** Run the script. It builds everything for you.
 
-**Weapons:** Copy the script, run it. Each one is self-contained.
+**Weapons:** Copy the script, run it. Each one is self-contained with its own README.
 
 **Spells:** Copy the cron config into your OpenClaw setup. They run themselves after that.
 
@@ -63,22 +63,23 @@ Guides and reference docs that save you hours.
 
 ## Custom Command Word
 
-Name your CLI anything you want during setup:
+Name your CLI anything during setup:
 
 ```
 armory init
 
   What's your command word?
-  > shadow
+  > faye
 
-  Done. "shadow swap", "shadow scan" are now live.
+  Done. Your weapons respond to "faye" now.
 ```
 
 ## Contributing
 
-Built something useful? Open a PR. Keep it practical, keep it tested, keep it documented.
+Built something? Open a PR. Keep it practical, keep it tested, keep it documented.
+
+If you don't like the names, you don't gotta use it.
 
 ---
 
 *Arm your terminal.*
-
