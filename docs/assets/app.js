@@ -184,8 +184,8 @@ function renderCart() {
   el.checkoutBtn.disabled = !(loadout.length > 0 && state.approved);
 }
 
-function psSingleQuote(value) {
-  return String(value).replace(/'/g, "''");
+function shSingleQuote(value) {
+  return String(value).replace(/'/g, `'\"'\"'`);
 }
 
 function createInstallerScript(loadout) {
@@ -209,118 +209,163 @@ function createInstallerScript(loadout) {
     }
   }
 
-  const bundlesJson = psSingleQuote(JSON.stringify(bundles));
-  const toolIdsJson = psSingleQuote(JSON.stringify(loadout.map((x) => x.id)));
+  const bundlesJson = shSingleQuote(JSON.stringify(bundles));
+  const toolIdsJson = shSingleQuote(JSON.stringify(loadout.map((x) => x.id)));
 
-  return `# Armory one-shot installer
+  return `#!/usr/bin/env bash
+# Armory one-shot installer
 # Generated from manifest ${generatedAt}
 
-param(
-  [ValidateSet('saga','civ')]
-  [string]$Mode,
-  [switch]$Civ,
-  [switch]$Saga,
-  [switch]$NoTelemetry,
-  [string]$InstallRoot = (Join-Path $PWD 'armory-loadout')
+set -euo pipefail
+
+MODE=""
+NO_TELEMETRY=0
+INSTALL_ROOT="${shSingleQuote("$(pwd)/armory-loadout")}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --mode)
+      MODE="${2:-}"
+      shift
+      ;;
+    --civ)
+      MODE="civ"
+      ;;
+    --saga)
+      MODE="saga"
+      ;;
+    --no-telemetry)
+      NO_TELEMETRY=1
+      ;;
+    --install-root)
+      INSTALL_ROOT="${2:-}"
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+resolve_mode() {
+  if [[ -n "$MODE" ]]; then
+    echo "$MODE"
+    return
+  fi
+  if [[ -f "$HOME/.armory/config.json" ]]; then
+    mode_from_cfg="$(python3 - "$HOME/.armory/config.json" <<'PY'
+import json,sys
+path=sys.argv[1]
+try:
+    obj=json.load(open(path))
+except Exception:
+    print("")
+    raise SystemExit(0)
+raw=str(obj.get("mode","")).strip().lower()
+if raw=="civ":
+    print("civ")
+elif raw in {"saga","lore","crystal"}:
+    print("saga")
+elif obj.get("civilianAliases") is True:
+    print("civ")
+else:
+    print("")
+PY
+)"
+    if [[ -n "$mode_from_cfg" ]]; then
+      echo "$mode_from_cfg"
+      return
+    fi
+  fi
+  if [[ "${ARMORY_MODE:-}" == "civ" || "${SOVEREIGN_MODE:-}" == "civ" ]]; then
+    echo "civ"
+  else
+    echo "${shSingleQuote(defaultMode)}"
+  fi
+}
+
+RESOLVED_MODE="$(resolve_mode)"
+BUNDLES_JSON='${bundlesJson}'
+TOOL_IDS_JSON='${toolIdsJson}'
+TELEMETRY_ENDPOINT='${shSingleQuote(telemetryEndpoint)}'
+MANIFEST_REF='${shSingleQuote(ref)}'
+
+python3 - "$INSTALL_ROOT" "$BUNDLES_JSON" <<'PY'
+import hashlib, json, os, pathlib, sys, urllib.request
+
+install_root = pathlib.Path(sys.argv[1]).expanduser().resolve()
+bundles = json.loads(sys.argv[2])
+install_root.mkdir(parents=True, exist_ok=True)
+
+for bundle in bundles:
+    dest = install_root / bundle["path"]
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with urllib.request.urlopen(bundle["url"]) as resp:
+        data = resp.read()
+    dest.write_bytes(data)
+    sha = (bundle.get("sha256") or "").strip()
+    if sha:
+        actual = hashlib.sha256(data).hexdigest().lower()
+        if actual != sha.lower():
+            raise SystemExit(f"Hash mismatch for {bundle['path']}")
+PY
+
+if [[ "$NO_TELEMETRY" -eq 0 && "${ARMORY_TELEMETRY:-on}" != "off" && -n "$TELEMETRY_ENDPOINT" ]]; then
+  python3 - "$TELEMETRY_ENDPOINT" "$TOOL_IDS_JSON" "$RESOLVED_MODE" "$MANIFEST_REF" <<'PY'
+import json, pathlib, sys, uuid, urllib.request
+from datetime import datetime, timezone
+
+endpoint, tool_ids_json, mode, manifest_ref = sys.argv[1:5]
+home = pathlib.Path.home()
+install_id_file = home / ".armory" / "install-id.txt"
+install_id_file.parent.mkdir(parents=True, exist_ok=True)
+if install_id_file.exists():
+    install_id = install_id_file.read_text(encoding="utf-8").strip()
+else:
+    install_id = str(uuid.uuid4())
+    install_id_file.write_text(install_id + "\\n", encoding="utf-8")
+
+payload = {
+    "eventName": "install_completed",
+    "installId": install_id,
+    "sessionId": str(uuid.uuid4()),
+    "source": "installer",
+    "toolIds": json.loads(tool_ids_json),
+    "mode": mode,
+    "manifestRef": manifest_ref,
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+}
+
+req = urllib.request.Request(
+    endpoint.rstrip("/") + "/v1/events",
+    data=json.dumps(payload).encode("utf-8"),
+    headers={"Content-Type": "application/json"},
+    method="POST",
 )
+try:
+    urllib.request.urlopen(req, timeout=5).read()
+except Exception:
+    pass
+PY
+fi
 
-$ErrorActionPreference = 'Stop'
-
-function Resolve-Mode {
-  if ($Civ) { return 'civ' }
-  if ($Saga) { return 'saga' }
-  if ($Mode) { return $Mode }
-
-  $cfg = Join-Path $env:USERPROFILE '.armory\\config.json'
-  if (Test-Path $cfg) {
-    try {
-      $obj = Get-Content -Path $cfg -Raw | ConvertFrom-Json
-      if ($obj.PSObject.Properties.Name -contains 'mode') {
-        $raw = [string]$obj.mode
-        if ($raw -eq 'civ') { return 'civ' }
-        if ($raw -in @('saga','lore','crystal')) { return 'saga' }
-      }
-      if ($obj.PSObject.Properties.Name -contains 'civilianAliases') {
-        if ([bool]$obj.civilianAliases) { return 'civ' }
-      }
-    } catch {}
-  }
-
-  $repoCfg = Join-Path $PWD '.sovereign.json'
-  if (Test-Path $repoCfg) {
-    try {
-      $obj = Get-Content -Path $repoCfg -Raw | ConvertFrom-Json
-      if ($obj.PSObject.Properties.Name -contains 'mode') {
-        $raw = [string]$obj.mode
-        if ($raw -eq 'civ') { return 'civ' }
-        if ($raw -in @('saga','lore','crystal')) { return 'saga' }
-      }
-    } catch {}
-  }
-
-  if ($env:ARMORY_MODE -eq 'civ' -or $env:SOVEREIGN_MODE -eq 'civ') { return 'civ' }
-  return '${psSingleQuote(defaultMode)}'
-}
-
-function File-Sha256([string]$Path) {
-  return (Get-FileHash -Path $Path -Algorithm SHA256).Hash.ToLowerInvariant()
-}
-
-function Emit-Telemetry([string]$EventName, [string[]]$ToolIds, [string]$ResolvedMode) {
-  if ($NoTelemetry) { return }
-  if ($env:ARMORY_TELEMETRY -eq 'off') { return }
-  $endpoint = '${psSingleQuote(telemetryEndpoint)}'
-  if (-not $endpoint) { return }
-
-  $installIdFile = Join-Path $env:USERPROFILE '.armory\\install-id.txt'
-  $installId = if (Test-Path $installIdFile) { Get-Content -Path $installIdFile -Raw } else { [guid]::NewGuid().ToString() }
-  if (-not (Test-Path $installIdFile)) {
-    New-Item -ItemType Directory -Path (Split-Path $installIdFile -Parent) -Force | Out-Null
-    Set-Content -Path $installIdFile -Value $installId -Encoding UTF8
-  }
-
-  $payload = @{
-    eventName = $EventName
-    installId = $installId.Trim()
-    sessionId = [guid]::NewGuid().ToString()
-    source = 'installer'
-    toolIds = $ToolIds
-    mode = $ResolvedMode
-    manifestRef = '${psSingleQuote(ref)}'
-    timestamp = (Get-Date).ToString('o')
-  } | ConvertTo-Json -Depth 8
-
-  try {
-    Invoke-RestMethod -Uri ($endpoint.TrimEnd('/') + '/v1/events') -Method Post -ContentType 'application/json' -Body $payload | Out-Null
-  } catch {}
-}
-
-$resolvedMode = Resolve-Mode
-$bundles = '${bundlesJson}' | ConvertFrom-Json
-$toolIds = '${toolIdsJson}' | ConvertFrom-Json
-
-foreach ($bundle in $bundles) {
-  $dest = Join-Path $InstallRoot $bundle.path
-  New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
-  Invoke-WebRequest -Uri $bundle.url -OutFile $dest -UseBasicParsing
-
-  if ($bundle.sha256) {
-    $actual = File-Sha256 -Path $dest
-    if ($actual -ne [string]$bundle.sha256) {
-      throw "Hash mismatch for $($bundle.path)"
-    }
-  }
-}
-
-Emit-Telemetry -EventName 'install_completed' -ToolIds $toolIds -ResolvedMode $resolvedMode
-
-if ($resolvedMode -eq 'civ') {
-  Write-Host 'Install complete. Tooling is ready.' -ForegroundColor Green
-  Write-Host ("Installed: {0}" -f (($toolIds | Sort-Object) -join ', ')) -ForegroundColor Gray
-} else {
-  Write-Host 'Loadout equipped. The party is battle-ready.' -ForegroundColor Green
-  Write-Host ("Equipped materia: {0}" -f (($toolIds | Sort-Object) -join ', ')) -ForegroundColor Gray
-}
+if [[ "$RESOLVED_MODE" == "civ" ]]; then
+  echo "Install complete. Tooling is ready."
+  echo "Installed: $(python3 - <<'PY'
+import json
+print(", ".join(sorted(json.loads('${toolIdsJson}'))))
+PY
+)"
+else
+  echo "Loadout equipped. The party is battle-ready."
+  echo "Equipped materia: $(python3 - <<'PY'
+import json
+print(", ".join(sorted(json.loads('${toolIdsJson}'))))
+PY
+)"
+fi
 `;
 }
 
@@ -428,7 +473,7 @@ function bindEvents() {
   el.checkoutBtn.addEventListener("click", async () => {
     const loadout = resolveLoadout();
     const script = createInstallerScript(loadout);
-    downloadTextFile("armory-loadout-installer.ps1", script);
+    downloadTextFile("armory-loadout-installer.sh", script);
     await emitTelemetry("installer_generated", loadout.map((x) => x.id));
   });
 }

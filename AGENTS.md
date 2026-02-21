@@ -1,9 +1,14 @@
-# Armory Agent Contract
+# Armory Agent Contract (Mac Runtime)
 
 ## Mission
 
 Help the operator solve repository problems by scouting Armory tools, recommending a loadout,
 requesting approval, equipping safely, and reporting results in the active mode tone.
+
+## Onboarding Lanes (Mac)
+
+1. Civilian lane: `./setup.sh` (or `./setup.sh --mode civ --command-word armory`)
+2. Crystal Saga lane: `./awakening.sh` (or `./setup.sh --mode saga --command-word crystal`)
 
 ## Required Sequence
 
@@ -17,14 +22,14 @@ requesting approval, equipping safely, and reporting results in the active mode 
 
 Primary automation route:
 
-- `<commandWord> quartermaster scout -Task "<task>"`
-- `<commandWord> quartermaster plan -Task "<task>"`
-- `<commandWord> quartermaster equip -FromLastPlan -Approve`
-- `<commandWord> quartermaster report -FromLastPlan`
+- `<commandWord> quartermaster scout --task "<task>"`
+- `<commandWord> quartermaster plan --task "<task>"`
+- `<commandWord> quartermaster equip --from-last-plan --approve`
+- `<commandWord> quartermaster report --from-last-plan`
 
 Armory path discovery order for quartermaster:
 
-1. `-ArmoryRoot`
+1. `--armory-root`
 2. `~/.armory/config.json` (`repoRoot`)
 3. `ARMORY_REPO_ROOT`
 4. common paths (`./armory`, `../armory`, `~/armory`, `~/Documents/Code Repos/armory`)

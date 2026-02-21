@@ -14,25 +14,31 @@ Quartermaster runs the required flow:
 
 ## Commands
 
-```powershell
+```bash
+# Via installed command shim (recommended from any repo)
+armory quartermaster scout --task "release readiness"
+armory quartermaster plan --task "secret scan and repo status" --top 3
+armory quartermaster equip --from-last-plan --approve
+armory quartermaster report --from-last-plan
+
 # Scout
-powershell -ExecutionPolicy Bypass -File .\items\quartermaster\quartermaster.ps1 scout -Task "release readiness"
+bash ./items/quartermaster/quartermaster.sh scout --task "release readiness"
 
 # Build cart/plan and persist it
-powershell -ExecutionPolicy Bypass -File .\items\quartermaster\quartermaster.ps1 plan -Task "secret scan and repo status" -Top 3
+bash ./items/quartermaster/quartermaster.sh plan --task "secret scan and repo status" --top 3
 
 # Equip from saved plan (approval required)
-powershell -ExecutionPolicy Bypass -File .\items\quartermaster\quartermaster.ps1 equip -FromLastPlan -Approve
+bash ./items/quartermaster/quartermaster.sh equip --from-last-plan --approve
 
 # Report status from saved plan
-powershell -ExecutionPolicy Bypass -File .\items\quartermaster\quartermaster.ps1 report -FromLastPlan
+bash ./items/quartermaster/quartermaster.sh report --from-last-plan
 ```
 
 ## Discovery Rules
 
 Armory root resolution order:
 
-1. `-ArmoryRoot`
+1. `--armory-root`
 2. `~/.armory/config.json` (`repoRoot`)
 3. `ARMORY_REPO_ROOT`
 4. Common paths (`./armory`, `../armory`, `~/armory`, `~/Documents/Code Repos/armory`)
@@ -44,4 +50,4 @@ Quartermaster persists the latest plan at:
 
 - `~/.armory/quartermaster/last-plan.json`
 
-Use `-FromLastPlan` to resume equip/report.
+Use `--from-last-plan` to resume equip/report.

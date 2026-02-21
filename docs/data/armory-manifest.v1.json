@@ -28,29 +28,32 @@
       "id": "alexander",
       "install": {
         "bundlePaths": [
-          "summons/alexander/alexander.ps1",
+          "summons/alexander/alexander.sh",
+          "summons/alexander/alexander.py",
           "summons/alexander/README.md"
         ],
         "bundleUrls": [
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/alexander.ps1",
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/README.md"
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/summons/alexander/alexander.sh",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/summons/alexander/alexander.py",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/summons/alexander/README.md"
         ],
         "checksums": {
           "summons/alexander/README.md": "b6145b6a528e53c123d0815488a0ad214b3e5aec7f1e4f6c694e68913b8554d6",
-          "summons/alexander/alexander.ps1": "68420598eca7df5c7e0f2266db33488e070a43034ab38f2e46301769728e2b5f"
+          "summons/alexander/alexander.py": "63f7ee3ce833c4cf71e2d7a8194e00fcbd486462b91515c65c93c68e748989a5",
+          "summons/alexander/alexander.sh": "a63b28d0ae6ec87ee28e4acd3afe82894caa3dcb121b119f54a7fc279adf9dc7"
         },
         "dependencies": [],
-        "entrypointPath": "summons/alexander/alexander.ps1",
+        "entrypointPath": "summons/alexander/alexander.sh",
         "platforms": [
-          "windows"
+          "macos"
         ]
       },
       "owner": "community",
       "source": {
         "readmePath": "summons/alexander/README.md",
-        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/README.md",
-        "scriptPath": "summons/alexander/alexander.ps1",
-        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/alexander.ps1"
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/summons/alexander/README.md",
+        "scriptPath": "summons/alexander/alexander.sh",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/summons/alexander/alexander.sh"
       },
       "status": "active",
       "tags": [
@@ -75,29 +78,32 @@
       "id": "chronicle",
       "install": {
         "bundlePaths": [
-          "spells/chronicle/chronicle.ps1",
+          "spells/chronicle/chronicle.sh",
+          "spells/chronicle/chronicle.py",
           "spells/chronicle/README.md"
         ],
         "bundleUrls": [
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/chronicle.ps1",
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/README.md"
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/spells/chronicle/chronicle.sh",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/spells/chronicle/chronicle.py",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/spells/chronicle/README.md"
         ],
         "checksums": {
           "spells/chronicle/README.md": "c7d0e6a0f95fc9b0856a4b09c8fe06696caf311f0c19da5f499f12051c22ce50",
-          "spells/chronicle/chronicle.ps1": "71d3762bcb9c3ec903f999ed76008e74a3b96a05c117f90731882b4f59e23bea"
+          "spells/chronicle/chronicle.py": "4b5243f94e30b93cebac8eff05fcd8dc02f6629e0615f8b916b5d407b6672cfb",
+          "spells/chronicle/chronicle.sh": "bf22d2b0b7e042cab0e62a85ba1698cb8a64ef675849528527d4103a2f04d4a2"
         },
         "dependencies": [],
-        "entrypointPath": "spells/chronicle/chronicle.ps1",
+        "entrypointPath": "spells/chronicle/chronicle.sh",
         "platforms": [
-          "windows"
+          "macos"
         ]
       },
       "owner": "community",
       "source": {
         "readmePath": "spells/chronicle/README.md",
-        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/README.md",
-        "scriptPath": "spells/chronicle/chronicle.ps1",
-        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/chronicle.ps1"
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/spells/chronicle/README.md",
+        "scriptPath": "spells/chronicle/chronicle.sh",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/spells/chronicle/chronicle.sh"
       },
       "status": "active",
       "tags": [
@@ -157,32 +163,38 @@
       "id": "quartermaster",
       "install": {
         "bundlePaths": [
-          "items/quartermaster/quartermaster.ps1",
-          "items/quartermaster/README.md"
+          "items/quartermaster/quartermaster.sh",
+          "items/quartermaster/lib/quartermaster.py",
+          "items/quartermaster/README.md",
+          "scripts/lib/armory_config.py"
         ],
         "bundleUrls": [
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/quartermaster.ps1",
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/README.md"
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/quartermaster/quartermaster.sh",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/quartermaster/lib/quartermaster.py",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/quartermaster/README.md",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/scripts/lib/armory_config.py"
         ],
         "checksums": {
-          "items/quartermaster/README.md": "1b932b34e18e9429f5fa8d7310bd926889bbe66ab9b6a99466999085250d0079",
-          "items/quartermaster/quartermaster.ps1": "98c7315b37ca94d94ed07449ad034543b1a9ef23ff65bce872dbf6bacb731571"
+          "items/quartermaster/README.md": "81db898ab37a028a14a2f86e9e4e95424b8ff5fb0082a0a0a0a3fcaadaa93c2e",
+          "items/quartermaster/lib/quartermaster.py": "cbbf5522bea3f53cfbfea7d1a7f40bec58e100ea01fed70dd18d54ef05eec7ff",
+          "items/quartermaster/quartermaster.sh": "a31797fdfcf40bd57713e63a02109ae690847d6942cd5f5c5313498cba8ccb79",
+          "scripts/lib/armory_config.py": "aea95d602c2129945142353cca8a1b1114414f287c5b4e589c2a466f2eda4b7c"
         },
         "dependencies": [
           "remedy",
           "chronicle"
         ],
-        "entrypointPath": "items/quartermaster/quartermaster.ps1",
+        "entrypointPath": "items/quartermaster/quartermaster.sh",
         "platforms": [
-          "windows"
+          "macos"
         ]
       },
       "owner": "community",
       "source": {
         "readmePath": "items/quartermaster/README.md",
-        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/README.md",
-        "scriptPath": "items/quartermaster/quartermaster.ps1",
-        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/quartermaster.ps1"
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/quartermaster/README.md",
+        "scriptPath": "items/quartermaster/quartermaster.sh",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/quartermaster/quartermaster.sh"
       },
       "status": "active",
       "tags": [
@@ -209,29 +221,32 @@
       "id": "remedy",
       "install": {
         "bundlePaths": [
-          "items/remedy/remedy.ps1",
+          "items/remedy/remedy.sh",
+          "items/remedy/remedy.py",
           "items/remedy/README.md"
         ],
         "bundleUrls": [
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/remedy.ps1",
-          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/README.md"
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/remedy/remedy.sh",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/remedy/remedy.py",
+          "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/remedy/README.md"
         ],
         "checksums": {
           "items/remedy/README.md": "2d08d7848090436d496fa5b9c7e7d2746a8d915a312042a9cd6f2a142896eb8d",
-          "items/remedy/remedy.ps1": "0b69be7751e0ffac2d5fe448d53e842dd715f1c84e51f296885df6a88fd27c2a"
+          "items/remedy/remedy.py": "0eb722726f08e918ba26f20b0f902264db5261ea606d5587c8e099bd8288a186",
+          "items/remedy/remedy.sh": "ef64ba0a1ba784ac3deaf86dbbc61e5b77ff680dc83208213d482a2c18962499"
         },
         "dependencies": [],
-        "entrypointPath": "items/remedy/remedy.ps1",
+        "entrypointPath": "items/remedy/remedy.sh",
         "platforms": [
-          "windows"
+          "macos"
         ]
       },
       "owner": "community",
       "source": {
         "readmePath": "items/remedy/README.md",
-        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/README.md",
-        "scriptPath": "items/remedy/remedy.ps1",
-        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/remedy.ps1"
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/remedy/README.md",
+        "scriptPath": "items/remedy/remedy.sh",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed/items/remedy/remedy.sh"
       },
       "status": "active",
       "tags": [
@@ -241,7 +256,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-02-21T16:08:55-05:00",
+  "generatedAt": "2026-02-21T16:15:17-05:00",
   "manifestVersion": 1,
   "modeContract": {
     "aliases": {
@@ -259,7 +274,7 @@
       "lore": "saga"
     }
   },
-  "ref": "187b3428a526f66080dadaf020a9d819374d16e1",
+  "ref": "ee24312e6242b99c4ed7f4e2a6a74cf6309a06ed",
   "repo": "VontaJamal/armory",
   "telemetry": {
     "enabledByDefault": true,

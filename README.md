@@ -1,17 +1,17 @@
 # The Armory
 
-Practical command-line tools for backups, security checks, service health, diagnostics, release hygiene, and scheduled automation.
+Practical command-line tools for backups, security checks, service health, diagnostics, release hygiene, and agent-driven automation.
 
 [![Armory CI](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml/badge.svg)](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml)
 
-## First Run (10 Seconds)
+## First Run (Mac, 10 Seconds)
 
-```powershell
+```bash
 # Civilian start (plain language onboarding)
-powershell -ExecutionPolicy Bypass -File .\setup.ps1
+./setup.sh
 
 # Crystal Saga start (Receive the Crystal)
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1
+./awakening.sh
 ```
 
 ## Choose Your Path
@@ -24,12 +24,12 @@ powershell -ExecutionPolicy Bypass -File .\awakening.ps1
 
 ## Shared Essentials
 
-```powershell
+```bash
 # 1) Civilian-first bootstrap
-powershell -ExecutionPolicy Bypass -File .\setup.ps1
+./setup.sh --mode civ --command-word armory
 
 # 2) Crystal Saga bootstrap (power-user lane)
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord crystal
+./setup.sh --mode saga --command-word crystal
 
 # 3) Check active mode
 armory civs status
@@ -53,11 +53,11 @@ Use this pattern with Codex/OpenClaw:
 
 Concrete CLI route:
 
-```powershell
-armory quartermaster scout -Task "release readiness for this repo"
-armory quartermaster plan -Task "release readiness for this repo"
-armory quartermaster equip -FromLastPlan -Approve
-armory quartermaster report -FromLastPlan
+```bash
+armory quartermaster scout --task "release readiness for this repo"
+armory quartermaster plan --task "release readiness for this repo"
+armory quartermaster equip --from-last-plan --approve
+armory quartermaster report --from-last-plan
 ```
 
 ## Full Guides

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+repo_root=""
+
+if [[ -n "${ARMORY_ROOT:-}" ]] && [[ -d "${ARMORY_ROOT}" ]]; then
+  repo_root="${ARMORY_ROOT}"
+else
+  repo_root="$(cd "$script_dir/.." && pwd)"
+fi
+
+export ARMORY_REPO_ROOT="$repo_root"
+# shellcheck source=scripts/lib/armory_common.sh
+source "$repo_root/scripts/lib/armory_common.sh"
+# shellcheck source=scripts/lib/dispatch_routes.sh
+source "$repo_root/scripts/lib/dispatch_routes.sh"
+
+command_word="$(armory_config_get commandWord armory)"
+if [[ -z "$command_word" ]]; then
+  command_word="armory"
+fi
+mode="$(armory_config_get mode saga)"
+if [[ "$mode" != "civ" ]]; then
+  mode="saga"
+fi
+
+cmd="${1:-help}"
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+
+armory_dispatch_route "$repo_root" "$command_word" "$mode" "$cmd" "$@"

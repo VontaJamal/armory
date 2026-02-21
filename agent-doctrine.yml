@@ -9,6 +9,13 @@ mode_contract:
     lore: saga
     crystal: saga
 
+runtime_surface:
+  platform: macos
+  shell: zsh
+  onboarding:
+    civilian: ./setup.sh
+    saga: ./awakening.sh
+
 agent_flow:
   - step: refresh_armory
     required: true
@@ -29,10 +36,10 @@ agent_flow:
   - step: quartermaster_default_route
     required: true
     commands:
-      - "<commandWord> quartermaster scout -Task \"<task>\""
-      - "<commandWord> quartermaster plan -Task \"<task>\""
-      - "<commandWord> quartermaster equip -FromLastPlan -Approve"
-      - "<commandWord> quartermaster report -FromLastPlan"
+      - "<commandWord> quartermaster scout --task \"<task>\""
+      - "<commandWord> quartermaster plan --task \"<task>\""
+      - "<commandWord> quartermaster equip --from-last-plan --approve"
+      - "<commandWord> quartermaster report --from-last-plan"
 
 path_discovery:
   resolver_order:
@@ -76,7 +83,7 @@ report_templates:
 telemetry:
   enabled_by_default: true
   opt_out:
-    - installer_flag: -NoTelemetry
+    - installer_flag: --no-telemetry
     - env: ARMORY_TELEMETRY=off
   payload_required:
     - eventName

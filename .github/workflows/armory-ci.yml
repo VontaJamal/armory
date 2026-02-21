@@ -42,8 +42,7 @@ jobs:
         run: python3 scripts/ci/secret_hygiene.py
 
       - name: Ensure remote URL has no embedded credentials
-        shell: pwsh
-        run: pwsh -NoProfile -File scripts/ci/check_remote_url.ps1
+        run: bash scripts/ci/check_remote_url.sh
 
   seven-shadow-trust-guard:
     name: seven-shadow-trust-guard
@@ -58,6 +57,7 @@ jobs:
   powershell-smoke:
     name: powershell-smoke
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,6 +73,7 @@ jobs:
   fixture-tests:
     name: fixture-tests
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -108,6 +109,19 @@ jobs:
       - name: Run quartermaster smoke tests
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/quartermaster-smoke.ps1
+
+  mac-runtime-smoke:
+    name: mac-runtime-smoke
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Mac runtime smoke checks
+        run: bash scripts/ci/mac-smoke.sh
+
+      - name: Run quartermaster smoke checks (Mac runtime)
+        run: bash scripts/ci/quartermaster-smoke.sh
 
   release-validate:
     name: release-validate

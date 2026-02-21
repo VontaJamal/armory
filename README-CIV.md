@@ -1,90 +1,72 @@
-# Armory Civilian Guide
+# README-CIV
 
 ## What Armory Is
 
-Armory is a practical command toolkit for operational work: security checks, backups, diagnostics, release validation, and agent workflows.
-
-Civilian Mode keeps language direct and plain while preserving all functionality.
+Armory is a Mac-first command and automation repository for practical repo operations. Civilian Mode uses plain language while keeping the same behavior and command surface as Crystal Saga Mode.
 
 ## 5-Minute Setup
 
-```powershell
-# 1) Run civilian bootstrap (recommended)
-powershell -ExecutionPolicy Bypass -File .\setup.ps1
-
-# Optional explicit command word
-powershell -ExecutionPolicy Bypass -File .\setup.ps1 -Mode civ -CommandWord armory
-
-# 2) Confirm Civilian Mode
-armory civs on
-armory civs status
-
-# 3) Run quick health/security path
-powershell -ExecutionPolicy Bypass -File .\items\remedy\remedy.ps1
-powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
-
-# 4) Open dashboard in plain mode
-powershell -ExecutionPolicy Bypass -File .\shop\open-dashboard.ps1
+```bash
+./setup.sh --mode civ --command-word armory
 ```
+
+This installs your command shim into `~/.local/bin`, updates `~/.zshrc`, and writes config to `~/.armory/config.json`.
 
 ## Civilian Workflow (Manual + Agent-First)
 
-Manual path:
+Manual flow:
 
-1. Browse tools in `shop/catalog.json` or dashboard.
-2. Select an install plan.
-3. Generate installer from dashboard cart.
-4. Run installer and verify outcome.
+```bash
+armory remedy --check config --check scripts
+armory chronicle --repo-path . --format table
+armory alexander
+```
 
-Agent-first path:
+Agent-first flow:
 
-1. Agent refreshes local Armory clone: `git -C <armoryRepoRoot> pull --ff-only`.
-2. Agent runs `quartermaster scout` and returns shortlist.
-3. Agent runs `quartermaster plan` to build the install cart.
-4. Human approves install, then agent runs `quartermaster equip -FromLastPlan -Approve`.
-5. Agent runs `quartermaster report -FromLastPlan` in active mode tone.
-
-### Same System, Two Voices
-
-Civilian and Crystal Saga are the same system and commands.
-Only language changes.
-
-- `install selected tools` <-> `equip loadout`
-- `installation complete` <-> `battle-ready`
+```bash
+armory quartermaster scout --task "what are we blocked on"
+armory quartermaster plan --task "build the best install plan"
+armory quartermaster equip --from-last-plan --approve
+armory quartermaster report --from-last-plan
+```
 
 ## Ask Your Agent
 
-Use prompts like:
+Prompt examples:
 
-1. `Scout Armory for this repo issue, shortlist the best options, and wait for my approval.`
-2. `Install remedy + chronicle after approval and report exactly what was installed.`
-3. `If refresh or install fails, stop and give a tactical failure report.`
+1. `Check Armory for tools that match this task and report top options.`
+2. `Build a plan, wait for my approval, then install and report.`
+3. `Refresh Armory first, then give me a concise recommendation.`
 
 ## Tool Selection And Install Examples
 
-| Situation | Suggested tool(s) | Example civilian report |
-|---|---|---|
-| Need environment baseline | `remedy` | `Environment check completed. No blocking issues found.` |
-| Need secret hygiene pass | `scan`, `truesight` | `Security scan completed. Findings attached.` |
-| Need release readiness | `alexander` | `Release preflight completed. Pass/fail summary ready.` |
-| Need repo pulse | `chronicle` | `Repository status report generated.` |
+- `remedy`: validate local runtime and config.
+- `chronicle`: inspect repository state.
+- `alexander`: run release preflight checks.
+- `quartermaster`: automate scout -> approval -> install -> report.
+
+Example install run:
+
+```bash
+armory quartermaster plan --task "stabilize release checks"
+armory quartermaster equip --from-last-plan --approve
+```
 
 ## Mode Controls (`civs`)
 
-```powershell
+```bash
 armory civs status
-armory civs off   # Crystal Saga Mode (mode=saga)
-armory civs on    # Civilian Mode (mode=civ)
+armory civs on    # plain-language reporting
+armory civs off   # crystal-saga flavored reporting
 ```
-
-Mode is shared across dispatcher, dashboard, installer, and agent reporting.
 
 ## Troubleshooting
 
-1. `armory` command not found: re-run `setup.ps1` (or `awakening.ps1`), then open a new shell session.
-2. Dashboard loads but no entries appear: rebuild manifest with `python3 scripts/build_armory_manifest.py --out docs/data/armory-manifest.v1.json`.
-3. Agent cannot refresh Armory clone: verify repo path and remote access, then run `git -C <armoryRepoRoot> pull --ff-only` manually.
-4. Installer hash mismatch: regenerate installer from current dashboard state and confirm manifest ref aligns with repository head.
+1. `command not found`: open a new terminal or run `source ~/.zshrc`.
+2. Wrong report tone: run `armory civs status` and switch with `on/off`.
+3. Armory path discovery failed: run `./setup.sh` in Armory root once.
+4. Quartermaster refresh failed: fix git auth/remote, then retry scout.
 
 ## Validation Commands
 
@@ -93,23 +75,18 @@ python3 scripts/validate_shop_catalog.py
 python3 scripts/build_armory_manifest.py --out docs/data/armory-manifest.v1.json
 python3 scripts/ci/check_manifest_determinism.py
 python3 scripts/ci/validate_readmes.py
-python3 scripts/ci/secret_hygiene.py
-python3 scripts/release/validate_release.py --mode ci
-```
-
-```powershell
-pwsh -File .\scripts\ci\help-smoke.ps1
-pwsh -File .\scripts\ci\mode-contract-smoke.ps1
-pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
-pwsh -File .\scripts\ci\run-chronicle-tests.ps1
-pwsh -File .\items\remedy\remedy.ps1 -Detailed
+bash scripts/ci/mac-smoke.sh
+bash scripts/ci/quartermaster-smoke.sh
 ```
 
 ## Contracts And References
 
-- [Root README](README.md)
-- [Crystal Saga Guide](README-SAGA.md)
 - [Agent contract](AGENTS.md)
 - [Agent doctrine](agent-doctrine.yml)
+- [Quartermaster runtime](items/quartermaster/README.md)
 - [Manifest](docs/data/armory-manifest.v1.json)
-- [Telemetry contract](docs/TELEMETRY.md)
+- [Catalog](shop/catalog.json)
+
+Same System, Two Voices:
+Commands and behavior are identical between modes. Wording changes, implementation does not.
+`equip loadout` and `install selected tools` point to the same runtime actions.

@@ -154,7 +154,7 @@ def _validate_install(
         value=value.get("dependencies"),
         allow_empty=True,
     )
-    _validate_string_list(
+    platforms = _validate_string_list(
         errors,
         entry_label=entry_label,
         field_name="install.platforms",
@@ -192,6 +192,12 @@ def _validate_install(
             errors.append(
                 f"[{entry_label}] install.entrypointPath must match scriptPath for active entries"
             )
+
+    if status == "active":
+        if isinstance(entrypoint, str) and not entrypoint.endswith(".sh"):
+            errors.append(f"[{entry_label}] install.entrypointPath must be a .sh script for active entries")
+        if "macos" not in platforms:
+            errors.append(f"[{entry_label}] install.platforms must include 'macos' for active entries")
 
 
 def validate_catalog(catalog: Any) -> list[str]:

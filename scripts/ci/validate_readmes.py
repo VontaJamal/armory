@@ -43,6 +43,12 @@ REQUIRED_CIV_SECTIONS = [
     "contracts and references",
 ]
 
+WINDOWS_FIRST_PATTERNS = (
+    r"powershell\s+-executionpolicy",
+    r"pwsh\s+-file",
+    r"\.ps1",
+)
+
 
 def _normalize_heading(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
@@ -153,6 +159,35 @@ def _validate_root_selector() -> list[str]:
     return errors
 
 
+def _validate_mac_first_onboarding() -> list[str]:
+    errors: list[str] = []
+
+    top_windows_re = re.compile("|".join(WINDOWS_FIRST_PATTERNS), re.IGNORECASE)
+
+    for readme in README_FILES:
+        top = "\n".join(readme.read_text(encoding="utf-8").splitlines()[:120])
+        if top_windows_re.search(top):
+            errors.append(
+                f"{readme.name}: top onboarding sections must be Mac-first (remove PowerShell/.ps1 examples)"
+            )
+
+    root_text = ROOT_README.read_text(encoding="utf-8")
+    if "./setup.sh" not in root_text:
+        errors.append("README.md: missing Mac onboarding command './setup.sh'")
+    if "./awakening.sh" not in root_text:
+        errors.append("README.md: missing Mac onboarding command './awakening.sh'")
+
+    civ_text = CIV_README.read_text(encoding="utf-8")
+    if "./setup.sh" not in civ_text:
+        errors.append("README-CIV.md: missing Mac onboarding command './setup.sh'")
+
+    saga_text = SAGA_README.read_text(encoding="utf-8")
+    if "./awakening.sh" not in saga_text:
+        errors.append("README-SAGA.md: missing Mac onboarding command './awakening.sh'")
+
+    return errors
+
+
 def _resolve_link_target(source_path: Path, target: str) -> Path:
     parsed = urlsplit(target)
     if parsed.path:
@@ -230,6 +265,7 @@ def main() -> int:
     errors.extend(_validate_required_sections(CIV_README, REQUIRED_CIV_SECTIONS))
     errors.extend(_validate_same_system_parity(SAGA_README))
     errors.extend(_validate_same_system_parity(CIV_README))
+    errors.extend(_validate_mac_first_onboarding())
     errors.extend(_validate_internal_links())
 
     if errors:
