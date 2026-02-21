@@ -218,14 +218,14 @@ function Resolve-ArmoryRoot {
 
     $cwd = (Get-Location).Path
     $parent = Split-Path $cwd -Parent
-    $home = Get-UserHome
+    $userHome = Get-UserHome
     $candidates.Add($cwd)
     $candidates.Add((Join-Path $cwd "armory"))
     if ($parent) {
         $candidates.Add((Join-Path $parent "armory"))
     }
-    $candidates.Add((Join-Path $home "armory"))
-    $candidates.Add((Join-Path (Join-Path $home "Documents\Code Repos") "armory"))
+    $candidates.Add((Join-Path $userHome "armory"))
+    $candidates.Add((Join-Path (Join-Path $userHome "Documents\Code Repos") "armory"))
 
     $seen = @{}
     foreach ($candidate in $candidates) {
