@@ -33,7 +33,7 @@ Use this contract for every tool README in the Armory.
 - Include one "if this fails" section with concrete fixes.
 - Keep themed words in headings or flavor lines, not in core instructions.
 - For dispatcher commands, document a welcoming "Civilian alias" in `Quick Start` and `Migration Notes`.
-- State platform compatibility explicitly (Windows + macOS by default, or call out constraints).
+- State platform compatibility explicitly (cross-platform preferred; platform-specific is acceptable with clear constraints and future-extension notes).
 
 ## Command Examples
 

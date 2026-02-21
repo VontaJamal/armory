@@ -99,7 +99,7 @@ pwsh -File .\civs.ps1 on
 
 ## Quality Rules
 
-1. New scripts should be compatible with Windows and macOS PowerShell runtimes (`powershell` on Windows, `pwsh` on macOS) unless explicitly documented as platform-specific.
+1. Cross-platform support is preferred (`powershell` on Windows, `pwsh` on macOS), but platform-specific tools are allowed when clearly documented and built for future extension.
 2. `-Help` and no-arg usage paths must not crash.
 3. Docs must be copy-paste friendly for non-experts.
 4. New links must resolve in-repo.
