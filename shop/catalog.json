@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "mognet",
+      "class": "idea",
+      "name": "Mognet",
+      "plainDescription": "Unified notification relay for tool outputs, with channel routing, retries, and digest formatting.",
+      "flavorLine": "A reliable message network for operational updates.",
+      "scriptPath": null,
+      "readmePath": null,
+      "status": "idea",
+      "owner": "community",
+      "addedOn": "2026-02-21"
+    }
+  ]
+}

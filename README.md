@@ -74,6 +74,16 @@ powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
 - `weapons/scan/deep-scan.ps1` -> `weapons/truesight/truesight.ps1`
 - `weapons/phoenix-down/setup-rebirth.ps1` -> `weapons/phoenix-down/save-point.ps1`
 
+## Armory Shopfront
+
+The whole repository is the shopfront.
+
+- Use [`shop/SHOP.md`](shop/SHOP.md) to browse the catalog.
+- Use [`shop/catalog.json`](shop/catalog.json) for machine-readable entries.
+- Use [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md) to add a full tool or an idea-only entry.
+
 ## Contributing
+
+Use [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full contribution flow.
 
 Use [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md) for all tool README updates.
