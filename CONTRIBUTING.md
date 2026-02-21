@@ -61,6 +61,7 @@ powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Nam
 Run these checks from repo root:
 
 ```bash
+python3 scripts/ci/validate_readmes.py
 python3 scripts/validate_shop_catalog.py
 python3 scripts/build_armory_manifest.py
 python3 scripts/ci/check_manifest_determinism.py
@@ -103,6 +104,24 @@ pwsh -File .\civs.ps1 on
 
 - `civs off` => Crystal Saga Mode (`mode=saga`)
 - `civs on` => Civilian Mode (`mode=civ`)
+
+## README Maintenance Rules
+
+Armory has one root selector README plus two companion guides:
+
+- `README.md` (path selector hub)
+- `README-SAGA.md` (Crystal Saga voice)
+- `README-CIV.md` (Civilian voice)
+
+When setup, workflow, or command behavior changes:
+
+1. Update both companion guides in the same PR.
+2. Keep command semantics in parity across both guides.
+3. Keep tone contract consistent with `mode=saga|civ`.
+4. Crystal Saga guide can use light flavor, but instructions stay technically clear.
+5. Civilian guide must remain plain and operational.
+6. Keep root README links to both guides plus dashboard deep links (`?mode=saga`, `?mode=civ`).
+7. Run `python3 scripts/ci/validate_readmes.py` before opening the PR.
 
 ## Quality Rules
 
