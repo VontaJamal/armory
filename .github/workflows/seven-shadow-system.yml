@@ -12,9 +12,18 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: seven-shadow-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   guard:
-    if: github.event_name != 'issue_comment' || github.event.issue.pull_request != null
+    if: >
+      (github.event_name != 'issue_comment' || github.event.issue.pull_request != null) &&
+      (
+        github.event_name != 'issue_comment' ||
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+      )
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +46,9 @@ jobs:
       - name: Build Seven Shadow System
         run: npm run build
         working-directory: governance/seven-shadow-system
+
+      - name: Validate trust store placeholders in bundle mode
+        run: python3 scripts/ci/validate_trust_store.py
 
       - name: Run Seven Shadow System
         env:
