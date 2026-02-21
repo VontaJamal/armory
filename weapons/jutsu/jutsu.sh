@@ -15,7 +15,7 @@ CYAN='\033[0;36m'; WHITE='\033[1;37m'; DIM='\033[0;90m'; NC='\033[0m'
 
 banner() {
   echo ""
-  echo "  ${CYAN}⚔️  Jutsu${NC} ${DIM}v${VERSION}${NC}"
+  echo "  ${CYAN}💨  Jutsu${NC} ${DIM}v${VERSION}${NC}"
   echo "  ${DIM}─────────────────────────────${NC}"
 }
 
