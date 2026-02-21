@@ -85,4 +85,6 @@ Both guides use the same commands and system behavior; only language/presentatio
 
 ## Protected by the [Seven Shadows](https://github.com/VontaJamal/seven-shadow-system)
 
+[Explore the Vault ->](https://github.com/VontaJamal/shadow-vault)
+
 Part of [Sovereign](https://github.com/VontaJamal) - The Shadow Dominion.
