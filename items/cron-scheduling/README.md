@@ -1,4 +1,4 @@
-# Cron Scheduling in OpenClaw
+﻿# Cron Scheduling in OpenClaw
 
 Common gotchas and patterns for reliable cron jobs.
 
@@ -29,8 +29,8 @@ Jobs created without it are disabled by default and will never fire. Always incl
 Use `channel:ID` or `user:ID`, not just the raw ID.
 
 ```
-✅ "to": "channel:1467271397540630621"
-❌ "to": "1467271397540630621"
+âœ… "to": "channel:1467271397540630621"
+âŒ "to": "1467271397540630621"
 ```
 
 ### 3. Updating a job may skip same-day runs
@@ -59,3 +59,4 @@ Don't tell isolated cron sessions to read files or check context. They start fre
 - Cron expressions run in the gateway's local timezone
 - If your gateway is on a server in UTC but you think in Eastern, offset your hours
 - Always verify with a test job before relying on timing
+

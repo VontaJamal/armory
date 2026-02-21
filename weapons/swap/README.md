@@ -1,4 +1,4 @@
-﻿# ðŸ—¡ï¸ Weapon #1: masamune
+﻿# ðŸ—¡ï¸ Weapon #1: swap
 
 **Vault and hot-swap AI provider API keys with one command.**
 
@@ -11,17 +11,17 @@ You've got multiple API keys across multiple providers â€” Anthropic, OpenA
 ## The Solution
 
 ```
-armory masamune add anthropic personal sk-ant-xxxxx
-armory masamune add anthropic work sk-ant-yyyyy
-armory masamune add openai main sk-proj-xxxxx
+armory swap add anthropic personal sk-ant-xxxxx
+armory swap add anthropic work sk-ant-yyyyy
+armory swap add openai main sk-proj-xxxxx
 ```
 
-Register your keys once. They're vaulted in `~/.openclaw/secrets/masamune-vault.json`.
+Register your keys once. They're vaulted in `~/.openclaw/secrets/swap-vault.json`.
 
 From that point on:
 
 ```
-armory masamune anthropic work
+armory swap anthropic work
 ```
 
 One command. Key is set, environment variable updated, `openclaw.json` provider config swapped. Done.
@@ -30,11 +30,11 @@ One command. Key is set, environment variable updated, `openclaw.json` provider 
 
 | Command | What It Does |
 |---------|-------------|
-| `armory masamune add <provider> <name> <key>` | Register a named key |
-| `armory masamune <provider> <name>` | Swap to a named key |
-| `armory masamune <provider>` | Swap (auto-picks if only one key) |
-| `armory masamune list` | Show all registered keys (masked) |
-| `armory masamune remove <provider> <name>` | Remove a key from the vault |
+| `armory swap add <provider> <name> <key>` | Register a named key |
+| `armory swap <provider> <name>` | Swap to a named key |
+| `armory swap <provider>` | Swap (auto-picks if only one key) |
+| `armory swap list` | Show all registered keys (masked) |
+| `armory swap remove <provider> <name>` | Remove a key from the vault |
 
 ## Supported Providers
 
@@ -48,9 +48,9 @@ One command. Key is set, environment variable updated, `openclaw.json` provider 
 ## What It Looks Like
 
 ```
-> armory masamune list
+> armory swap list
 
-  masamune Scroll
+  swap Scroll
 
   anthropic
     personal         sk-ant.....3kF  <- active
@@ -61,32 +61,32 @@ One command. Key is set, environment variable updated, `openclaw.json` provider 
 ```
 
 ```
-> armory masamune anthropic work
+> armory swap anthropic work
 
-  masamune activated. Chakra nature: anthropic (work)
+  swap activated. Provider: anthropic (work)
   Model: anthropic/claude-opus-4-6
   Restart gateway to take effect.
 ```
 
 ## Installation
 
-1. Copy `masamune.ps1` to your scripts directory (or anywhere in your PATH)
+1. Copy `swap.ps1` to your scripts directory (or anywhere in your PATH)
 2. Create a `.cmd` wrapper to call it:
 
 ```cmd
 @echo off
-powershell -ExecutionPolicy Bypass -File "C:\path\to\masamune.ps1" %*
+powershell -ExecutionPolicy Bypass -File "C:\path\to\swap.ps1" %*
 ```
 
-3. Run `armory masamune add` to register your first key
+3. Run `armory swap add` to register your first key
 
 ## Customization
 
-During `armory init`, you can set your own command word. The script adapts â€” `faye masamune`, `shadow masamune`, `sage masamune` â€” whatever fits your setup.
+During `armory init`, you can set your own command word. The script adapts â€” `faye swap`, `shadow swap`, `sage swap` â€” whatever fits your setup.
 
 ## Security
 
-- Keys are stored locally in `~/.openclaw/secrets/masamune-vault.json`
+- Keys are stored locally in `~/.openclaw/secrets/swap-vault.json`
 - Keys are masked in all display output
 - After the initial `add`, keys never appear in terminal history again
 - The vault file should be excluded from version control (add to `.gitignore`)
@@ -94,4 +94,5 @@ During `armory init`, you can set your own command word. The script adapts â€
 ---
 
 *Part of [The Armory](https://github.com/VontaJamal/armory) â€” weapons for your terminal.*
+
 

@@ -1,8 +1,8 @@
-# 🛡️ Sentinel
+﻿# ðŸ›¡ï¸ healthcheck
 
 **Automated service health monitoring with Telegram alerts.**
 
-Sentinel watches your services so you don't have to. If something goes down, you know immediately.
+healthcheck watches your services so you don't have to. If something goes down, you know immediately.
 
 ## What It Does
 
@@ -15,7 +15,7 @@ Sentinel watches your services so you don't have to. If something goes down, you
 
 ```powershell
 # Check services and alert if anything is down
-.\sentinel.ps1
+.\healthcheck.ps1
 ```
 
 ## Configuration
@@ -34,7 +34,7 @@ Run every 15-30 minutes via OpenClaw cron:
 
 ```json
 {
-  "name": "Sentinel Health Check",
+  "name": "healthcheck Health Check",
   "enabled": true,
   "schedule": { "cron": "*/30 * * * *" },
   "payload": {
@@ -51,4 +51,5 @@ Run every 15-30 minutes via OpenClaw cron:
 
 ---
 
-*"The party's guardian." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Always watching. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+

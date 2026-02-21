@@ -1,71 +1,69 @@
-# The Armory ⚔️
+﻿# The Armory âš”ï¸
 
 Battle-tested tools and guides for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI setups.
 
-Everything here was built solving real problems in production. No theory. No tutorials. Just weapons.
-
-> *"Every weapon has a name. Every name has a legacy."*
+Everything here was built solving real problems in production. No theory. No tutorials. Just tools that work.
 
 ---
 
-## ⚔️ Weapon Shop
+## ðŸ‰ Summons
 
-Executable tools you wield yourself.
+Full systems deployed with one command.
 
-| Weapon | What It Does |
-|--------|-------------|
-| [**Masamune**](weapons/masamune/) | Vault and hot-swap AI provider API keys with one command |
-| [**Phoenix Down**](weapons/phoenix-down/) | Encrypted backup + 3-command restore for your entire setup |
-| [**Sentinel**](weapons/sentinel/) | Service health monitoring with Telegram alerts |
-| [**Scan**](weapons/scan/) | Security audit — find leaked secrets across all your repos |
+| Name | What It Does |
+|------|-------------|
+| [**spawn**](summons/spawn/) | Create a fully configured AI agent â€” workspace, personality, memory, config, ready to go |
+| [**cleanup**](summons/cleanup/) | One-command system cleanup â€” zombie processes, stale sessions, bloated logs, temp files |
 
-## 🔮 Spell Shop
+## âš”ï¸ Weapons
 
-Automations that cast themselves. Set them and they work while you sleep.
+Standalone tools you run yourself.
 
-| Spell | What It Does |
-|-------|-------------|
-| [**Libra**](spells/libra/) | Daily intel report — system health, GitHub activity, delivered to Telegram |
-| [**Cure**](spells/cure/) | Weekly backup verification — makes sure Phoenix Down is actually working |
-| [**Protect**](spells/protect/) | Scheduled security audit — catches leaked secrets before anyone else does |
-| [**Regen**](spells/regen/) | Morning briefing — weather, calendar, agent activity, today's priorities |
+| Name | What It Does |
+|------|-------------|
+| [**swap**](weapons/swap/) | Vault and hot-swap AI provider API keys with one command |
+| [**backup**](weapons/backup/) | Encrypted backup + 3-command restore for your entire setup |
+| [**healthcheck**](weapons/healthcheck/) | Service health monitoring with Telegram alerts |
+| [**scan**](weapons/scan/) | Security audit â€” find leaked secrets across all your repos |
 
-## 🧪 Item Shop
+## ðŸ”® Spells
 
-Guides and reference docs. Knowledge that saves you hours.
+Automations that run themselves on a schedule.
 
-| Item | What You'll Learn |
+| Name | What It Does |
+|------|-------------|
+| [**intel**](spells/intel/) | Daily system report â€” health, storage, GitHub activity, delivered to Telegram |
+| [**verify-backup**](spells/verify-backup/) | Weekly check that your backups are actually working |
+| [**auto-audit**](spells/auto-audit/) | Scheduled security scan â€” catches leaked secrets automatically |
+| [**briefing**](spells/briefing/) | Morning summary â€” weather, calendar, agent activity, today's priorities |
+
+## ðŸ§ª Items
+
+Guides and reference docs that save you hours.
+
+| Name | What You'll Learn |
 |------|-----------------|
-| [**Teleport**](items/teleport/) | Dual-machine gateway — two machines, one agent, zero conflicts |
-| [**Cron Scheduling**](items/cron-scheduling/) | Every cron gotcha that'll waste your hours (so you don't have to) |
-| [**Telegram Setup**](items/telegram-setup/) | Chat IDs, channel routing, group config, bot permissions |
-| [**NSSM Services**](items/nssm-services/) | Register any process as a Windows service that survives reboots |
-| [**Agent Comms**](items/agent-comms/) | Multi-agent communication patterns, session keys, relay protocols |
-
-## 🐉 Summon Chamber
-
-The top shelf. Full systems summoned with one command.
-
-| Summon | What It Brings |
-|--------|---------------|
-| [**Ifrit**](summons/ifrit/) | Summon a fully configured AI agent — workspace, personality, memory, config, ready for orders |
-| [**Odin**](summons/odin/) | Zantetsuken — one-slash system cleanup. Zombies, stale sessions, bloated logs, all cut |
+| [**multi-machine**](items/multi-machine/) | Run one agent across two machines â€” setup, sync, and common pitfalls |
+| [**cron-scheduling**](items/cron-scheduling/) | Every scheduling gotcha that'll waste your time (so you don't have to) |
+| [**telegram-setup**](items/telegram-setup/) | Chat IDs, channel routing, group config, bot permissions |
+| [**nssm-services**](items/nssm-services/) | Register any process as a Windows service that survives reboots |
+| [**multi-agent**](items/multi-agent/) | Set up multiple agents that communicate and coordinate |
 
 ---
 
 ## How to Use
 
-**Weapons:** Browse `weapons/`, pick one, follow the README. Copy the script, run the installer, done.
+**Summons:** Run the script. It builds everything for you.
 
-**Spells:** Browse `spells/`, copy the cron config into your OpenClaw setup. They cast themselves from there.
+**Weapons:** Copy the script, run it. Each one is self-contained.
 
-**Summons:** Browse `summons/`, run the script. These are full systems — they set up everything for you.
+**Spells:** Copy the cron config into your OpenClaw setup. They run themselves after that.
 
-**Items:** Browse `items/`, find the guide, follow it. Most problems are solved in under 5 minutes with these.
+**Items:** Read the guide, follow the steps. Most things are solved in under 5 minutes.
 
 ## Custom Command Word
 
-During setup, name your CLI anything you want:
+Name your CLI anything you want during setup:
 
 ```
 armory init
@@ -73,23 +71,14 @@ armory init
   What's your command word?
   > shadow
 
-  Done. "shadow masamune", "shadow scan" are now live.
+  Done. "shadow swap", "shadow scan" are now live.
 ```
-
-Same weapons. Your identity.
-
-## Coming Soon
-
-- 📜 **Bestiary** — Pre-built agent templates with personalities and skills
-- 🏟️ **Coliseum** — Model benchmarks and agent challenge runs
-- 🐤 **Chocobo Stable** — Agent fleet management
 
 ## Contributing
 
-Built a weapon? Wrote a spell? Forged an item? Open a PR.
-
-Keep it practical. Keep it tested. Keep it documented.
+Built something useful? Open a PR. Keep it practical, keep it tested, keep it documented.
 
 ---
 
 *Arm your terminal.*
+

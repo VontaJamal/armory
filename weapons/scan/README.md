@@ -1,13 +1,13 @@
-# 👁️ Scan
+﻿# ðŸ‘ï¸ Scan
 
 **Security audit for your repos and secrets.**
 
-Cast Scan on your codebase and see everything exposed — leaked API keys, tracked `.env` files, secrets in git history.
+Cast Scan on your codebase and see everything exposed â€” leaked API keys, tracked `.env` files, secrets in git history.
 
 ## What It Checks
 
 - All local git repos for tracked secrets (API keys, tokens, passwords)
-- `.env` files — are they gitignored or accidentally committed?
+- `.env` files â€” are they gitignored or accidentally committed?
 - Public vs private repo classification
 - Environment variable exposure
 - Common secret patterns (AWS, Anthropic, OpenAI, Stripe, etc.)
@@ -18,7 +18,7 @@ Cast Scan on your codebase and see everything exposed — leaked API keys, track
 # Scan all repos in a directory
 .\scan.ps1 -RepoPath "D:\Code Repos"
 
-# Deep scan — checks git history too
+# Deep scan â€” checks git history too
 .\deep-scan.ps1 -RepoPath "D:\Code Repos"
 ```
 
@@ -26,10 +26,10 @@ Cast Scan on your codebase and see everything exposed — leaked API keys, track
 
 ```
 SECRETS SCAN REPORT
-═══════════════════
-Public repos:  16 — CLEAN
-Private repos:  3 — .env present but NOT tracked
-Local only:     4 — not on GitHub
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Public repos:  16 â€” CLEAN
+Private repos:  3 â€” .env present but NOT tracked
+Local only:     4 â€” not on GitHub
 
 Leaked secrets: 0
 Exposed .env:   0
@@ -52,4 +52,5 @@ Status: ALL CLEAR
 
 ---
 
-*"Reveals enemy weaknesses." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Find problems before they find you. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+

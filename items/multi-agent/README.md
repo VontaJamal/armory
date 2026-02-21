@@ -1,4 +1,4 @@
-# Agent-to-Agent Communication
+﻿# Agent-to-Agent Communication
 
 How to set up multiple OpenClaw agents that talk to each other.
 
@@ -40,9 +40,9 @@ sessions_list(activeMinutes=15, messageLimit=2)
 
 ### Hub and Spoke
 One orchestrator agent dispatches work to specialist agents. Specialists report back.
-- Main → dispatches tasks
-- Specialists → execute and report
-- Main → synthesizes and surfaces results
+- Main â†’ dispatches tasks
+- Specialists â†’ execute and report
+- Main â†’ synthesizes and surfaces results
 
 ### Agent Relay
 After dispatching, the orchestrator periodically checks agent sessions and relays results to the human without being asked.
@@ -52,7 +52,7 @@ Each agent posts to its own Telegram channel. The orchestrator monitors all chan
 
 ## Common Issues
 
-### Timeouts ≠ Failures
+### Timeouts â‰  Failures
 Agent-to-agent messages can time out but still be delivered. Don't assume a timeout means the message was lost. Check the target agent's session.
 
 ### Session Keys Are Specific
@@ -60,3 +60,4 @@ Agent-to-agent messages can time out but still be delivered. Don't assume a time
 
 ### Agents Need Their Own Workspaces
 Don't share workspaces between agents. File conflicts will happen. Each agent gets its own directory with its own memory files.
+

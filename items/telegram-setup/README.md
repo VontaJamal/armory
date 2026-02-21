@@ -1,4 +1,4 @@
-# Telegram Channel Setup for OpenClaw
+﻿# Telegram Channel Setup for OpenClaw
 
 How to get your Telegram bot talking to channels, groups, and DMs.
 
@@ -49,3 +49,4 @@ Updates expire after 24 hours. If you haven't polled recently, send a new messag
 
 ### Rate limits
 Telegram limits bots to ~30 messages per second to different chats, and 1 message per second to the same chat. If you're sending bulk alerts, add small delays.
+

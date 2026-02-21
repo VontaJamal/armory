@@ -1,21 +1,21 @@
 ﻿@echo off
-REM masamune installer â€” adds to your PATH for instant access
+REM swap installer â€” adds to your PATH for instant access
 
 set "INSTALL_DIR=%USERPROFILE%\.openclaw\bin"
 set "SCRIPT_DIR=%~dp0"
 
 echo.
-echo   Installing masamune to %INSTALL_DIR%...
+echo   Installing swap to %INSTALL_DIR%...
 echo.
 
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 
-copy "%SCRIPT_DIR%masamune.ps1" "%INSTALL_DIR%\masamune.ps1" >nul
+copy "%SCRIPT_DIR%swap.ps1" "%INSTALL_DIR%\swap.ps1" >nul
 
 (
 echo @echo off
-echo powershell -ExecutionPolicy Bypass -File "%INSTALL_DIR%\masamune.ps1" %%*
-) > "%INSTALL_DIR%\armory-masamune.cmd"
+echo powershell -ExecutionPolicy Bypass -File "%INSTALL_DIR%\swap.ps1" %%*
+) > "%INSTALL_DIR%\armory swap.cmd"
 
 REM Add to user PATH if not already there
 echo %PATH% | findstr /i /c:"%INSTALL_DIR%" >nul
@@ -30,6 +30,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo   Done. Open a new terminal and run: armory-masamune
+echo   Done. Open a new terminal and run: armory swap
 echo.
+
 

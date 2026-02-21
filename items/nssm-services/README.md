@@ -1,4 +1,4 @@
-# Running Bots as Windows Services with NSSM
+﻿# Running Bots as Windows Services with NSSM
 
 NSSM (Non-Sucking Service Manager) lets you run any script or process as a Windows service that auto-starts on boot and restarts on crash.
 
@@ -81,3 +81,4 @@ foreach ($svc in $services) {
     }
 }
 ```
+

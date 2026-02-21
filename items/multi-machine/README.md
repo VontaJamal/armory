@@ -1,11 +1,11 @@
-# Multi-Machine Gateway Setup
+﻿# Multi-Machine Gateway Setup
 
 Running OpenClaw across two machines (daily driver + always-on server) is powerful but has real pitfalls. Here's what we learned the hard way.
 
 ## The Architecture
 
 ```
-[Mac/Laptop] ←── Tailscale ──→ [Windows Server]
+[Mac/Laptop] â†â”€â”€ Tailscale â”€â”€â†’ [Windows Server]
   (daily driver)                  (always-on)
   Gateway: primary                Gateway: NSSM service
   Telegram: enabled               Telegram: disabled
@@ -19,13 +19,13 @@ If both gateways have Telegram enabled, you'll get duplicate messages, session c
 
 ### 2. Workspace sync direction matters
 Decide which machine is the primary editor and sync ONE direction:
-- Mac → Windows: Mac edits, Windows receives
-- Windows → Mac: Windows edits, Mac receives
+- Mac â†’ Windows: Mac edits, Windows receives
+- Windows â†’ Mac: Windows edits, Mac receives
 
 **Never sync both directions.** You will get silent overwrites.
 
 ### 3. Kill Syncthing if you're using SCP
-Syncthing and SCP sync scripts will fight each other. Pick one. We recommend SCP with a cron/scheduled task — it's explicit and predictable.
+Syncthing and SCP sync scripts will fight each other. Pick one. We recommend SCP with a cron/scheduled task â€” it's explicit and predictable.
 
 ### 4. Session JSON files cache paths
 When you move the gateway between machines, stale session paths in `sessions.json` can cause failures. Clear them after any migration.
@@ -54,7 +54,7 @@ Now you can `sc stop/start` from SSH without elevation.
 
 ```bash
 #!/bin/bash
-# Mac → Windows workspace sync (runs every 60s via launchd/cron)
+# Mac â†’ Windows workspace sync (runs every 60s via launchd/cron)
 REMOTE="devon@192.168.1.188"
 LOCAL="$HOME/.openclaw/workspace/"
 REMOTE_PATH="/C/Users/Devon/.openclaw/workspace/"
@@ -75,3 +75,4 @@ rsync -avz --delete \
 - [ ] NSSM service set to auto-start?
 - [ ] `sc sdset` applied for non-elevated service control?
 - [ ] Session JSON cleared after migration?
+

@@ -1,8 +1,8 @@
-# 🔥 Phoenix Down
+﻿# ðŸ”¥ backup
 
 **Encrypted backup and one-command restore for your entire OpenClaw setup.**
 
-Your system died? Use a Phoenix Down. Three commands and you're back.
+Your system died? Use a backup. Three commands and you're back.
 
 ## What It Backs Up
 
@@ -16,12 +16,12 @@ Your system died? Use a Phoenix Down. Three commands and you're back.
 ## How It Works
 
 ```
-# First time — set your encryption password
+# First time â€” set your encryption password
 .\setup-rebirth.ps1
 
 # Runs automatically every 2 hours, keeps last 5 backups
 # Or run manually:
-.\phoenix-down.ps1
+.\backup.ps1
 ```
 
 ## Restore (3 Commands)
@@ -37,7 +37,7 @@ Your system died? Use a Phoenix Down. Three commands and you're back.
 .\RESTORE.ps1
 ```
 
-That's it. Full setup restored — configs, secrets, agents, everything.
+That's it. Full setup restored â€” configs, secrets, agents, everything.
 
 ## Security
 
@@ -53,4 +53,5 @@ That's it. Full setup restored — configs, secrets, agents, everything.
 
 ---
 
-*"KO'd? Not anymore." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Never lose your setup again. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+

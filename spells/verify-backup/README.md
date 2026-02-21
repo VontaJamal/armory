@@ -1,8 +1,8 @@
-# 💚 Cure
+﻿# ðŸ’š Cure
 
 **Automated weekly backup verification.**
 
-Cure checks that your backups are actually working — not just running, but producing valid, recent archives. Because a backup you never tested is just a prayer.
+Cure checks that your backups are actually working â€” not just running, but producing valid, recent archives. Because a backup you never tested is just a prayer.
 
 ## What It Checks
 
@@ -15,7 +15,7 @@ Cure checks that your backups are actually working — not just running, but pro
 
 ```json
 {
-  "name": "Cure — Backup Verification",
+  "name": "Cure â€” Backup Verification",
   "enabled": true,
   "schedule": { "cron": "0 6 * * 0" },
   "sessionTarget": "isolated",
@@ -32,14 +32,15 @@ Cure checks that your backups are actually working — not just running, but pro
 ## Schedule
 
 Runs every Sunday at 6 AM by default. Adjust to your preference:
-- `0 6 * * 0` — Sunday 6 AM
-- `0 6 * * 1` — Monday 6 AM
-- `0 6 * * *` — Daily (if you're paranoid, and you should be)
+- `0 6 * * 0` â€” Sunday 6 AM
+- `0 6 * * 1` â€” Monday 6 AM
+- `0 6 * * *` â€” Daily (if you're paranoid, and you should be)
 
 ## Pairs With
 
-**Phoenix Down** (Weapon) — Phoenix Down creates the backups, Cure makes sure they're actually working.
+**backup** (Weapon) â€” backup creates the backups, Cure makes sure they're actually working.
 
 ---
 
-*"Restores what was lost." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Trust but verify. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+

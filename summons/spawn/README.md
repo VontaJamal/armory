@@ -1,21 +1,21 @@
-# 🔥 Ifrit
+﻿# ðŸ”¥ spawn
 
 **Summon a fully configured AI agent in one command.**
 
-Ifrit doesn't just create a file. It builds an entire agent — workspace, personality, memory system, Telegram channel, cron jobs, and registers it in your OpenClaw config. One summon. A new soldier on the field.
+spawn doesn't just create a file. It builds an entire agent â€” workspace, personality, memory system, Telegram channel, cron jobs, and registers it in your OpenClaw config. One summon. A new soldier on the field.
 
 ## What It Creates
 
 ```
 ~/.openclaw/
   workspace-{name}/
-    SOUL.md              ← Agent personality and directives
-    AGENTS.md            ← Operating instructions
-    MEMORY.md            ← Long-term memory (empty, ready)
-    TOOLS.md             ← Agent-specific tool notes
-    IDENTITY.md          ← Name, role, archetype
-    memory/              ← Daily memory logs directory
-  agents/{name}/agent/   ← Auth and agent-specific config
+    SOUL.md              â† Agent personality and directives
+    AGENTS.md            â† Operating instructions
+    MEMORY.md            â† Long-term memory (empty, ready)
+    TOOLS.md             â† Agent-specific tool notes
+    IDENTITY.md          â† Name, role, archetype
+    memory/              â† Daily memory logs directory
+  agents/{name}/agent/   â† Auth and agent-specific config
 ```
 
 ## What It Configures
@@ -30,12 +30,12 @@ Ifrit doesn't just create a file. It builds an entire agent — workspace, perso
 ## Usage
 
 ```powershell
-.\ifrit.ps1 -Name "cipher" -Role "Crypto intelligence" -Model "claude-sonnet-4-20250514"
+.\spawn.ps1 -Name "cipher" -Role "Crypto intelligence" -Model "claude-sonnet-4-20250514"
 ```
 
 Or interactive:
 ```powershell
-.\ifrit.ps1
+.\spawn.ps1
 
   Agent name: cipher
   Role: Crypto intelligence and pipeline monitoring
@@ -46,7 +46,7 @@ Or interactive:
 
   Summoning...
 
-  🔥 Ifrit has answered.
+  ðŸ”¥ Agent ready.
   
   Agent: cipher
   Workspace: ~/.openclaw/workspace-cipher/
@@ -61,12 +61,12 @@ Or interactive:
 Every agent gets a starter soul that you customize:
 
 ```markdown
-# SOUL.md — Who You Are
+# SOUL.md â€” Who You Are
 
 ## Name: {name}
 ## Role: {role}
 
-You are a specialist agent in the Shadow Court.
+You are a specialist agent in the your setup.
 You report to the orchestrator. You execute your domain.
 
 ## Core Directives
@@ -76,7 +76,7 @@ You report to the orchestrator. You execute your domain.
 - Post start/finish pings to your Telegram channel
 
 ## Personality
-(Customize this — give your agent a real personality)
+(Customize this â€” give your agent a real personality)
 ```
 
 ## After Summoning
@@ -88,7 +88,7 @@ You report to the orchestrator. You execute your domain.
 
 ## Architecture
 
-Ifrit follows the hub-and-spoke pattern:
+spawn follows the hub-and-spoke pattern:
 - **Orchestrator** (your main agent) dispatches tasks
 - **Specialists** (summoned agents) execute their domain
 - Each agent has its own workspace, memory, and identity
@@ -102,4 +102,5 @@ Ifrit follows the hub-and-spoke pattern:
 
 ---
 
-*"Hellfire." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Built from real systems. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+

@@ -1,8 +1,8 @@
-# 🛡️ Protect
+﻿# ðŸ›¡ï¸ Protect
 
 **Scheduled security audit that runs automatically.**
 
-Protect casts Scan on a schedule — checking your repos for leaked secrets, exposed environment files, and security drift. You don't have to remember to audit. It remembers for you.
+Protect casts Scan on a schedule â€” checking your repos for leaked secrets, exposed environment files, and security drift. You don't have to remember to audit. It remembers for you.
 
 ## What It Does
 
@@ -15,7 +15,7 @@ Protect casts Scan on a schedule — checking your repos for leaked secrets, exp
 
 ```json
 {
-  "name": "Protect — Security Audit",
+  "name": "Protect â€” Security Audit",
   "enabled": true,
   "schedule": { "cron": "0 7 * * *" },
   "sessionTarget": "isolated",
@@ -31,12 +31,12 @@ Protect casts Scan on a schedule — checking your repos for leaked secrets, exp
 
 ## Schedule
 
-- `0 7 * * *` — Daily at 7 AM (catch overnight mistakes)
-- `0 7 * * 1` — Weekly Monday (lighter touch)
+- `0 7 * * *` â€” Daily at 7 AM (catch overnight mistakes)
+- `0 7 * * 1` â€” Weekly Monday (lighter touch)
 
 ## Pairs With
 
-**Scan** (Weapon) — Scan is the manual audit. Protect is the automated version.
+**Scan** (Weapon) â€” Scan is the manual audit. Protect is the automated version.
 
 ## Why Both?
 
@@ -44,4 +44,5 @@ Scan is for when you want to check RIGHT NOW. Protect is the safety net that cat
 
 ---
 
-*"Reduces incoming damage." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*Prevention beats recovery. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+
