@@ -67,6 +67,7 @@ python3 scripts/release/validate_release.py --mode ci
 pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
+pwsh -File .\scripts\ci\run-chronicle-tests.ps1
 ```
 
 If your environment does not have PowerShell or 7-Zip, call that out in your PR validation notes.

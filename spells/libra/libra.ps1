@@ -6,6 +6,7 @@
 param(
     [switch]$Telegram,
     [string]$Output,
+    [switch]$NoRepoSummary,
     [switch]$Help,
     [switch]$Sound,
     [switch]$NoSound
@@ -29,7 +30,7 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 $config = @{
     telegramBotToken = $env:TELEGRAM_BOT_TOKEN
     telegramChatId = $env:TELEGRAM_CHAT_ID
-    gitRepoDirs = @("D:\Code Repos")
+    reposFile = "~/.armory/repos.json"
     apiKeyEnvVars = @("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GITHUB_TOKEN", "GOOGLE_API_KEY")
     serviceNames = @("OpenClawGateway", "CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard")
 }
@@ -43,7 +44,74 @@ function Show-Help {
     Write-Host "    .\\libra.ps1"
     Write-Host "    .\\libra.ps1 -Output C:\\Reports\\libra.txt"
     Write-Host "    .\\libra.ps1 -Telegram"
+    Write-Host "    .\\libra.ps1 -NoRepoSummary"
     Write-Host ""
+}
+
+function Expand-ArmoryPath {
+    param([string]$PathValue)
+    if (-not $PathValue) { return $PathValue }
+
+    $expanded = [Environment]::ExpandEnvironmentVariables($PathValue)
+    if ($expanded.StartsWith("~")) {
+        $trimmed = $expanded.Substring(1).TrimStart('/', '\')
+        if ($trimmed) {
+            return (Join-Path $HOME $trimmed)
+        }
+        return $HOME
+    }
+    return $expanded
+}
+
+function Get-RepoPulseRecord {
+    param([string]$InputPath)
+
+    $expanded = Expand-ArmoryPath -PathValue $InputPath
+    $resolvedPath = $expanded
+    if (Test-Path $expanded) {
+        $resolvedPath = (Resolve-Path $expanded).Path
+    }
+
+    $record = [ordered]@{
+        Repo = (Split-Path $resolvedPath -Leaf)
+        Path = $resolvedPath
+        State = "missing"
+        Ahead = 0
+        Behind = 0
+        Dirty = 0
+        Untracked = 0
+    }
+
+    if (-not $record.Repo) { $record.Repo = $InputPath }
+    if (-not (Test-Path $expanded)) { return [PSCustomObject]$record }
+    if (-not (Test-Path (Join-Path $expanded ".git"))) {
+        $record.State = "not-git"
+        return [PSCustomObject]$record
+    }
+
+    $record.State = "ok"
+
+    $statusLines = @(git -C $expanded status --porcelain 2>$null)
+    if ($LASTEXITCODE -eq 0) {
+        foreach ($line in $statusLines) {
+            if (-not $line) { continue }
+            if ($line.StartsWith("??")) { $record.Untracked++ } else { $record.Dirty++ }
+        }
+    }
+
+    $upstream = git -C $expanded rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" 2>$null
+    if ($LASTEXITCODE -eq 0 -and $upstream) {
+        $aheadBehind = git -C $expanded rev-list --left-right --count "@{upstream}...HEAD" 2>$null
+        if ($LASTEXITCODE -eq 0 -and $aheadBehind) {
+            $parts = $aheadBehind.Trim() -split "\s+"
+            if ($parts.Count -ge 2) {
+                $record.Behind = [int]$parts[0]
+                $record.Ahead = [int]$parts[1]
+            }
+        }
+    }
+
+    return [PSCustomObject]$record
 }
 
 if ($Help) {
@@ -135,25 +203,54 @@ foreach ($k in $config.apiKeyEnvVars) {
 }
 $lines += ""
 
-# Git status
-$lines += "Git working tree status:"
-$repoCount = 0
-foreach ($root in $config.gitRepoDirs) {
-    if (-not (Test-Path $root)) { continue }
-    $repos = Get-ChildItem $root -Directory -ErrorAction SilentlyContinue
-    foreach ($r in $repos) {
-        if (-not (Test-Path (Join-Path $r.FullName ".git"))) { continue }
-        $repoCount++
-        $dirty = git -C $r.FullName status --porcelain 2>$null
-        if ($dirty) {
-            $lines += "  $($r.Name) - uncommitted changes"
+# Repo pulse summary (derived from Chronicle logic)
+if ($NoRepoSummary) {
+    $lines += "Repo pulse: skipped (--NoRepoSummary)"
+    $lines += ""
+} else {
+    $lines += "Repo pulse:"
+    $reposFilePath = Expand-ArmoryPath -PathValue $config.reposFile
+    if (-not (Test-Path $reposFilePath)) {
+        $lines += "  repos file not found: $reposFilePath"
+        $lines += ""
+    } else {
+        $repoTargets = @()
+        try {
+            $repoConfig = Get-Content -Path $reposFilePath -Raw | ConvertFrom-Json
+            foreach ($entry in @($repoConfig.repos)) {
+                if ($entry) { $repoTargets += [string]$entry }
+            }
+        } catch {
+            $lines += "  repos file parse failed"
+            $lines += ""
+            $repoTargets = @()
+        }
+
+        if ($repoTargets.Count -eq 0) {
+            $lines += "  no repos configured in allowlist"
+            $lines += ""
+        } else {
+            $pulse = @()
+            foreach ($repoTarget in ($repoTargets | Sort-Object -Unique)) {
+                $pulse += Get-RepoPulseRecord -InputPath $repoTarget
+            }
+
+            $dirtyRepos = @($pulse | Where-Object { $_.State -eq "ok" -and ($_.Dirty -gt 0 -or $_.Untracked -gt 0) }).Count
+            $behindRepos = @($pulse | Where-Object { $_.State -eq "ok" -and $_.Behind -gt 0 }).Count
+            $missingRepos = @($pulse | Where-Object { $_.State -eq "missing" }).Count
+            $notGitRepos = @($pulse | Where-Object { $_.State -eq "not-git" }).Count
+
+            $lines += "  repos: $($pulse.Count) (dirty: $dirtyRepos, behind: $behindRepos, missing: $missingRepos, not-git: $notGitRepos)"
+            foreach ($r in ($pulse | Select-Object -First 5)) {
+                $lines += "  $($r.Repo) - state=$($r.State), dirty=$($r.Dirty), untracked=$($r.Untracked), ahead=$($r.Ahead), behind=$($r.Behind)"
+            }
+            if ($pulse.Count -gt 5) {
+                $lines += "  ... $($pulse.Count - 5) more repos omitted"
+            }
+            $lines += ""
         }
     }
 }
-if ($repoCount -eq 0) {
-    $lines += "  no git repos found in configured roots"
-}
-$lines += ""
 
 $report = ($lines -join "`r`n")
 

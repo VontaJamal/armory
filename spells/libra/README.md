@@ -26,6 +26,9 @@ powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Output "C:\Re
 
 # Send report to Telegram
 powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Telegram
+
+# Skip repo pulse when you only need host/service summary
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -NoRepoSummary
 ```
 
 ## Flags
@@ -34,6 +37,7 @@ powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Telegram
 |---|---|---|
 | `-Output <path>` | none | Write report to file instead of stdout |
 | `-Telegram` | off | Send report to configured Telegram chat |
+| `-NoRepoSummary` | off | Skip the Chronicle-derived repo pulse section |
 | `-Sound` | off | Enable sound cues |
 | `-NoSound` | off | Disable sound cues |
 | `-Help` | off | Print usage and exit |
@@ -43,7 +47,7 @@ powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Telegram
 Top config block controls:
 
 - Telegram token/chat id
-- git repo directories to inspect
+- repos allowlist file (`~/.armory/repos.json`) for repo pulse
 - API key variable names to check
 
 ## Output And Exit Codes

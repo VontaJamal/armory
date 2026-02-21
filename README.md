@@ -11,6 +11,7 @@ Themed names are for personality. Instructions are plain-language first.
 | You need to... | Use this tool | Why |
 |---|---|---|
 | Set up a command word like `faye` | [`awakening.ps1`](awakening.ps1) | One-time setup for command routing and PATH |
+| Rename your command word later | [`rename-command-word.ps1`](rename-command-word.ps1) | Switch to any new command word quickly |
 | Save encrypted backups | [`weapons/phoenix-down/phoenix-down.ps1`](weapons/phoenix-down/phoenix-down.ps1) | Creates encrypted backup archives |
 | Bootstrap backup automation | [`weapons/phoenix-down/save-point.ps1`](weapons/phoenix-down/save-point.ps1) | Sets up recurring backup + restore command |
 | Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Detects stale/corrupt backups and returns strict exit codes |
@@ -20,6 +21,7 @@ Themed names are for personality. Instructions are plain-language first.
 | Schedule security scans | [`spells/protect/protect.ps1`](spells/protect/protect.ps1) | Quiet cron-friendly scanner |
 | Get daily ops intelligence | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Operations health summary (not secret scanning) |
 | Get a morning briefing | [`spells/regen/regen.ps1`](spells/regen/regen.ps1) | Weather + key daily status summary |
+| Check all repos at once | [`spells/chronicle/chronicle.ps1`](spells/chronicle/chronicle.ps1) | Cross-repo branch/dirty/ahead-behind + recent commits |
 | Add optional sound cues | [`bard/bard.ps1`](bard/bard.ps1) | Start/success/fail cues across tools |
 
 ## Tools By Category
@@ -48,6 +50,7 @@ Themed names are for personality. Instructions are plain-language first.
 - [`spells/cure/`](spells/cure/) - backup verification.
 - [`spells/protect/`](spells/protect/) - scheduled security scan.
 - [`spells/regen/`](spells/regen/) - morning briefing.
+- [`spells/chronicle/`](spells/chronicle/) - cross-repo git intelligence.
 
 ## Audio Layer
 
@@ -64,6 +67,12 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1
 
 # Run a backup check
 powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1
+
+# Run cross-repo status summary
+powershell -ExecutionPolicy Bypass -File .\spells\chronicle\chronicle.ps1
+
+# Rename command word (example: armory -> faye)
+powershell -ExecutionPolicy Bypass -File .\rename-command-word.ps1 faye
 ```
 
 ## Shopfront And Contribution Path
@@ -98,7 +107,7 @@ CI runs five required checks:
 1. `catalog-validate` (`scripts/validate_shop_catalog.py`)
 2. `secret-hygiene` (`scripts/ci/secret_hygiene.py` + `scripts/ci/check_remote_url.ps1`)
 3. `powershell-smoke` (`scripts/ci/help-smoke.ps1`)
-4. `fixture-tests` (`scripts/ci/run-fixture-tests.ps1`)
+4. `fixture-tests` (`scripts/ci/run-fixture-tests.ps1` + `scripts/ci/run-chronicle-tests.ps1`)
 5. `release-validate` (`scripts/release/validate_release.py --mode ci`)
 
 Local commands:

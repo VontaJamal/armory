@@ -19,6 +19,7 @@ if (-not $runner) {
 $targets = @(
     @{ Name = "awakening help"; Path = "awakening.ps1"; Args = @("-Help") },
     @{ Name = "init alias help"; Path = "init.ps1"; Args = @("-Help") },
+    @{ Name = "rename command help"; Path = "rename-command-word.ps1"; Args = @("-Help") },
     @{ Name = "materia-forge help"; Path = "materia-forge.ps1"; Args = @("-Help") },
     @{ Name = "shop list help"; Path = "shop/list-shop.ps1"; Args = @("-Help") },
     @{ Name = "bard help"; Path = "bard/bard.ps1"; Args = @("-Help") },
@@ -40,6 +41,7 @@ $targets = @(
     @{ Name = "deep-scan alias help"; Path = "weapons/scan/deep-scan.ps1"; Args = @("-Help") },
 
     @{ Name = "libra help"; Path = "spells/libra/libra.ps1"; Args = @("-Help") },
+    @{ Name = "chronicle help"; Path = "spells/chronicle/chronicle.ps1"; Args = @("-Help") },
     @{ Name = "cure help"; Path = "spells/cure/cure.ps1"; Args = @("-Help") },
     @{ Name = "protect help"; Path = "spells/protect/protect.ps1"; Args = @("-Help") },
     @{ Name = "regen help"; Path = "spells/regen/regen.ps1"; Args = @("-Help") }

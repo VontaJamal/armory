@@ -71,6 +71,10 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/run-fixture-tests.ps1 -SevenZipPath "$env:SEVEN_ZIP_PATH"
 
+      - name: Run chronicle fixture tests
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/run-chronicle-tests.ps1
+
   release-validate:
     name: release-validate
     runs-on: ubuntu-latest

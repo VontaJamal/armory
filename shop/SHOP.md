@@ -29,6 +29,14 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
 2. If you only have an idea, add an idea entry now so others can build it later.
 3. Use [`../materia-forge.ps1`](../materia-forge.ps1) for guided scaffolding.
 
+## Active Highlights
+
+## Chronicle (Spell)
+
+- Plain description: Cross-repo git intelligence with branch status, ahead/behind, dirty state, and recent commits.
+- Flavor line: A living record of every front in your codebase.
+- Script: [`../spells/chronicle/chronicle.ps1`](../spells/chronicle/chronicle.ps1)
+
 ## Current Idea Shelf
 
 ## Mognet (Idea)
@@ -50,4 +58,5 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
 
 `materia-forge.ps1` appends or updates short catalog stub lines in this section.
 
+- `chronicle` (spell/active): Cross-repo git intelligence with branch status, ahead/behind, dirty state, and recent commits.
 - `mognet` (idea/idea): Unified notification relay for tool outputs, with channel routing, retries, and digest formatting.

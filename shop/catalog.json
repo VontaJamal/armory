@@ -2,6 +2,18 @@
   "version": 1,
   "entries": [
     {
+      "id": "chronicle",
+      "class": "spell",
+      "name": "Chronicle",
+      "plainDescription": "Cross-repo git intelligence with branch status, ahead/behind, dirty state, and recent commits.",
+      "flavorLine": "A living record of every front in your codebase.",
+      "scriptPath": "spells/chronicle/chronicle.ps1",
+      "readmePath": "spells/chronicle/README.md",
+      "status": "active",
+      "owner": "community",
+      "addedOn": "2026-02-21"
+    },
+    {
       "id": "mognet",
       "class": "idea",
       "name": "Mognet",

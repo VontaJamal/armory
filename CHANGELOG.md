@@ -11,10 +11,13 @@ This file is also the release counter for deprecation windows (see `POLICIES/DEP
 - Shop validator, `materia-forge`, and `shop/list-shop` command support.
 - Release hardening workflows: manual release dispatch, release validation, and secret hygiene enforcement.
 - Branch protection and release policy docs.
+- `chronicle` spell for cross-repo git intelligence with allowlist support.
+- Command-word rename utility (`rename-command-word.ps1`) plus dispatcher routes.
 
 ### Changed
 - Documentation expanded for contributor workflow and policy references.
 - CI required checks expanded to include `secret-hygiene` and `release-validate`.
+- Fixture coverage expanded with Chronicle scenarios.
 
 ## [2026-02-21] - Baseline
 
