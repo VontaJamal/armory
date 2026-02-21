@@ -19,6 +19,21 @@ Short themed line.
 - scriptPath: (or null)
 - readmePath: (or null)
 
+## Display Variants
+
+- display.saga.name:
+- display.saga.description:
+- display.civ.name:
+- display.civ.description:
+
+## Install Metadata
+
+- install.entrypointPath: (or null)
+- install.bundlePaths: []
+- install.dependencies: []
+- install.platforms: []
+- tags: []
+
 ## Status
 
 - status: active | idea | planned | deprecated

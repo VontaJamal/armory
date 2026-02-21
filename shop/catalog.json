@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "entries": [
     {
       "id": "alexander",
@@ -11,7 +11,33 @@
       "readmePath": "summons/alexander/README.md",
       "status": "active",
       "owner": "community",
-      "addedOn": "2026-02-21"
+      "addedOn": "2026-02-21",
+      "display": {
+        "saga": {
+          "name": "Alexander",
+          "description": "Summon the fortress gate to judge release readiness before deployment."
+        },
+        "civ": {
+          "name": "Release Preflight Gate",
+          "description": "Runs read-only release checks and returns pass/fail status."
+        }
+      },
+      "install": {
+        "entrypointPath": "summons/alexander/alexander.ps1",
+        "bundlePaths": [
+          "summons/alexander/alexander.ps1",
+          "summons/alexander/README.md"
+        ],
+        "dependencies": [],
+        "platforms": [
+          "windows"
+        ]
+      },
+      "tags": [
+        "release",
+        "preflight",
+        "validation"
+      ]
     },
     {
       "id": "chronicle",
@@ -23,7 +49,33 @@
       "readmePath": "spells/chronicle/README.md",
       "status": "active",
       "owner": "community",
-      "addedOn": "2026-02-21"
+      "addedOn": "2026-02-21",
+      "display": {
+        "saga": {
+          "name": "Chronicle",
+          "description": "Read the living record of repo fronts, drift, and momentum."
+        },
+        "civ": {
+          "name": "Repo Intelligence",
+          "description": "Collects cross-repo branch, dirty-state, and commit pulse details."
+        }
+      },
+      "install": {
+        "entrypointPath": "spells/chronicle/chronicle.ps1",
+        "bundlePaths": [
+          "spells/chronicle/chronicle.ps1",
+          "spells/chronicle/README.md"
+        ],
+        "dependencies": [],
+        "platforms": [
+          "windows"
+        ]
+      },
+      "tags": [
+        "git",
+        "status",
+        "reporting"
+      ]
     },
     {
       "id": "remedy",
@@ -35,7 +87,33 @@
       "readmePath": "items/remedy/README.md",
       "status": "active",
       "owner": "community",
-      "addedOn": "2026-02-21"
+      "addedOn": "2026-02-21",
+      "display": {
+        "saga": {
+          "name": "Remedy",
+          "description": "Use field medicine to diagnose Armory setup and operational drift."
+        },
+        "civ": {
+          "name": "Environment Health Check",
+          "description": "Runs read-only checks for Armory config, wrappers, CI helpers, and dependencies."
+        }
+      },
+      "install": {
+        "entrypointPath": "items/remedy/remedy.ps1",
+        "bundlePaths": [
+          "items/remedy/remedy.ps1",
+          "items/remedy/README.md"
+        ],
+        "dependencies": [],
+        "platforms": [
+          "windows"
+        ]
+      },
+      "tags": [
+        "diagnostics",
+        "health",
+        "read-only"
+      ]
     },
     {
       "id": "mognet",
@@ -47,7 +125,27 @@
       "readmePath": null,
       "status": "idea",
       "owner": "community",
-      "addedOn": "2026-02-21"
+      "addedOn": "2026-02-21",
+      "display": {
+        "saga": {
+          "name": "Mognet",
+          "description": "An idea for a moogle relay network across tool events."
+        },
+        "civ": {
+          "name": "Notification Relay",
+          "description": "An idea for centralized routing, retry, and digest formatting of tool outputs."
+        }
+      },
+      "install": {
+        "entrypointPath": null,
+        "bundlePaths": [],
+        "dependencies": [],
+        "platforms": []
+      },
+      "tags": [
+        "idea",
+        "notifications"
+      ]
     }
   ]
 }

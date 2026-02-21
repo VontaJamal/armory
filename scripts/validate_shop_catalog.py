@@ -24,10 +24,14 @@ REQUIRED_ENTRY_FIELDS = [
     "status",
     "owner",
     "addedOn",
+    "display",
+    "install",
+    "tags",
 ]
 
 ALLOWED_CLASS = {"summon", "weapon", "spell", "item", "audio", "idea"}
 ALLOWED_STATUS = {"active", "idea", "planned", "deprecated"}
+ALLOWED_MODE = {"saga", "civ"}
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
@@ -47,7 +51,7 @@ def _validate_relative_path(
     require_exists: bool,
 ) -> None:
     if not isinstance(value, str) or not value.strip():
-        errors.append(f"[{entry_label}] {field_name}: must be a non-empty relative path or null")
+        errors.append(f"[{entry_label}] {field_name}: must be a non-empty relative path")
         return
 
     rel = Path(value)
@@ -78,6 +82,118 @@ def _validate_added_on(errors: list[str], *, entry_label: str, value: Any) -> No
         errors.append(f"[{entry_label}] addedOn: invalid calendar date")
 
 
+def _validate_display(errors: list[str], *, entry_label: str, value: Any) -> None:
+    if not isinstance(value, dict):
+        errors.append(f"[{entry_label}] display: must be an object")
+        return
+
+    for mode in sorted(ALLOWED_MODE):
+        mode_obj = value.get(mode)
+        if not isinstance(mode_obj, dict):
+            errors.append(f"[{entry_label}] display.{mode}: must be an object")
+            continue
+        for field in ("name", "description"):
+            field_value = mode_obj.get(field)
+            if not isinstance(field_value, str) or not field_value.strip():
+                errors.append(f"[{entry_label}] display.{mode}.{field}: must be a non-empty string")
+
+
+def _validate_string_list(
+    errors: list[str],
+    *,
+    entry_label: str,
+    field_name: str,
+    value: Any,
+    allow_empty: bool,
+) -> list[str]:
+    if not isinstance(value, list):
+        errors.append(f"[{entry_label}] {field_name}: must be an array")
+        return []
+
+    out: list[str] = []
+    for idx, item in enumerate(value):
+        if not isinstance(item, str) or not item.strip():
+            errors.append(f"[{entry_label}] {field_name}[{idx}]: must be a non-empty string")
+            continue
+        out.append(item)
+
+    if not allow_empty and not out:
+        errors.append(f"[{entry_label}] {field_name}: must contain at least one value")
+
+    return out
+
+
+def _validate_install(
+    errors: list[str],
+    *,
+    entry_label: str,
+    entry: dict[str, Any],
+    status: Any,
+) -> None:
+    value = entry.get("install")
+    if not isinstance(value, dict):
+        errors.append(f"[{entry_label}] install: must be an object")
+        return
+
+    for field in ("entrypointPath", "bundlePaths", "dependencies", "platforms"):
+        if field not in value:
+            errors.append(f"[{entry_label}] install missing field: {field}")
+
+    entrypoint = value.get("entrypointPath")
+    bundle_paths = _validate_string_list(
+        errors,
+        entry_label=entry_label,
+        field_name="install.bundlePaths",
+        value=value.get("bundlePaths"),
+        allow_empty=(status == "idea"),
+    )
+    _validate_string_list(
+        errors,
+        entry_label=entry_label,
+        field_name="install.dependencies",
+        value=value.get("dependencies"),
+        allow_empty=True,
+    )
+    _validate_string_list(
+        errors,
+        entry_label=entry_label,
+        field_name="install.platforms",
+        value=value.get("platforms"),
+        allow_empty=(status == "idea"),
+    )
+
+    if status == "idea":
+        if entrypoint is not None:
+            errors.append(f"[{entry_label}] install.entrypointPath: must be null when status=idea")
+        if bundle_paths:
+            errors.append(f"[{entry_label}] install.bundlePaths: must be empty when status=idea")
+        return
+
+    _validate_relative_path(
+        errors,
+        entry_label=entry_label,
+        field_name="install.entrypointPath",
+        value=entrypoint,
+        require_exists=(status == "active"),
+    )
+
+    for idx, path_value in enumerate(bundle_paths):
+        _validate_relative_path(
+            errors,
+            entry_label=entry_label,
+            field_name=f"install.bundlePaths[{idx}]",
+            value=path_value,
+            require_exists=(status == "active"),
+        )
+
+    script_path = entry.get("scriptPath")
+    if status == "active" and isinstance(script_path, str) and isinstance(entrypoint, str):
+        if script_path != entrypoint:
+            errors.append(
+                f"[{entry_label}] install.entrypointPath must match scriptPath for active entries"
+            )
+
+
 def validate_catalog(catalog: Any) -> list[str]:
     errors: list[str] = []
 
@@ -85,8 +201,8 @@ def validate_catalog(catalog: Any) -> list[str]:
         return ["top-level JSON must be an object"]
 
     version = catalog.get("version")
-    if not isinstance(version, int):
-        errors.append("top-level field 'version' must be an integer")
+    if version != 2:
+        errors.append("top-level field 'version' must be 2")
 
     entries = catalog.get("entries")
     if not isinstance(entries, list):
@@ -175,6 +291,16 @@ def validate_catalog(catalog: Any) -> list[str]:
                     value=readme_path,
                     require_exists=False,
                 )
+
+        _validate_display(errors, entry_label=entry_label, value=entry.get("display"))
+        _validate_install(errors, entry_label=entry_label, entry=entry, status=status)
+        _validate_string_list(
+            errors,
+            entry_label=entry_label,
+            field_name="tags",
+            value=entry.get("tags"),
+            allow_empty=False,
+        )
 
     return errors
 

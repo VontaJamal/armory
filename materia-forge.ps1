@@ -264,12 +264,12 @@ if (-not (Test-Path $catalogPath)) {
     if ($DryRun) {
         $changedFiles.Add("shop/catalog.json (new)") | Out-Null
     } else {
-        @{ version = 1; entries = @() } | ConvertTo-Json -Depth 8 | Set-Content -Path $catalogPath -Encoding UTF8
+        @{ version = 2; entries = @() } | ConvertTo-Json -Depth 8 | Set-Content -Path $catalogPath -Encoding UTF8
         $changedFiles.Add("shop/catalog.json") | Out-Null
     }
 }
 
-$catalog = if (Test-Path $catalogPath) { Get-Content -Path $catalogPath -Raw | ConvertFrom-Json } else { [PSCustomObject]@{ version = 1; entries = @() } }
+$catalog = if (Test-Path $catalogPath) { Get-Content -Path $catalogPath -Raw | ConvertFrom-Json } else { [PSCustomObject]@{ version = 2; entries = @() } }
 $entries = @($catalog.entries)
 
 $newEntry = [ordered]@{
@@ -283,6 +283,23 @@ $newEntry = [ordered]@{
     status = $Status
     owner = $Owner
     addedOn = $addedOn
+    display = @{
+        saga = @{
+            name = $Name
+            description = $FlavorLine
+        }
+        civ = @{
+            name = $Name
+            description = $Description
+        }
+    }
+    install = @{
+        entrypointPath = if ($Category -eq "idea") { $null } else { $scriptPath }
+        bundlePaths = if ($Category -eq "idea") { @() } else { @($scriptPath, $readmePath) }
+        dependencies = @()
+        platforms = if ($Category -eq "idea") { @() } else { @("windows") }
+    }
+    tags = @($Category, $Status)
 }
 
 $existingIndex = -1
