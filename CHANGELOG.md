@@ -13,13 +13,21 @@ This file is also the release counter for deprecation windows (see `POLICIES/DEP
 - Branch protection and release policy docs.
 - `chronicle` spell for cross-repo git intelligence with allowlist support.
 - Command-word rename utility (`rename-command-word.ps1`) plus dispatcher routes.
-- `doctor` health-check command with dispatcher alias `esuna`.
+- `remedy` item command for one-command environment health checks.
+- `alexander` summon command for read-only release preflight gating (plus dispatcher alias `gate`).
+- `civs` command to manage Civilian alias mode (`on`, `off`, `status`).
 
 ### Changed
 - Documentation expanded for contributor workflow and policy references.
 - CI required checks expanded to include `secret-hygiene` and `release-validate`.
 - Fixture coverage expanded with Chronicle scenarios.
 - Root README rewritten into onboarding-first flow with quick paths and release checklist.
+- Dispatcher routes now include `remedy`, `alexander`, and `gate`.
+- `esuna` now routes to Remedy as a supported long-term alias.
+- Added full dispatcher-wide Civilian alias layer with mode control via `civs`.
+
+### Deprecated
+- `doctor.ps1` is now a compatibility alias to `items/remedy/remedy.ps1` and begins a two-release deprecation window.
 
 ## [2026-02-21] - Baseline
 

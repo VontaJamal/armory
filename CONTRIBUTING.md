@@ -25,7 +25,8 @@ Checklist:
 2. Put files in the right category folder (`summons/`, `weapons/`, `spells/`, `items/`, or `bard/`).
 3. Add README sections in docs-contract order.
 4. Ensure script has `-Help` and clear exit code behavior.
-5. Add `shop/catalog.json` entry with `status: "active"` and valid `scriptPath`/`readmePath`.
+5. Define at least one welcoming "Civilian alias" for dispatcher usage when applicable.
+6. Add `shop/catalog.json` entry with `status: "active"` and valid `scriptPath`/`readmePath`.
 
 ## Path B: Idea-Only Submission
 
@@ -68,19 +69,32 @@ pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
 pwsh -File .\scripts\ci\run-chronicle-tests.ps1
-pwsh -File .\doctor.ps1 -Detailed
+pwsh -File .\items\remedy\remedy.ps1 -Detailed
+pwsh -File .\summons\alexander\alexander.ps1
 ```
 
 If your environment does not have PowerShell or 7-Zip, call that out in your PR validation notes.
 
-## Doctor Command (Recommended Preflight)
+## Remedy Command (Recommended Preflight)
 
-Use `doctor.ps1` (dispatcher alias: `esuna`) when you want a single read-only environment health report before shipping changes.
+Use `items/remedy/remedy.ps1` (dispatcher aliases: `remedy`, `esuna`) when you want a single read-only environment health report before shipping changes.
+`doctor.ps1` is still available as a deprecated compatibility alias for two releases.
 
 ```powershell
-pwsh -File .\doctor.ps1
-pwsh -File .\doctor.ps1 -Check config,wrapper
-pwsh -File .\doctor.ps1 -Detailed -Output "$env:USERPROFILE\.armory\reports\doctor.txt"
+pwsh -File .\items\remedy\remedy.ps1
+pwsh -File .\items\remedy\remedy.ps1 -Check config,wrapper
+pwsh -File .\items\remedy\remedy.ps1 -Detailed -Output "$env:USERPROFILE\.armory\reports\remedy.txt"
+pwsh -File .\doctor.ps1 -Check scripts,ci
+```
+
+## Civilian Alias Mode
+
+Use `civs.ps1` (dispatcher route: `civs`) to control plain-language alias availability.
+
+```powershell
+pwsh -File .\civs.ps1 status
+pwsh -File .\civs.ps1 off
+pwsh -File .\civs.ps1 on
 ```
 
 ## Quality Rules
@@ -92,6 +106,7 @@ pwsh -File .\doctor.ps1 -Detailed -Output "$env:USERPROFILE\.armory\reports\doct
 5. Rename migrations must follow the two-release policy in [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md).
 6. Release tags must follow semver format `vMAJOR.MINOR.PATCH`.
 7. Release gating checks are mandatory and defined in [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md).
+8. User-facing commands should include a welcoming Civilian alias for maximum symbiosis.
 
 ## PR Template Notes
 

@@ -2,6 +2,18 @@
   "version": 1,
   "entries": [
     {
+      "id": "alexander",
+      "class": "summon",
+      "name": "Alexander",
+      "plainDescription": "Read-only local release preflight gate that runs Armory validation commands and reports pass/fail.",
+      "flavorLine": "A fortress gate that tests your readiness before deployment.",
+      "scriptPath": "summons/alexander/alexander.ps1",
+      "readmePath": "summons/alexander/README.md",
+      "status": "active",
+      "owner": "community",
+      "addedOn": "2026-02-21"
+    },
+    {
       "id": "chronicle",
       "class": "spell",
       "name": "Chronicle",
@@ -9,6 +21,18 @@
       "flavorLine": "A living record of every front in your codebase.",
       "scriptPath": "spells/chronicle/chronicle.ps1",
       "readmePath": "spells/chronicle/README.md",
+      "status": "active",
+      "owner": "community",
+      "addedOn": "2026-02-21"
+    },
+    {
+      "id": "remedy",
+      "class": "item",
+      "name": "Remedy",
+      "plainDescription": "Read-only environment health checker for Armory config, wrappers, scripts, CI files, remotes, and dependencies.",
+      "flavorLine": "A field medicine kit for your local toolchain.",
+      "scriptPath": "items/remedy/remedy.ps1",
+      "readmePath": "items/remedy/README.md",
       "status": "active",
       "owner": "community",
       "addedOn": "2026-02-21"

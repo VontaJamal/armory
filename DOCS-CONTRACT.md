@@ -32,6 +32,7 @@ Use this contract for every tool README in the Armory.
 - State exactly what `0` and `1` mean for exit codes.
 - Include one "if this fails" section with concrete fixes.
 - Keep themed words in headings or flavor lines, not in core instructions.
+- For dispatcher commands, document a welcoming "Civilian alias" in `Quick Start` and `Migration Notes`.
 
 ## Command Examples
 
