@@ -72,6 +72,23 @@ A living collection of tools, CLIs, and patterns that make OpenClaw agents smart
 
 ## Adding to This File
 
+## Agentic Engineering Patterns
+
+### Behavioral Testing Philosophy
+- **Source:** [@nnennahacks](https://x.com/nnennahacks/status/2025311312037994558) (Feb 21, 2026)
+- **What:** Made Claude Code produce behavioral tests (spec-style) instead of implementation-detail tests. Removed 11 tests, deleted 293 lines, maintained 100% coverage. Test names read as specifications — you know the system guarantees without opening the implementation.
+- **Key insight:** "Test names are specifications." Fewer, better tests > more tests. Removing tests that maintain coverage is an improvement, not a regression.
+- **Sovereign use:** Built into Seven Shadow System as `sss test-quality` — behavioral test quality gate under the Shadow of Testing.
+- **Build candidate:** Already specced → `BUILD-SPEC-SENTINEL-EYE.md`
+
+### Agent PR Monitoring
+- **Source:** [@jarredsumner](https://x.com/jarredsumner) (Feb 21, 2026, Bun creator)
+- **What:** Feature request for `gh` CLI: agent-friendly subcommand for monitoring PRs — unresolved comments with file:line, failing CI logs filtered to errors, lint errors from actions.
+- **Sovereign use:** Built into Seven Shadow System as Sentinel Eye (`sss comments`, `sss failures`, `sss lint`).
+- **Build candidate:** Already specced → `BUILD-SPEC-SENTINEL-EYE.md`
+
+---
+
 When you find a tool, tweet, repo, or pattern that could benefit the Sovereign ecosystem:
 
 1. Add it to the appropriate section
