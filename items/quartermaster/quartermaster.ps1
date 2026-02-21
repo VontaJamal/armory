@@ -547,20 +547,36 @@ function Invoke-ArmoryRefresh {
         }
     }
 
-    $nativePrefExists = $null -ne (Get-Variable -Name PSNativeCommandUseErrorActionPreference -Scope Global -ErrorAction SilentlyContinue)
-    $nativePrefOriginal = $null
-    if ($nativePrefExists) {
-        $nativePrefOriginal = $global:PSNativeCommandUseErrorActionPreference
-        $global:PSNativeCommandUseErrorActionPreference = $false
-    }
+    $stdoutPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stdout-" + [Guid]::NewGuid().ToString("N") + ".log")
+    $stderrPath = Join-Path ([System.IO.Path]::GetTempPath()) ("armory-refresh-stderr-" + [Guid]::NewGuid().ToString("N") + ".log")
+    $exitCode = 1
+    $output = ""
 
     try {
-        $output = & $git.Source -C $ArmoryRepoRoot pull --ff-only 2>&1 | Out-String
-        $exitCode = $LASTEXITCODE
-    } finally {
-        if ($nativePrefExists) {
-            $global:PSNativeCommandUseErrorActionPreference = $nativePrefOriginal
+        $proc = Start-Process `
+            -FilePath $git.Source `
+            -ArgumentList @("-C", $ArmoryRepoRoot, "pull", "--ff-only") `
+            -NoNewWindow `
+            -Wait `
+            -PassThru `
+            -RedirectStandardOutput $stdoutPath `
+            -RedirectStandardError $stderrPath
+
+        $exitCode = $proc.ExitCode
+
+        $stdout = ""
+        $stderr = ""
+        if (Test-Path $stdoutPath) {
+            $stdout = Get-Content -Path $stdoutPath -Raw -ErrorAction SilentlyContinue
         }
+        if (Test-Path $stderrPath) {
+            $stderr = Get-Content -Path $stderrPath -Raw -ErrorAction SilentlyContinue
+        }
+
+        $output = @($stdout, $stderr) -join "`n"
+    } finally {
+        Remove-Item -Path $stdoutPath -ErrorAction SilentlyContinue
+        Remove-Item -Path $stderrPath -ErrorAction SilentlyContinue
     }
     $ok = ($exitCode -eq 0)
 
