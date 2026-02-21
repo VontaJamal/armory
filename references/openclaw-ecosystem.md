@@ -81,6 +81,13 @@ A living collection of tools, CLIs, and patterns that make OpenClaw agents smart
 - **Sovereign use:** Built into Seven Shadow System as `sss test-quality` — behavioral test quality gate under the Shadow of Testing.
 - **Build candidate:** Already specced → `BUILD-SPEC-SENTINEL-EYE.md`
 
+### Don't Test What the Type System Guarantees
+- **Source:** [@mattpocockuk](https://x.com/mattpocockuk) (Feb 17, 2026) — 1K likes, 95K views, reposted by @VontaJamal
+- **What:** "Don't write tests for what the type system already guarantees." Helps eliminate an entire class of useless tests — type-checking a string is a string, verifying an interface shape that TypeScript already enforces.
+- **Key insight:** If the compiler catches it, a test for it is waste. Agents especially need this rule because they default to writing tests for everything including type contracts.
+- **Sovereign use:** Feeds into `sss test-quality` — flag tests that duplicate type system guarantees as candidates for removal.
+- **Build candidate:** Already covered by Sentinel Eye spec
+
 ### Agent PR Monitoring
 - **Source:** [@jarredsumner](https://x.com/jarredsumner) (Feb 21, 2026, Bun creator)
 - **What:** Feature request for `gh` CLI: agent-friendly subcommand for monitoring PRs — unresolved comments with file:line, failing CI logs filtered to errors, lint errors from actions.
