@@ -276,3 +276,9 @@ pwsh -File .\summons\alexander\alexander.ps1
 - [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
 - [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)
 - [`CHANGELOG.md`](CHANGELOG.md)
+
+---
+
+## Protected by the [Seven Shadows](https://github.com/VontaJamal/seven-shadow-system)
+
+Part of [Sovereign](https://github.com/VontaJamal) — The Shadow Dominion.
