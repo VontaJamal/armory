@@ -203,9 +203,11 @@ function Resolve-ArmoryRoot {
     param([hashtable]$Config)
 
     $candidates = New-Object System.Collections.Generic.List[string]
+    $explicitRoot = $null
 
     if ($ArmoryRoot) {
-        $candidates.Add((Expand-ArmoryPath -PathValue $ArmoryRoot))
+        $explicitRoot = Expand-ArmoryPath -PathValue $ArmoryRoot
+        $candidates.Add($explicitRoot)
     }
 
     if ($Config.ContainsKey("repoRoot") -and [string]$Config["repoRoot"]) {
@@ -239,7 +241,20 @@ function Resolve-ArmoryRoot {
 
         if (Test-IsArmoryRoot -PathValue $expanded) {
             $resolved = (Resolve-Path $expanded).Path
-            Save-ArmoryConfig -Config $Config -RepoRoot $resolved
+            $shouldPersist = $true
+            if ($explicitRoot) {
+                $explicitResolved = $explicitRoot
+                if (Test-Path $explicitRoot) {
+                    $explicitResolved = (Resolve-Path $explicitRoot).Path
+                }
+                if ($resolved.ToLowerInvariant() -eq $explicitResolved.ToLowerInvariant()) {
+                    $shouldPersist = $false
+                }
+            }
+
+            if ($shouldPersist) {
+                Save-ArmoryConfig -Config $Config -RepoRoot $resolved
+            }
             return $resolved
         }
     }
