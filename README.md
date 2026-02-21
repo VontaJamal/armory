@@ -1,8 +1,8 @@
 # The Armory ⚔️
 
-Battle-tested tools and guides for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI setups.
+Battle-tested terminal tools for developers. API key management, system diagnostics, encrypted backups, service monitoring, and more.
 
-Everything here was built solving real problems in production. No theory. No tutorials. Just weapons.
+Works with any terminal setup. Extra features for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI users, but everything here stands on its own.
 
 ---
 
