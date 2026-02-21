@@ -1,116 +1,67 @@
 # The Armory
 
-Practical command-line tools for backups, security checks, service health, diagnostics, and scheduled automation.
+Practical command-line tools for backups, security checks, service health, diagnostics, release hygiene, and scheduled automation.
 
-Themed names are for personality. Instructions are plain-language first.
+Themed names stay for personality. Instructions stay plain-language first.
 
 [![Armory CI](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml/badge.svg)](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml)
 
-## Pick The Right Tool
+## What's New (Latest Wave)
 
-| You need to... | Use this tool | Why |
-|---|---|---|
-| Set up a command word like `faye` | [`awakening.ps1`](awakening.ps1) | One-time setup for command routing and PATH |
-| Rename your command word later | [`rename-command-word.ps1`](rename-command-word.ps1) | Switch to any new command word quickly |
-| Save encrypted backups | [`weapons/phoenix-down/phoenix-down.ps1`](weapons/phoenix-down/phoenix-down.ps1) | Creates encrypted backup archives |
-| Bootstrap backup automation | [`weapons/phoenix-down/save-point.ps1`](weapons/phoenix-down/save-point.ps1) | Sets up recurring backup + restore command |
-| Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Detects stale/corrupt backups and returns strict exit codes |
-| Check services now | [`weapons/aegis/aegis.ps1`](weapons/aegis/aegis.ps1) | Service monitor with optional alerts |
-| Scan repos for leaked secrets | [`weapons/scan/scan.ps1`](weapons/scan/scan.ps1) | Fast manual security scan |
-| Run deeper security scan | [`weapons/truesight/truesight.ps1`](weapons/truesight/truesight.ps1) | Broader and deeper security checks |
-| Schedule security scans | [`spells/protect/protect.ps1`](spells/protect/protect.ps1) | Quiet cron-friendly scanner |
-| Get daily ops intelligence | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Operations health summary (not secret scanning) |
-| Get a morning briefing | [`spells/regen/regen.ps1`](spells/regen/regen.ps1) | Weather + key daily status summary |
-| Check all repos at once | [`spells/chronicle/chronicle.ps1`](spells/chronicle/chronicle.ps1) | Cross-repo branch/dirty/ahead-behind + recent commits |
-| Add optional sound cues | [`bard/bard.ps1`](bard/bard.ps1) | Start/success/fail cues across tools |
+- Added `chronicle` for cross-repo git intelligence (plus plain alias `status`).
+- Added easy command-word rename utility: `rename-command-word.ps1`.
+- Added release hardening workflows and policies (`release.yml`, release validator, branch protection baseline).
+- Expanded CI with secret hygiene and release validation checks.
+- Added `doctor` health-check command (plus themed alias `esuna`) for one-command environment diagnostics.
 
-## Tools By Category
-
-## Summons (full workflows)
-
-- [`summons/bahamut/`](summons/bahamut/) - restore a full environment from encrypted backup.
-- [`summons/ifrit/`](summons/ifrit/) - create and register a new specialist agent.
-- [`summons/odin/`](summons/odin/) - run cleanup for stale logs/temp/session files.
-- [`summons/ramuh/`](summons/ramuh/) - run an all-in-one system diagnostic.
-- [`summons/shiva/`](summons/shiva/) - capture and compare machine snapshots.
-
-## Weapons (manual tools)
-
-- [`weapons/masamune/`](weapons/masamune/) - manage and swap provider API keys.
-- [`weapons/phoenix-down/`](weapons/phoenix-down/) - create encrypted backups and setup restore flows.
-- [`weapons/aegis/`](weapons/aegis/) - service health checks.
-- [`weapons/scan/`](weapons/scan/) - fast security scan.
-- [`weapons/truesight/`](weapons/truesight/) - deep security scan.
-- [`weapons/jutsu/`](weapons/jutsu/) - macOS zsh key-swap and gateway helper.
-- `weapons/warp/` (planned) - one-command SSH into any machine. No memorizing IPs or keys.
-
-## Spells (scheduled automation)
-
-- [`spells/libra/`](spells/libra/) - daily operations report.
-- [`spells/cure/`](spells/cure/) - backup verification.
-- [`spells/protect/`](spells/protect/) - scheduled security scan.
-- [`spells/regen/`](spells/regen/) - morning briefing.
-- [`spells/chronicle/`](spells/chronicle/) - cross-repo git intelligence.
-
-## Audio Layer
-
-- [`bard/`](bard/) - optional sound effects and themes.
-
-## Quick Start (Windows PowerShell 5.1)
+## Start Here In 5 Minutes
 
 ```powershell
-# Install command dispatcher
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1
+# 1) Install your command word dispatcher (example: armory)
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord armory
 
-# Browse shop catalog
-powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1
+# 2) Quick security scan
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1
 
-# Run a backup check
+# 3) Backup health check
 powershell -ExecutionPolicy Bypass -File .\spells\cure\cure.ps1
 
-# Run cross-repo status summary
+# 4) Cross-repo status (uses ~/.armory/repos.json)
 powershell -ExecutionPolicy Bypass -File .\spells\chronicle\chronicle.ps1
 
-# Rename command word (example: armory -> faye)
+# 5) Rename command word later (example: armory -> faye)
 powershell -ExecutionPolicy Bypass -File .\rename-command-word.ps1 faye
 ```
 
-## Shopfront And Contribution Path
+## Command Word Lifecycle
 
-This repository is the shopfront.
+1. First setup: run `awakening.ps1` to create `%USERPROFILE%\bin\<commandWord>.cmd`.
+2. Daily use: run commands like `<command-word> scan` or `<command-word> chronicle`.
+3. Rename later:
+4. direct script: `powershell -ExecutionPolicy Bypass -File .\rename-command-word.ps1 newword`
+5. dispatcher route: `<command-word> rename newword`
+6. Keep old alias when needed: `-KeepOldAlias`.
+7. Chronicle alias: `<command-word> status` routes to `chronicle`.
 
-1. Browse catalog docs: [`shop/SHOP.md`](shop/SHOP.md)
-2. Browse catalog data: [`shop/catalog.json`](shop/catalog.json)
-3. Add new entries: [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md)
-4. Scaffold a new tool: `powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1`
+## Operations Quick Paths
 
-Examples:
+### Daily
 
 ```powershell
-# Table view
-powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1
-
-# JSON output for automation
-powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format json
-
-# Scaffold a weapon tool
-powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category weapon -Name "Aero Guard" -Description "Monitors service restarts"
-
-# Add an idea-only entry
-powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Name "Mognet" -Description "Unified notification relay for tool outputs" -FlavorLine "A reliable message network for operational updates."
+<command-word> doctor
+<command-word> libra
+<command-word> chronicle
 ```
 
-## CI And Validation
+### Weekly
 
-CI runs five required checks:
+```powershell
+<command-word> protect
+<command-word> cure
+<command-word> scan
+```
 
-1. `catalog-validate` (`scripts/validate_shop_catalog.py`)
-2. `secret-hygiene` (`scripts/ci/secret_hygiene.py` + `scripts/ci/check_remote_url.ps1`)
-3. `powershell-smoke` (`scripts/ci/help-smoke.ps1`)
-4. `fixture-tests` (`scripts/ci/run-fixture-tests.ps1` + `scripts/ci/run-chronicle-tests.ps1`)
-5. `release-validate` (`scripts/release/validate_release.py --mode ci`)
-
-Local commands:
+### Release Day
 
 ```bash
 python3 scripts/validate_shop_catalog.py
@@ -122,23 +73,114 @@ python3 scripts/release/validate_release.py --mode ci
 pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
+pwsh -File .\scripts\ci\run-chronicle-tests.ps1
 ```
 
-## Release Flow
+### Incident
 
-Releases are manual and gated.
+```powershell
+<command-word> aegis
+<command-word> truesight
+<command-word> doctor -Detailed
+```
 
-1. Add a semver section to `CHANGELOG.md` (for example `## [v1.2.0]`).
-2. Run preflight checks locally.
-3. Run GitHub workflow `Armory Release` with:
-4. `version` set to `vMAJOR.MINOR.PATCH`.
-5. `target_branch` set to `main` (default).
-6. `dry_run` first, then real release.
+## Release Day Checklist
 
-Policy docs:
+1. Ensure `CHANGELOG.md` has a semver section like `## [v1.2.0]`.
+2. Run local preflight commands above.
+3. Run GitHub workflow `Armory Release` in dry run mode.
+4. Re-run without dry run to publish tag and release notes.
+
+Policy references:
 
 - [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
 - [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)
+- [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)
+
+## Pick The Right Tool
+
+| You need to... | Use this tool | Why |
+|---|---|---|
+| Set up a command word | [`awakening.ps1`](awakening.ps1) | One-time setup for dispatcher + PATH |
+| Rename command word later | [`rename-command-word.ps1`](rename-command-word.ps1) | Move to any new command word quickly |
+| Run one-command environment checks | [`doctor.ps1`](doctor.ps1) | Validates config, wrapper, scripts, CI files, remotes, deps |
+| Save encrypted backups | [`weapons/phoenix-down/phoenix-down.ps1`](weapons/phoenix-down/phoenix-down.ps1) | Creates encrypted backup archives |
+| Verify backup health | [`spells/cure/cure.ps1`](spells/cure/cure.ps1) | Stale/corrupt detection with strict exit codes |
+| Check service health now | [`weapons/aegis/aegis.ps1`](weapons/aegis/aegis.ps1) | Fast service monitor |
+| Run fast secret scan | [`weapons/scan/scan.ps1`](weapons/scan/scan.ps1) | Manual security scan |
+| Run deeper secret scan | [`weapons/truesight/truesight.ps1`](weapons/truesight/truesight.ps1) | Broader and deeper checks |
+| Schedule security scans | [`spells/protect/protect.ps1`](spells/protect/protect.ps1) | Scheduler-friendly security workflow |
+| Get daily ops intelligence | [`spells/libra/libra.ps1`](spells/libra/libra.ps1) | Ops report with optional repo pulse |
+| Get cross-repo git intelligence | [`spells/chronicle/chronicle.ps1`](spells/chronicle/chronicle.ps1) | Branch/dirty/ahead-behind + recent commits |
+| Use plain alias for chronicle | Dispatcher `status` | Easier language for regular users |
+| Add sound cues | [`bard/bard.ps1`](bard/bard.ps1) | Start/success/fail cues across tools |
+
+## Tool Catalog
+
+### Summons (full workflows)
+
+- [`summons/bahamut/`](summons/bahamut/) - restore full environment from encrypted backup.
+- [`summons/ifrit/`](summons/ifrit/) - create and register specialist agent.
+- [`summons/odin/`](summons/odin/) - clean stale logs/temp/session files.
+- [`summons/ramuh/`](summons/ramuh/) - all-in-one system diagnostic.
+- [`summons/shiva/`](summons/shiva/) - capture and compare machine snapshots.
+
+### Weapons (manual tools)
+
+- [`weapons/masamune/`](weapons/masamune/) - provider API key swapping.
+- [`weapons/phoenix-down/`](weapons/phoenix-down/) - encrypted backup workflows.
+- [`weapons/aegis/`](weapons/aegis/) - service health checks.
+- [`weapons/scan/`](weapons/scan/) - fast security scan.
+- [`weapons/truesight/`](weapons/truesight/) - deep security scan.
+- [`weapons/jutsu/`](weapons/jutsu/) - macOS zsh swap + gateway helper.
+- `weapons/warp/` (planned) - one-command SSH into any machine.
+
+### Spells (scheduled/automation-focused)
+
+- [`spells/libra/`](spells/libra/) - daily operations report.
+- [`spells/cure/`](spells/cure/) - backup verification.
+- [`spells/protect/`](spells/protect/) - scheduled security scan.
+- [`spells/regen/`](spells/regen/) - morning briefing.
+- [`spells/chronicle/`](spells/chronicle/) - cross-repo git intelligence.
+
+### Audio Layer
+
+- [`bard/`](bard/) - optional sound effects and themes.
+
+## Shopfront And Contributions
+
+This repository is the shopfront.
+
+1. Browse catalog docs: [`shop/SHOP.md`](shop/SHOP.md)
+2. Browse catalog data: [`shop/catalog.json`](shop/catalog.json)
+3. Add ideas or tools: [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md)
+4. Scaffold with: `powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1`
+
+## CI And Local Validation
+
+Required CI checks:
+
+1. `catalog-validate`
+2. `secret-hygiene`
+3. `powershell-smoke`
+4. `fixture-tests`
+5. `release-validate`
+
+Local validation commands:
+
+```bash
+python3 scripts/validate_shop_catalog.py
+python3 scripts/ci/secret_hygiene.py
+python3 scripts/release/validate_release.py --mode ci
+```
+
+```powershell
+pwsh -File .\scripts\ci\check_remote_url.ps1
+pwsh -File .\scripts\ci\help-smoke.ps1
+pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
+pwsh -File .\scripts\ci\run-chronicle-tests.ps1
+pwsh -File .\doctor.ps1 -Detailed
+```
 
 ## Compatibility Aliases (One Release)
 
@@ -147,20 +189,11 @@ Policy docs:
 - `weapons/scan/deep-scan.ps1` -> `weapons/truesight/truesight.ps1`
 - `weapons/phoenix-down/setup-rebirth.ps1` -> `weapons/phoenix-down/save-point.ps1`
 
-Deprecation lifecycle is documented in [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md) and tracked in [`CHANGELOG.md`](CHANGELOG.md).
+## Docs And Policies
 
-## Tool Categories
-
-- Summons: [`summons/`](summons/) - full workflows and orchestration commands.
-- Weapons: [`weapons/`](weapons/) - direct-use operational and security utilities.
-- Spells: [`spells/`](spells/) - scheduler-friendly recurring checks.
-- Items: [`items/`](items/) - practical reference guides.
-- Audio: [`bard/`](bard/) - optional sound themes.
-
-## Contributor Docs
-
-- Contribution workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- README contract for each tool: [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md)
-- Deprecation lifecycle policy: [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)
-- Release lifecycle policy: [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
-- Branch protection baseline: [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)
+- [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md)
+- [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)
+- [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
+- [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)
+- [`CHANGELOG.md`](CHANGELOG.md)

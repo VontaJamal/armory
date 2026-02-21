@@ -68,9 +68,20 @@ pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
 pwsh -File .\scripts\ci\run-chronicle-tests.ps1
+pwsh -File .\doctor.ps1 -Detailed
 ```
 
 If your environment does not have PowerShell or 7-Zip, call that out in your PR validation notes.
+
+## Doctor Command (Recommended Preflight)
+
+Use `doctor.ps1` (dispatcher alias: `esuna`) when you want a single read-only environment health report before shipping changes.
+
+```powershell
+pwsh -File .\doctor.ps1
+pwsh -File .\doctor.ps1 -Check config,wrapper
+pwsh -File .\doctor.ps1 -Detailed -Output "$env:USERPROFILE\.armory\reports\doctor.txt"
+```
 
 ## Quality Rules
 
