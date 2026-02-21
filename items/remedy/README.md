@@ -36,7 +36,7 @@ powershell -ExecutionPolicy Bypass -File .\items\remedy\remedy.ps1 -Output "$env
 
 | Flag | Default | Description |
 |---|---|---|
-| `-Check <name[]>` | all checks | Run only selected checks (`config`, `wrapper`, `scripts`, `repos`, `ci`, `remote`, `deps`) |
+| `-Check <name[]>` | all checks | Run only selected checks (`config`, `wrapper`, `scripts`, `repos`, `ci`, `shadow`, `remote`, `deps`) |
 | `-Detailed` | off | Adds JSON-like detail payload to output |
 | `-Output <path>` | none | Writes report text to a file |
 | `-Sound` | off | Enables optional start/success/fail cues |
@@ -45,7 +45,7 @@ powershell -ExecutionPolicy Bypass -File .\items\remedy\remedy.ps1 -Output "$env
 
 ## Config
 
-- `~/.armory/config.json` is used for command word and wrapper checks.
+- `~/.armory/config.json` is used for command word, wrapper, and mode (`saga|civ`) checks.
 - `~/.armory/repos.json` is used for repos allowlist checks.
 - Repo files are resolved relative to the Armory repository root.
 
@@ -60,6 +60,7 @@ powershell -ExecutionPolicy Bypass -File .\items\remedy\remedy.ps1 -Output "$env
 - `config` fails: run `awakening.ps1` again to regenerate `~/.armory/config.json`.
 - `wrapper` fails: verify `%USERPROFILE%\bin\<command-word>.cmd` exists and PATH includes install directory.
 - `repos` fails: create/repair `~/.armory/repos.json` with a `repos` array.
+- `shadow` warns: `governance/seven-shadow-system` not found in repo root.
 - `remote` fails: remove embedded credentials from `git remote -v` URLs.
 
 ## Automation Examples

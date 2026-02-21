@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Manage Civilian alias mode for Armory dispatcher commands.
+  Manage Armory mode (`saga` or `civ`) for aliases and reporting tone.
 #>
 
 param(
@@ -25,17 +25,34 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 
 function Show-Usage {
     Write-Host ""
-    Write-Host "  Civilian Alias Mode" -ForegroundColor Cyan
+    Write-Host "  Armory Mode" -ForegroundColor Cyan
     Write-Host "  -----------------------------" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "  Toggle plain-language civilian aliases for dispatcher commands."
+    Write-Host "  Toggle between Crystal Saga Mode and Civilian Mode."
     Write-Host ""
     Write-Host "  Usage:"
     Write-Host "    .\civs.ps1"
     Write-Host "    .\civs.ps1 status"
-    Write-Host "    .\civs.ps1 on"
-    Write-Host "    .\civs.ps1 off"
+    Write-Host "    .\civs.ps1 on   # Civilian Mode"
+    Write-Host "    .\civs.ps1 off  # Crystal Saga Mode"
     Write-Host ""
+}
+
+function Resolve-CanonicalMode {
+    param([pscustomobject]$Config)
+
+    if ($null -ne $Config -and $Config.PSObject.Properties.Name -contains "mode") {
+        $raw = [string]$Config.mode
+        if ($raw -eq "civ") { return "civ" }
+        if ($raw -in @("saga", "lore", "crystal")) { return "saga" }
+    }
+
+    if ($null -ne $Config -and $Config.PSObject.Properties.Name -contains "civilianAliases") {
+        if ([bool]$Config.civilianAliases) { return "civ" }
+        return "saga"
+    }
+
+    return "saga"
 }
 
 if ($Help) {
@@ -68,35 +85,33 @@ try {
     exit 1
 }
 
-$currentEnabled = $true
-if ($config.PSObject.Properties.Name -contains "civilianAliases") {
-    $currentEnabled = [bool]$config.civilianAliases
-}
+$currentMode = Resolve-CanonicalMode -Config $config
 
 switch ($Mode) {
     "on" {
-        $currentEnabled = $true
-        $config | Add-Member -NotePropertyName civilianAliases -NotePropertyValue $true -Force
-        $config | ConvertTo-Json -Depth 8 | Set-Content -Path $configPath -Encoding UTF8
-        Write-Host "  Civilian aliases are now ON." -ForegroundColor Green
+        $currentMode = "civ"
+        Write-Host "  Civilian Mode is now ON." -ForegroundColor Green
     }
     "off" {
-        $currentEnabled = $false
-        $config | Add-Member -NotePropertyName civilianAliases -NotePropertyValue $false -Force
-        $config | ConvertTo-Json -Depth 8 | Set-Content -Path $configPath -Encoding UTF8
-        Write-Host "  Civilian aliases are now OFF." -ForegroundColor Yellow
+        $currentMode = "saga"
+        Write-Host "  Crystal Saga Mode is now ON." -ForegroundColor Yellow
     }
     default {
-        # status mode: no file mutation
+        # status mode: no file mutation beyond normalization
     }
 }
 
-$statusText = if ($currentEnabled) { "ON" } else { "OFF" }
-$statusColor = if ($currentEnabled) { "Green" } else { "Yellow" }
+# Persist canonical mode and legacy alias boolean for compatibility.
+$config | Add-Member -NotePropertyName mode -NotePropertyValue $currentMode -Force
+$config | Add-Member -NotePropertyName civilianAliases -NotePropertyValue ($currentMode -eq "civ") -Force
+$config | ConvertTo-Json -Depth 8 | Set-Content -Path $configPath -Encoding UTF8
+
+$modeLabel = if ($currentMode -eq "civ") { "Civilian Mode" } else { "Crystal Saga Mode" }
+$statusColor = if ($currentMode -eq "civ") { "Green" } else { "Yellow" }
 $commandWord = if ($config.PSObject.Properties.Name -contains "commandWord") { [string]$config.commandWord } else { "<command-word>" }
 
 Write-Host ""
-Write-Host ("  Current status: {0}" -f $statusText) -ForegroundColor $statusColor
+Write-Host ("  Current mode: {0} ({1})" -f $modeLabel, $currentMode) -ForegroundColor $statusColor
 Write-Host "  Command examples:" -ForegroundColor Cyan
 Write-Host ("    {0} civs status" -f $commandWord) -ForegroundColor White
 Write-Host ("    {0} civs on" -f $commandWord) -ForegroundColor White
