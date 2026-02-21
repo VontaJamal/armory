@@ -42,6 +42,15 @@ Guides and reference docs. Knowledge that saves you hours.
 | [**NSSM Services**](items/nssm-services/) | Register any process as a Windows service that survives reboots |
 | [**Agent Comms**](items/agent-comms/) | Multi-agent communication patterns, session keys, relay protocols |
 
+## 🐉 Summon Chamber
+
+The top shelf. Full systems summoned with one command.
+
+| Summon | What It Brings |
+|--------|---------------|
+| [**Ifrit**](summons/ifrit/) | Summon a fully configured AI agent — workspace, personality, memory, config, ready for orders |
+| [**Odin**](summons/odin/) | Zantetsuken — one-slash system cleanup. Zombies, stale sessions, bloated logs, all cut |
+
 ---
 
 ## How to Use
@@ -49,6 +58,8 @@ Guides and reference docs. Knowledge that saves you hours.
 **Weapons:** Browse `weapons/`, pick one, follow the README. Copy the script, run the installer, done.
 
 **Spells:** Browse `spells/`, copy the cron config into your OpenClaw setup. They cast themselves from there.
+
+**Summons:** Browse `summons/`, run the script. These are full systems — they set up everything for you.
 
 **Items:** Browse `items/`, find the guide, follow it. Most problems are solved in under 5 minutes with these.
 
