@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Odin — Zantetsuken. System cleanup in one slash.
+  Odin - Zantetsuken. System cleanup in one slash.
 .USAGE
   .\odin.ps1              Full sweep
   .\odin.ps1 -DryRun      Show what would be cut
@@ -15,12 +15,45 @@ param(
     [switch]$Chrome,
     [switch]$Sessions,
     [switch]$Logs,
-    [switch]$Temp
+    [switch]$Temp,
+    [switch]$Help,
+    [switch]$Sound,
+    [switch]$NoSound
 )
 
 $ErrorActionPreference = "Continue"
 $totalFreed = 0
 $allTargets = -not ($Chrome -or $Sessions -or $Logs -or $Temp)
+
+$hookCandidates = @(
+    (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
+    (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
+)
+foreach ($h in $hookCandidates) {
+    if (Test-Path $h) { . $h; break }
+}
+$soundContext = $null
+if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
+    $soundContext = Initialize-ArmorySound -Sound:$Sound -NoSound:$NoSound
+    Invoke-ArmoryCue -Context $soundContext -Type start
+}
+
+if ($Help) {
+    Write-Host ""
+    Write-Host "  Odin" -ForegroundColor Red
+    Write-Host "  -----------------------------" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "  Usage:"
+    Write-Host "    .\odin.ps1"
+    Write-Host "    .\odin.ps1 -DryRun"
+    Write-Host "    .\odin.ps1 -Chrome"
+    Write-Host "    .\odin.ps1 -Sessions"
+    Write-Host "    .\odin.ps1 -Logs"
+    Write-Host "    .\odin.ps1 -Temp"
+    Write-Host ""
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+    exit 0
+}
 
 function Format-Size($bytes) {
     if ($bytes -ge 1GB) { return "{0:N1} GB" -f ($bytes / 1GB) }
@@ -184,3 +217,4 @@ if ($DryRun) {
 Write-Host ""
 Write-Host "  Clean cut." -ForegroundColor Red
 Write-Host ""
+if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }

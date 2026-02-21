@@ -7,24 +7,39 @@
     .\shiva.ps1 --list       List all snapshots
 #>
 param(
-    [switch]$Help
+    [switch]$Help,
+    [switch]$Sound,
+    [switch]$NoSound
 )
 
 $snapshotDir = Join-Path $env:USERPROFILE ".shiva\snapshots"
 $isDiff = $args -contains "--diff"
 $isList = $args -contains "--list"
 
+$hookCandidates = @(
+    (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
+    (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
+)
+foreach ($h in $hookCandidates) {
+    if (Test-Path $h) { . $h; break }
+}
+$soundContext = $null
+if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
+    $soundContext = Initialize-ArmorySound -Sound:$Sound -NoSound:$NoSound
+    Invoke-ArmoryCue -Context $soundContext -Type start
+}
+
 function Write-Banner {
     Write-Host ""
-    Write-Host "  ❄️ " -NoNewline -ForegroundColor Cyan
+    Write-Host "  * " -NoNewline -ForegroundColor Cyan
     Write-Host "Diamond Dust" -ForegroundColor White
-    Write-Host "  ─────────────────────────────" -ForegroundColor DarkGray
+    Write-Host "  -----------------------------" -ForegroundColor DarkGray
 }
 
 if ($Help) {
     Write-Host @"
 
-  ❄️ Shiva — Diamond Dust
+  * Shiva - Diamond Dust
   Freeze your system state. Compare snapshots to find what changed.
 
   Usage:
@@ -35,6 +50,7 @@ if ($Help) {
     .\shiva.ps1 -Help        This message
 
 "@
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
     exit 0
 }
 
@@ -43,7 +59,7 @@ if (-not (Test-Path $snapshotDir)) { New-Item -Path $snapshotDir -ItemType Direc
 
 Write-Banner
 
-# ── List ────────────────────────────────────────────────
+# -- List ------------------------------------------------
 if ($isList) {
     $files = Get-ChildItem $snapshotDir -Filter "*.json" | Sort-Object Name -Descending
     if ($files.Count -eq 0) {
@@ -57,10 +73,11 @@ if ($isList) {
         }
     }
     Write-Host ""
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
     exit 0
 }
 
-# ── Diff ────────────────────────────────────────────────
+# -- Diff ------------------------------------------------
 if ($isDiff) {
     $diffIdx = [Array]::IndexOf($args, "--diff")
     $diffArgs = @($args | Select-Object -Skip ($diffIdx + 1) | Where-Object { $_ -notmatch "^--" })
@@ -73,6 +90,7 @@ if ($isDiff) {
         $files = Get-ChildItem $snapshotDir -Filter "*.json" | Sort-Object Name -Descending | Select-Object -First 2
         if ($files.Count -lt 2) {
             Write-Host "`n  Need at least 2 snapshots to diff. Take more snapshots first." -ForegroundColor Yellow
+            if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
             Write-Host ""; exit 1
         }
         $file1 = $files[1].FullName; $file2 = $files[0].FullName
@@ -82,7 +100,7 @@ if ($isDiff) {
     $new = Get-Content $file2 -Raw | ConvertFrom-Json
 
     Write-Host "`n  Comparing:" -ForegroundColor DarkGray
-    Write-Host "    $(Split-Path $file1 -Leaf) → $(Split-Path $file2 -Leaf)" -ForegroundColor White
+    Write-Host "    $(Split-Path $file1 -Leaf) -> $(Split-Path $file2 -Leaf)" -ForegroundColor White
 
     # Service diff
     $svcChanges = @()
@@ -98,7 +116,7 @@ if ($isDiff) {
         foreach ($c in $svcChanges) {
             $color = if ($c.to -eq "Running") { "Green" } else { "Red" }
             Write-Host "    $($c.name.PadRight(30))" -NoNewline -ForegroundColor White
-            Write-Host "$($c.from) → $($c.to)" -ForegroundColor $color
+            Write-Host "$($c.from) -> $($c.to)" -ForegroundColor $color
         }
     }
 
@@ -119,7 +137,7 @@ if ($isDiff) {
         foreach ($c in $diskChanges) {
             $sign = if ($c.delta -gt 0) { "+" } else { "" }
             $color = if ($c.delta -lt 0) { "Yellow" } else { "Green" }
-            Write-Host "    $($c.drive)  $($c.from) GB → $($c.to) GB" -NoNewline -ForegroundColor White
+            Write-Host "    $($c.drive)  $($c.from) GB -> $($c.to) GB" -NoNewline -ForegroundColor White
             Write-Host "  (${sign}$($c.delta) GB)" -ForegroundColor $color
         }
     }
@@ -161,10 +179,11 @@ if ($isDiff) {
     }
 
     Write-Host ""
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
     exit 0
 }
 
-# ── Snapshot ────────────────────────────────────────────
+# -- Snapshot --------------------------------------------
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $outFile = Join-Path $snapshotDir "$timestamp.json"
 
@@ -220,3 +239,4 @@ Write-Host "  Snapshot saved: " -NoNewline -ForegroundColor Green
 Write-Host $outFile -ForegroundColor White
 Write-Host "  Captured: $svcCount services, $procCount processes, $portCount ports, $diskCount drives" -ForegroundColor DarkGray
 Write-Host ""
+if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }

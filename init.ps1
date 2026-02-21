@@ -1,10 +1,11 @@
 <#
 .SYNOPSIS
-  Legacy alias wrapper for save-point.
+  Legacy alias wrapper for awakening.
 #>
 
-Write-Host "  setup-rebirth.ps1 is a compatibility alias. Use save-point.ps1 for new setups." -ForegroundColor Yellow
-$target = Join-Path $PSScriptRoot "save-point.ps1"
+$target = Join-Path $PSScriptRoot "awakening.ps1"
+
+Write-Host "  init.ps1 is a compatibility alias. Use awakening.ps1 for new setups." -ForegroundColor Yellow
 if (-not (Test-Path $target)) {
     Write-Host "  Missing target script: $target" -ForegroundColor Red
     exit 1
