@@ -92,8 +92,8 @@ if (-not $Quiet) {
 
 foreach ($repo in $repos) {
     $files = Get-ChildItem $repo.FullName -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-        $_.FullName -notmatch "[\\/](\\.git|node_modules|\\.venv|dist|__pycache__)[\\/]" -and
-        $_.Extension -match "\\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$"
+        $_.FullName -notmatch '[\\/](\.git|node_modules|\.venv|dist|__pycache__)[\\/]' -and
+        $_.Extension -match '\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$'
     }
 
     foreach ($f in $files) {
@@ -106,7 +106,7 @@ foreach ($repo in $repos) {
 
         if (-not $content) { continue }
 
-        if ($content -match "\\d{8,12}:[A-Za-z0-9_-]{30,}") {
+        if ($content -match '\d{8,12}:[A-Za-z0-9_-]{30,}') {
             $findings += Add-Finding -Level "CRITICAL" -Repo $repo.Name -File $f.FullName -Message "Telegram token pattern"
         }
         if ($content -match "(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})") {
@@ -121,14 +121,14 @@ foreach ($repo in $repos) {
     }
 
     if (Test-Path (Join-Path $repo.FullName ".git")) {
-        $trackedEnv = git -C $repo.FullName ls-files 2>$null | Where-Object { $_ -match "(^|/|\\\\)\\.env($|\\.)" }
+        $trackedEnv = git -C $repo.FullName ls-files 2>$null | Where-Object { $_ -match '(^|/|\\)\.env($|\.)' }
         foreach ($te in $trackedEnv) {
             $findings += Add-Finding -Level "CRITICAL" -Repo $repo.Name -File $te -Message ".env tracked by git"
         }
 
         $recentDiff = git -C $repo.FullName log -n 10 --name-only --pretty=format:"" 2>$null
         foreach ($line in $recentDiff) {
-            if ($line -and $line -match "(^|/|\\\\)\\.env($|\\.)") {
+            if ($line -and $line -match '(^|/|\\)\.env($|\.)') {
                 $findings += Add-Finding -Level "WARNING" -Repo $repo.Name -File $line -Message ".env appeared in recent commit list"
             }
         }
