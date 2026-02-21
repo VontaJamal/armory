@@ -9,6 +9,8 @@ param(
     [ValidateSet("active", "idea", "planned", "deprecated")]
     [string]$Status,
     [switch]$IdeasOnly,
+    [ValidateSet("saga", "civ")]
+    [string]$Mode,
     [ValidateSet("table", "json", "markdown")]
     [string]$Format = "table",
     [switch]$Help
@@ -27,8 +29,34 @@ function Show-HelpText {
     Write-Host "    .\\shop\\list-shop.ps1"
     Write-Host "    .\\shop\\list-shop.ps1 -Class weapon -Status active"
     Write-Host "    .\\shop\\list-shop.ps1 -IdeasOnly -Format markdown"
+    Write-Host "    .\\shop\\list-shop.ps1 -Mode civ"
     Write-Host "    .\\shop\\list-shop.ps1 -Format json"
     Write-Host ""
+}
+
+function Resolve-ModeFromConfig {
+    if ($Mode) { return $Mode }
+
+    $userHome = if ($env:USERPROFILE) { $env:USERPROFILE } elseif ($HOME) { $HOME } else { [Environment]::GetFolderPath("UserProfile") }
+    $cfgPath = Join-Path $userHome ".armory\config.json"
+    if (Test-Path $cfgPath) {
+        try {
+            $cfg = Get-Content -Path $cfgPath -Raw | ConvertFrom-Json
+            if ($cfg.PSObject.Properties.Name -contains "mode") {
+                $raw = [string]$cfg.mode
+                if ($raw -eq "civ") { return "civ" }
+                if ($raw -in @("saga", "lore", "crystal")) { return "saga" }
+            }
+            if ($cfg.PSObject.Properties.Name -contains "civilianAliases") {
+                if ([bool]$cfg.civilianAliases) { return "civ" }
+                return "saga"
+            }
+        } catch {
+            # fall through to default
+        }
+    }
+
+    return "saga"
 }
 
 if ($Help) {
@@ -46,6 +74,7 @@ if (-not (Test-Path $catalogPath)) {
 
 $catalog = Get-Content -Path $catalogPath -Raw | ConvertFrom-Json
 $entries = @($catalog.entries)
+$resolvedMode = Resolve-ModeFromConfig
 
 if ($IdeasOnly) {
     $entries = @($entries | Where-Object { $_.class -eq "idea" -or $_.status -eq "idea" })
@@ -66,7 +95,7 @@ $display = @(
             Name = $_.name
             Status = $_.status
             Id = $_.id
-            Description = $_.plainDescription
+            Description = if ($_.display -and $_.display.$resolvedMode -and $_.display.$resolvedMode.description) { $_.display.$resolvedMode.description } else { $_.plainDescription }
             Script = if ($_.scriptPath) { $_.scriptPath } else { "-" }
         }
     }

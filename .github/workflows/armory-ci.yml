@@ -15,6 +15,12 @@ jobs:
       - name: Validate catalog schema and paths
         run: python3 scripts/validate_shop_catalog.py
 
+      - name: Build manifest from catalog
+        run: python3 scripts/build_armory_manifest.py
+
+      - name: Check manifest determinism
+        run: python3 scripts/ci/check_manifest_determinism.py
+
   secret-hygiene:
     name: secret-hygiene
     runs-on: ubuntu-latest
@@ -39,6 +45,10 @@ jobs:
       - name: Run help smoke checks
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/help-smoke.ps1
+
+      - name: Run mode contract smoke checks
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/mode-contract-smoke.ps1
 
   fixture-tests:
     name: fixture-tests
