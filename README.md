@@ -28,6 +28,7 @@ Standalone tools you wield yourself.
 | [**Phoenix Down**](weapons/phoenix-down/) | *Rise Again* | Encrypted backup + 3-command restore for your entire setup |
 | [**Sentinel**](weapons/sentinel/) | *The Watch* | Service health monitoring with Telegram alerts |
 | [**Scan**](weapons/scan/) | *Know Thy Enemy* | Security audit — find leaked secrets across all your repos |
+| [**Warp**](weapons/warp/) | *Be There Now* | One-command SSH into any machine — no memorizing IPs or keys |
 
 ## 🔮 Spells
 

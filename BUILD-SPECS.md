@@ -138,6 +138,50 @@ All 4 spells are README-only (cron config templates). Each needs an actual scrip
 
 ---
 
+### 12. Warp (`weapons/warp/`)
+**What it does:** One-command SSH into a remote machine. No remembering IPs, users, or key paths.
+**Why it matters:** Most developers have 2+ machines. Typing `ssh -i ~/.ssh/id_ed25519 devon@192.168.1.188` every time is painful. Warp stores your machines and gets you there instantly.
+**Files:** `warp.sh` (zsh, Mac/Linux), `warp.ps1` (Windows), `README.md`
+
+**Commands:**
+```bash
+warp                         # SSH into default machine (interactive shell)
+warp "openclaw pairing"      # Run one command on default machine, come back
+warp <name>                  # SSH into a named machine
+warp <name> "command"        # Run command on named machine
+warp add <name>              # Interactive: add a machine (host, user, key, set as default?)
+warp list                    # Show all saved machines
+warp remove <name>           # Remove a machine
+warp set-default <name>      # Change default machine
+```
+
+**Config:** `~/.warp/machines.json`
+```json
+{
+  "default": "windows",
+  "machines": {
+    "windows": { "host": "192.168.1.188", "user": "devon", "key": "~/.ssh/id_ed25519" },
+    "pi": { "host": "192.168.1.50", "user": "pi" },
+    "vps": { "host": "my.server.com", "user": "root", "port": 2222 }
+  }
+}
+```
+
+**Behavior:**
+- `warp` with no args = SSH into default machine (interactive session)
+- `warp "command"` = run command on default, print output, return to local shell
+- `warp add` = interactive wizard: "Host IP or domain?", "SSH user?", "SSH key path? (optional)", "Set as default? (y/n)"
+- If no default set, first machine added becomes default
+- If SSH key not specified, use system default (`~/.ssh/id_ed25519` or ssh-agent)
+- Support custom port via config
+- Colored output: machine name in cyan, connection status, command output
+
+**README scroll format:** What it is, who it is for (anyone with more than one machine), usage examples, setup, pairs with Teleport item guide.
+
+**Standalone:** Works without OpenClaw. Pure SSH wrapper. Anyone with two machines benefits.
+
+---
+
 ## STYLE GUIDE FOR ALL SCRIPTS
 
 ```powershell

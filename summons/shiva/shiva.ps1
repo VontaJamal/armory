@@ -16,9 +16,9 @@ $isList = $args -contains "--list"
 
 function Write-Banner {
     Write-Host ""
-    Write-Host "  ❄️ " -NoNewline -ForegroundColor Cyan
-    Write-Host "Diamond Dust" -ForegroundColor White
-    Write-Host "  ─────────────────────────────" -ForegroundColor DarkGray
+    Write-Host "  " -NoNewline
+    Write-Host "Diamond Dust" -ForegroundColor Cyan
+    Write-Host "  -----------------------------" -ForegroundColor DarkGray
 }
 
 if ($Help) {
@@ -191,7 +191,7 @@ $snapshot = [ordered]@{
         [ordered]@{ port = $_.LocalPort; address = $_.LocalAddress; process = $proc; pid = $_.OwningProcess }
     } | Sort-Object { $_.port } -Unique)
 
-    disk      = @(Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
+    disk      = @(Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object { $_.Size -gt 0 } | ForEach-Object {
         [ordered]@{
             drive   = $_.DeviceID
             freeGB  = [math]::Round($_.FreeSpace / 1GB, 1)
