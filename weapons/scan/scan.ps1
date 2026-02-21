@@ -13,6 +13,22 @@ param(
 
 $ErrorActionPreference = "Continue"
 
+# Some runners invoke scripts through wrappers that can leave named args in $args.
+# Backfill RepoPath from raw args when it was not bound through the param block.
+if (-not $PSBoundParameters.ContainsKey("RepoPath") -and $args.Count -gt 0) {
+    for ($i = 0; $i -lt $args.Count; $i++) {
+        $token = [string]$args[$i]
+        if ($token -ieq "-RepoPath" -and ($i + 1) -lt $args.Count) {
+            $RepoPath = [string]$args[$i + 1]
+            break
+        }
+        if ($token -like "-RepoPath:*") {
+            $RepoPath = $token.Substring(10)
+            break
+        }
+    }
+}
+
 $hookCandidates = @(
     (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
     (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
@@ -27,13 +43,13 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 }
 
 $config = @{
-    fileExtensions = "\\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$"
-    ignorePathPattern = "[\\/](\\.git|node_modules|\\.venv|dist|__pycache__)[\\/]"
+    fileExtensions = '\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$'
+    ignorePathPattern = '[\\/](\.git|node_modules|\.venv|dist|__pycache__)[\\/]'
     patterns = @(
-        @{ level = "CRITICAL"; name = "Telegram token"; regex = "\\d{8,12}:[A-Za-z0-9_-]{30,}" },
+        @{ level = "CRITICAL"; name = "Telegram token"; regex = '\d{8,12}:[A-Za-z0-9_-]{30,}' },
         @{ level = "CRITICAL"; name = "Provider API key"; regex = "(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})" },
         @{ level = "CRITICAL"; name = "Private key"; regex = "PRIVATE KEY" },
-        @{ level = "WARNING"; name = "Hardcoded password"; regex = "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{6,}['\"]" }
+        @{ level = "WARNING"; name = "Hardcoded password"; regex = '(?i)(password|passwd|pwd)\s*[:=]\s*[''"][^''"]{6,}[''"]' }
     )
 }
 
@@ -71,7 +87,7 @@ if (-not (Test-Path $RepoPath)) {
     exit 1
 }
 
-$repos = Get-ChildItem -Path $RepoPath -Directory -ErrorAction SilentlyContinue
+$repos = @(Get-ChildItem -Path $RepoPath -Directory -ErrorAction SilentlyContinue)
 if ($repos.Count -eq 0) {
     $repos = @((Get-Item $RepoPath))
 }
@@ -111,7 +127,7 @@ foreach ($repo in $repos) {
     }
 
     $envFiles = Get-ChildItem $repo.FullName -Recurse -Filter ".env" -File -ErrorAction SilentlyContinue | Where-Object {
-        $_.FullName -notmatch "[\\/]\\.git[\\/]"
+        $_.FullName -notmatch '[\\/]\.git[\\/]'
     }
 
     foreach ($ef in $envFiles) {

@@ -31,7 +31,7 @@ $config = @{
     dirs = @("D:\Code Repos")
     telegramBotToken = $env:TELEGRAM_BOT_TOKEN
     telegramChatId = $env:TELEGRAM_CHAT_ID
-    ignorePattern = "[\\/](\\.git|node_modules|\\.venv|dist|__pycache__)[\\/]"
+    ignorePattern = '[\\/](\.git|node_modules|\.venv|dist|__pycache__)[\\/]'
 }
 
 function Show-Help {
@@ -66,7 +66,7 @@ foreach ($dir in $targetDirs) {
 
     $files = Get-ChildItem $dir -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
         $_.FullName -notmatch $config.ignorePattern -and
-        $_.Extension -match "\\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$"
+        $_.Extension -match '\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$'
     }
 
     foreach ($f in $files) {
@@ -79,7 +79,7 @@ foreach ($dir in $targetDirs) {
 
         if (-not $content) { continue }
 
-        if ($content -match "\\d{8,12}:[A-Za-z0-9_-]{30,}") {
+        if ($content -match '\d{8,12}:[A-Za-z0-9_-]{30,}') {
             $findings += "CRITICAL|$($f.FullName)|Telegram token pattern"
         }
         if ($content -match "(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})") {
@@ -88,7 +88,7 @@ foreach ($dir in $targetDirs) {
         if ($content -match "PRIVATE KEY") {
             $findings += "CRITICAL|$($f.FullName)|Private key text"
         }
-        if ($content -match "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{4,}['\"]") {
+        if ($content -match '(?i)(password|passwd|pwd)\s*[:=]\s*[''"][^''"]{4,}[''"]') {
             $findings += "WARNING|$($f.FullName)|Hardcoded password pattern"
         }
     }

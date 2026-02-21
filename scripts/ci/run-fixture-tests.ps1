@@ -35,10 +35,10 @@ if (-not $SevenZipPath -or -not (Test-Path $SevenZipPath)) {
 function Invoke-PsFile {
     param(
         [string]$ScriptPath,
-        [string[]]$Args
+        [string[]]$ScriptArgs
     )
 
-    $invokeArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $ScriptPath) + @($Args)
+    $invokeArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $ScriptPath) + @($ScriptArgs)
     $output = & $runner.Source @invokeArgs 2>&1 | Out-String
     $exitCode = $LASTEXITCODE
 
@@ -53,10 +53,10 @@ function Assert-Scenario {
         [string]$Name,
         [int]$ExpectedExitCode,
         [string]$ScriptPath,
-        [string[]]$Args
+        [string[]]$ScriptArgs
     )
 
-    $result = Invoke-PsFile -ScriptPath $ScriptPath -Args $Args
+    $result = Invoke-PsFile -ScriptPath $ScriptPath -ScriptArgs $ScriptArgs
     if ($result.ExitCode -ne $ExpectedExitCode) {
         Write-Host "Scenario failed: $Name" -ForegroundColor Red
         Write-Host "  expected exit: $ExpectedExitCode" -ForegroundColor Yellow
@@ -100,14 +100,14 @@ try {
         & $git.Source -C $trackedEnvRepo commit -m "fixture: tracked env" | Out-Null
     }
 
-    Assert-Scenario -Name "scan clean" -ExpectedExitCode 0 -ScriptPath $scanScript -Args @("-RepoPath", $cleanRepo)
-    Assert-Scenario -Name "scan leak" -ExpectedExitCode 1 -ScriptPath $scanScript -Args @("-RepoPath", $leakRepo)
+    Assert-Scenario -Name "scan clean" -ExpectedExitCode 0 -ScriptPath $scanScript -ScriptArgs @("-RepoPath", $cleanRepo)
+    Assert-Scenario -Name "scan leak" -ExpectedExitCode 1 -ScriptPath $scanScript -ScriptArgs @("-RepoPath", $leakRepo)
 
-    Assert-Scenario -Name "truesight clean" -ExpectedExitCode 0 -ScriptPath $truesightScript -Args @("-RepoPath", $cleanRepo, "-Quiet")
-    Assert-Scenario -Name "truesight leak" -ExpectedExitCode 1 -ScriptPath $truesightScript -Args @("-RepoPath", $leakRepo, "-Quiet")
+    Assert-Scenario -Name "truesight clean" -ExpectedExitCode 0 -ScriptPath $truesightScript -ScriptArgs @("-RepoPath", $cleanRepo, "-Quiet")
+    Assert-Scenario -Name "truesight leak" -ExpectedExitCode 1 -ScriptPath $truesightScript -ScriptArgs @("-RepoPath", $leakRepo, "-Quiet")
 
     if ($git) {
-        Assert-Scenario -Name "truesight tracked .env" -ExpectedExitCode 1 -ScriptPath $truesightScript -Args @("-RepoPath", $trackedEnvRepo, "-Quiet")
+        Assert-Scenario -Name "truesight tracked .env" -ExpectedExitCode 1 -ScriptPath $truesightScript -ScriptArgs @("-RepoPath", $trackedEnvRepo, "-Quiet")
     } else {
         Write-Host "SKIP truesight tracked .env (git not found)" -ForegroundColor Yellow
     }
@@ -142,21 +142,21 @@ try {
     $corruptArchive = Join-Path $corruptDir "corrupt-backup.7z"
     New-Item -ItemType File -Path $corruptArchive -Force | Out-Null
 
-    Assert-Scenario -Name "cure healthy" -ExpectedExitCode 0 -ScriptPath $cureScript -Args @(
+    Assert-Scenario -Name "cure healthy" -ExpectedExitCode 0 -ScriptPath $cureScript -ScriptArgs @(
         "-Dir", $healthyDir,
         "-MaxAgeHours", "24",
         "-SevenZipPath", $SevenZipPath,
         "-PasswordFile", $passwordFile
     )
 
-    Assert-Scenario -Name "cure stale" -ExpectedExitCode 1 -ScriptPath $cureScript -Args @(
+    Assert-Scenario -Name "cure stale" -ExpectedExitCode 1 -ScriptPath $cureScript -ScriptArgs @(
         "-Dir", $staleDir,
         "-MaxAgeHours", "24",
         "-SevenZipPath", $SevenZipPath,
         "-PasswordFile", $passwordFile
     )
 
-    Assert-Scenario -Name "cure corrupt" -ExpectedExitCode 1 -ScriptPath $cureScript -Args @(
+    Assert-Scenario -Name "cure corrupt" -ExpectedExitCode 1 -ScriptPath $cureScript -ScriptArgs @(
         "-Dir", $corruptDir,
         "-MaxAgeHours", "24",
         "-SevenZipPath", $SevenZipPath,

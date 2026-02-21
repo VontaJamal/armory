@@ -8,6 +8,7 @@ param(
     [ValidateSet("on", "off", "status")]
     [string]$Mode = "status",
     [switch]$Help,
+    [switch]$EmitFlag,
     [switch]$Sound,
     [switch]$NoSound
 )
@@ -71,6 +72,10 @@ $userHome = if ($env:USERPROFILE) {
 $configDir = Join-Path $userHome ".armory"
 $configPath = Join-Path $configDir "config.json"
 if (-not (Test-Path $configPath)) {
+    if ($EmitFlag) {
+        Write-Output "0"
+        exit 0
+    }
     Write-Host "  Missing Armory config: $configPath" -ForegroundColor Red
     Write-Host "  Run awakening.ps1 first to initialize your command word." -ForegroundColor Yellow
     if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
@@ -80,12 +85,27 @@ if (-not (Test-Path $configPath)) {
 try {
     $config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
 } catch {
+    if ($EmitFlag) {
+        Write-Output "0"
+        exit 0
+    }
     Write-Host "  Failed to parse Armory config: $configPath" -ForegroundColor Red
     if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
     exit 1
 }
 
 $currentMode = Resolve-CanonicalMode -Config $config
+
+if ($EmitFlag) {
+    if ($Mode -eq "on") { $currentMode = "civ" }
+    if ($Mode -eq "off") { $currentMode = "saga" }
+    if ($currentMode -eq "civ") {
+        Write-Output "1"
+    } else {
+        Write-Output "0"
+    }
+    exit 0
+}
 
 switch ($Mode) {
     "on" {
