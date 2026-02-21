@@ -15,8 +15,10 @@ Themed names stay for personality. Instructions stay plain-language first.
 - Added `remedy` as the primary one-command environment health checker.
 - Added `alexander` summon as a read-only release preflight gate (plain alias `gate`).
 - Deprecated `doctor` as an alias to `remedy` (two-release window). `esuna` remains a supported alias.
-- Added `civs` command for Civilian alias mode (`on`, `off`, `status`).
-- Civilian aliases are ON by default across commands. Jump to `Civilian Alias Map (for the uninitiated)` below.
+- Added canonical shared mode contract: `mode=saga|civ` (default `saga`).
+- Added Crystal Saga / Civilian mode controls with `civs` (`on`, `off`, `status`).
+- Added agent-first contracts (`AGENTS.md`, `agent-doctrine.yml`) and manifest build pipeline.
+- Added static dashboard shopfront (`docs/`) with cart, approval gate, and installer generation.
 - Cross-platform support is preferred, but platform-specific tools are allowed when clearly documented.
 
 ## Start Here In 5 Minutes
@@ -40,7 +42,7 @@ powershell -ExecutionPolicy Bypass -File .\items\remedy\remedy.ps1
 # 6) Rename command word later (example: armory -> faye)
 powershell -ExecutionPolicy Bypass -File .\rename-command-word.ps1 faye
 
-# 7) Check Civilian alias mode
+# 7) Check mode
 <command-word> civs status
 ```
 
@@ -54,11 +56,15 @@ powershell -ExecutionPolicy Bypass -File .\rename-command-word.ps1 faye
 6. Keep old alias when needed: `-KeepOldAlias`.
 7. Chronicle alias: `<command-word> status` routes to `chronicle`.
 8. Alexander alias: `<command-word> gate` routes to `alexander`.
-9. Civilian alias controls: `<command-word> civs on|off|status`.
+9. Mode controls: `<command-word> civs on|off|status`.
+10. `civs off` => Crystal Saga Mode (`mode=saga`), `civs on` => Civilian Mode (`mode=civ`).
 
-## Civilian Alias Map (for the uninitiated)
+## Crystal Saga And Civilian Alias Map
 
-Every command has a welcoming, plain-language path so anyone can use Armory without memorizing lore names first.
+Armory runs in one shared mode:
+
+- Crystal Saga Mode (`mode=saga`) - Final Fantasy voice and themed reporting.
+- Civilian Mode (`mode=civ`) - plain-language reporting and aliases.
 
 Use this if you're new:
 
@@ -70,7 +76,7 @@ Use this if you're new:
 <command-word> health -Detailed
 ```
 
-Civilian mode controls:
+Mode controls:
 
 ```powershell
 <command-word> civs status
@@ -168,7 +174,7 @@ Every dispatcher command also has a Civilian alias listed in the map above.
 | You need to... | Use this tool | Why |
 |---|---|---|
 | Set up a command word | [`awakening.ps1`](awakening.ps1) | One-time setup for dispatcher + PATH |
-| Toggle Civilian alias mode | [`civs.ps1`](civs.ps1) | Turns Civilian aliases on/off and shows current mode |
+| Toggle Crystal Saga / Civilian mode | [`civs.ps1`](civs.ps1) | Sets shared `mode=saga|civ` and shows active mode |
 | Rename command word later | [`rename-command-word.ps1`](rename-command-word.ps1) | Move to any new command word quickly |
 | Run one-command environment checks | [`items/remedy/remedy.ps1`](items/remedy/remedy.ps1) | Validates config, wrapper, scripts, CI files, remotes, deps |
 | Keep old environment-check alias during migration | [`doctor.ps1`](doctor.ps1) | Deprecated alias forwarding to Remedy |
@@ -229,8 +235,25 @@ This repository is the shopfront.
 
 1. Browse catalog docs: [`shop/SHOP.md`](shop/SHOP.md)
 2. Browse catalog data: [`shop/catalog.json`](shop/catalog.json)
-3. Add ideas or tools: [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md)
-4. Scaffold with: `powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1`
+3. Browse machine manifest: [`docs/data/armory-manifest.v1.json`](docs/data/armory-manifest.v1.json)
+4. Open dashboard: [`docs/index.html`](docs/index.html)
+5. Telemetry contract: [`docs/TELEMETRY.md`](docs/TELEMETRY.md)
+6. Add ideas or tools: [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md)
+7. Scaffold with: `powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1`
+
+## Agent-First Prompt Pattern
+
+Use this operator prompt pattern in Codex/OpenClaw:
+
+`Scout Armory for this task, return a shortlist, wait for my approval, then equip selected tools and report in active mode.`
+
+Agent flow contract:
+
+1. Refresh local Armory clone: `git -C <armoryRepoRoot> pull --ff-only`
+2. Read manifest/catalog and scout all divisions.
+3. Recommend shortlist for current repo context.
+4. Wait for explicit approval.
+5. Equip selected loadout and report in `mode=saga|civ` tone.
 
 ## CI And Local Validation
 
@@ -246,6 +269,8 @@ Local validation commands:
 
 ```bash
 python3 scripts/validate_shop_catalog.py
+python3 scripts/build_armory_manifest.py
+python3 scripts/ci/check_manifest_determinism.py
 python3 scripts/ci/secret_hygiene.py
 python3 scripts/release/validate_release.py --mode ci
 ```
@@ -272,6 +297,8 @@ pwsh -File .\summons\alexander\alexander.ps1
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md)
+- [`AGENTS.md`](AGENTS.md)
+- [`agent-doctrine.yml`](agent-doctrine.yml)
 - [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)
 - [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
 - [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)

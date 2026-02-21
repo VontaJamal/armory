@@ -27,6 +27,7 @@ Checklist:
 4. Ensure script has `-Help` and clear exit code behavior.
 5. Define at least one welcoming "Civilian alias" for dispatcher usage when applicable.
 6. Add `shop/catalog.json` entry with `status: "active"` and valid `scriptPath`/`readmePath`.
+7. Include schema v2 metadata fields: `display`, `install`, and `tags`.
 
 ## Path B: Idea-Only Submission
 
@@ -36,8 +37,9 @@ Checklist:
 
 1. Add `class: "idea"` and `status: "idea"` in `shop/catalog.json`.
 2. Keep `scriptPath` and `readmePath` as `null`.
-3. Write a plain-language `plainDescription`.
-4. Add a short listing note in `shop/SHOP.md`.
+3. Keep `install.entrypointPath` as `null` and `install.bundlePaths` empty.
+4. Write both `display.saga.description` and `display.civ.description`.
+5. Add a short listing note in `shop/SHOP.md`.
 
 ## Use Materia Forge (Recommended)
 
@@ -60,6 +62,8 @@ Run these checks from repo root:
 
 ```bash
 python3 scripts/validate_shop_catalog.py
+python3 scripts/build_armory_manifest.py
+python3 scripts/ci/check_manifest_determinism.py
 python3 scripts/ci/secret_hygiene.py
 python3 scripts/release/validate_release.py --mode ci
 ```
@@ -87,15 +91,18 @@ pwsh -File .\items\remedy\remedy.ps1 -Detailed -Output "$env:USERPROFILE\.armory
 pwsh -File .\doctor.ps1 -Check scripts,ci
 ```
 
-## Civilian Alias Mode
+## Crystal Saga / Civilian Mode
 
-Use `civs.ps1` (dispatcher route: `civs`) to control plain-language alias availability.
+Use `civs.ps1` (dispatcher route: `civs`) to control the shared mode flag (`mode=saga|civ`).
 
 ```powershell
 pwsh -File .\civs.ps1 status
 pwsh -File .\civs.ps1 off
 pwsh -File .\civs.ps1 on
 ```
+
+- `civs off` => Crystal Saga Mode (`mode=saga`)
+- `civs on` => Civilian Mode (`mode=civ`)
 
 ## Quality Rules
 
@@ -107,6 +114,8 @@ pwsh -File .\civs.ps1 on
 6. Release tags must follow semver format `vMAJOR.MINOR.PATCH`.
 7. Release gating checks are mandatory and defined in [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md).
 8. User-facing commands should include a welcoming Civilian alias for maximum symbiosis.
+9. Tests must validate real executable behavior only; do not add fabricated helper APIs.
+10. If `governance/seven-shadow-system` exists, include its real check output in PR validation notes.
 
 ## PR Template Notes
 
