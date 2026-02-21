@@ -1,18 +1,34 @@
-﻿# Agent-to-Agent Communication
+# Agent-To-Agent Communication
 
-How to set up multiple OpenClaw agents that talk to each other.
+How to run an Armory scout/equip loop with OpenClaw agents.
 
 ## Architecture
 
 Each agent gets its own:
+
 - Workspace directory (`~/.openclaw/workspace-{name}/`)
 - Config section in `openclaw.json`
 - Session key (`agent:{name}:main`)
-- Optional: dedicated Telegram channel for output
+- Optional dedicated Telegram output channel
+
+## Required Scout/Eqip Loop
+
+Use this sequence for Armory work:
+
+1. Refresh Armory clone:
+   - `git -C <armoryRepoRoot> pull --ff-only`
+2. Read catalog/manifest.
+3. Return shortlist for current repository problem.
+4. Wait for explicit approval.
+5. Equip approved loadout.
+6. Report completion in active mode tone (`mode=saga|civ`).
+
+If pull fails, stop and report immediately.
 
 ## Configuration
 
 In your `openclaw.json`:
+
 ```json
 {
   "agents": {
@@ -27,37 +43,44 @@ In your `openclaw.json`:
 ## Sending Messages Between Agents
 
 From your main agent to a sub-agent:
+
 ```
-sessions_send(sessionKey="agent:cipher:main", message="Check the pipeline status")
+sessions_send(sessionKey="agent:cipher:main", message="Scout Armory for this repo issue and report a shortlist")
 ```
 
-From any agent, check what other agents are doing:
+From any agent, check active sessions:
+
 ```
 sessions_list(activeMinutes=15, messageLimit=2)
 ```
 
-## Patterns That Work
+## Reporting Tone Contract
 
-### Hub and Spoke
-One orchestrator agent dispatches work to specialist agents. Specialists report back.
-- Main â†’ dispatches tasks
-- Specialists â†’ execute and report
-- Main â†’ synthesizes and surfaces results
+Shared mode flag controls human-facing language:
 
-### Agent Relay
-After dispatching, the orchestrator periodically checks agent sessions and relays results to the human without being asked.
+- `mode=civ`: plain language
+- `mode=saga`: Final Fantasy style
 
-### Dedicated Channels
-Each agent posts to its own Telegram channel. The orchestrator monitors all channels and summarizes.
+Example completion styles:
+
+- Civ: `Install complete. Added: remedy, chronicle.`
+- Saga: `I used a Potion, equipped Masamune, and we are battle-ready.`
+
+## Seven Shadow Requirement
+
+If `governance/seven-shadow-system` exists, run real checks from that repo before final report.
+If it is missing, report that explicitly and continue with Armory checks.
 
 ## Common Issues
 
-### Timeouts â‰  Failures
-Agent-to-agent messages can time out but still be delivered. Don't assume a timeout means the message was lost. Check the target agent's session.
+### Timeouts Are Not Always Failures
+
+Agent-to-agent messages can time out but still deliver. Validate by checking target session.
 
 ### Session Keys Are Specific
-`agent:cipher:main` is not the same as `cipher`. Use the full session key format.
 
-### Agents Need Their Own Workspaces
-Don't share workspaces between agents. File conflicts will happen. Each agent gets its own directory with its own memory files.
+`agent:cipher:main` is not the same as `cipher`.
 
+### Dedicated Workspaces
+
+Do not share workspaces between agents. It causes file conflicts.
