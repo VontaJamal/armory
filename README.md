@@ -1,39 +1,58 @@
 # The Armory ⚔️
 
-Battle-tested snippets, cheat sheets, and workflow patterns for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI setups.
+Battle-tested tools and guides for [OpenClaw](https://github.com/openclaw/openclaw) and multi-agent AI setups.
 
 Everything here was built solving real problems in production. No theory. No tutorials. Just weapons.
 
-## 🗡️ Weapons Gallery
+> *"Every weapon has a name. Every name has a legacy."*
 
-Standalone tools you can install and use immediately. Each one solves a real problem.
+## ⚔️ Weapon Shop
+
+Executable tools you can install and use immediately.
 
 | # | Weapon | What It Does |
 |---|--------|-------------|
-| 1 | [**jutsu**](weapons/jutsu/) | Vault and hot-swap AI provider API keys with one command |
+| 1 | [**Masamune**](weapons/masamune/) | Vault and hot-swap AI provider API keys with one command |
+| 2 | [**Phoenix Down**](weapons/phoenix-down/) | Encrypted backup + 3-command restore for your entire setup |
+| 3 | [**Sentinel**](weapons/sentinel/) | Automated service health monitoring with Telegram alerts |
+| 4 | [**Scan**](weapons/scan/) | Security audit — find leaked secrets across all your repos |
 
-*The Armory grows.*
+## 🧪 Item Shop
 
-## Reference Docs
+Guides, configs, and reference docs. Knowledge is power.
 
-| Folder | What You'll Find |
-|--------|-----------------|
-| `openclaw/` | Configuration tips, cron scheduling, gateway debugging, Telegram setup |
-| `agents/` | Multi-agent communication, heartbeat patterns, sub-agent orchestration |
-| `windows/` | NSSM services, PowerShell automation, SSH from non-elevated shells |
-| `scripts/` | Ready-to-use scripts for backups, health checks, workspace sync |
+| Item | What You'll Learn |
+|------|-----------------|
+| [**Teleport**](items/teleport/) | Dual-machine gateway setup — two machines, one agent |
+| [**Cron Scheduling**](items/cron-scheduling/) | Every cron gotcha that'll waste your hours (so you don't have to) |
+| [**Telegram Setup**](items/telegram-setup/) | Chat IDs, channel routing, group config, rate limits |
+| [**NSSM Services**](items/nssm-services/) | Register bots as Windows services that survive reboots |
+| [**Agent Comms**](items/agent-comms/) | Multi-agent communication patterns and session keys |
 
 ## How to Use
 
-**Weapons:** Browse `weapons/`, pick one, run the installer or copy the script. Each has its own README.
+**Weapons:** Browse `weapons/`, pick one, follow the README. Each weapon is self-contained.
 
-**Reference:** Browse the other folders. Find what you need. Copy it. Most files are self-contained with clear instructions at the top.
+**Items:** Browse `items/`, find the guide you need, follow it step by step.
 
-If something saved you time, star the repo so others can find it too.
+## Custom Command Word
+
+During setup, you can name your CLI anything:
+
+```
+armory init
+
+  What do you want your command word to be?
+  > faye
+
+  Done. "faye masamune", "faye scan" are now live.
+```
+
+Same weapons, your identity.
 
 ## Contributing
 
-Found a better way to do something? Built a new weapon? Open a PR. Keep it practical, keep it tested, keep it documented.
+Built a new weapon? Wrote a guide that saved you hours? Open a PR. Keep it practical, keep it tested, keep it documented.
 
 ---
 

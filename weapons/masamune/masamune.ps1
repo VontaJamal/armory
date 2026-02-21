@@ -7,7 +7,7 @@
 
 $ErrorActionPreference = "Stop"
 $configPath = "$env:USERPROFILE\.openclaw\openclaw.json"
-$vaultPath = "$env:USERPROFILE\.openclaw\secrets\jutsu-vault.json"
+$vaultPath = "$env:USERPROFILE\.openclaw\secrets\masamune-vault.json"
 
 $providerDefs = @{
     "anthropic" = @{
@@ -97,11 +97,11 @@ function Apply-Swap($provider, $apiKey) {
 # --- No args: show help ---
 if (-not $Action) {
     Write-Host ""
-    Write-Host "  armory jutsu" -ForegroundColor Magenta
+    Write-Host "  armory masamune" -ForegroundColor Magenta
     Write-Host ""
     Write-Host "  add [provider] [name] [key]   Register a key to the scroll"
     Write-Host "  [provider] [name]             Swap to a named key"
-    Write-Host "  list                          Show the jutsu scroll"
+    Write-Host "  list                          Show the Masamune Vault"
     Write-Host "  remove [provider] [name]      Remove a key"
     Write-Host ""
     Write-Host "  Providers: anthropic, openai, google, k2" -ForegroundColor DarkGray
@@ -116,7 +116,7 @@ if ($Action -eq "add") {
     $apiKey = $Arg3
 
     if (-not $provider -or -not $name -or -not $apiKey) {
-        Write-Host "  Usage: armory jutsu add [provider] [name] [api-key]" -ForegroundColor Red
+        Write-Host "  Usage: armory masamune add [provider] [name] [api-key]" -ForegroundColor Red
         exit 1
     }
     if (-not $providerDefs.ContainsKey($provider)) {
@@ -152,7 +152,7 @@ if ($Action -eq "list") {
     }
 
     Write-Host ""
-    Write-Host "  Jutsu Scroll" -ForegroundColor Magenta
+    Write-Host "  Masamune Vault" -ForegroundColor Magenta
     Write-Host ""
 
     $hasEntries = $false
@@ -171,7 +171,7 @@ if ($Action -eq "list") {
         Write-Host ""
     }
     if (-not $hasEntries) {
-        Write-Host "  (empty -- use 'armory jutsu add' to register keys)" -ForegroundColor DarkGray
+        Write-Host "  (empty -- use 'armory masamune add' to register keys)" -ForegroundColor DarkGray
         Write-Host ""
     }
     exit 0
@@ -182,7 +182,7 @@ if ($Action -eq "remove") {
     $provider = $Arg1.ToLower()
     $name = $Arg2
     if (-not $provider -or -not $name) {
-        Write-Host "  Usage: armory jutsu remove [provider] [name]" -ForegroundColor Red
+        Write-Host "  Usage: armory masamune remove [provider] [name]" -ForegroundColor Red
         exit 1
     }
 
@@ -199,7 +199,7 @@ if ($Action -eq "remove") {
     exit 0
 }
 
-# --- SWAP: armory jutsu [provider] [name] ---
+# --- SWAP: armory masamune [provider] [name] ---
 $provider = $Action.ToLower()
 $name = $Arg1
 
@@ -217,13 +217,13 @@ if (-not $name) {
         } else {
             Write-Host "  Multiple keys for $provider. Specify which:" -ForegroundColor Yellow
             foreach ($k in $keys) {
-                Write-Host "    armory jutsu $provider $($k.Name)" -ForegroundColor DarkGray
+                Write-Host "    armory masamune $provider $($k.Name)" -ForegroundColor DarkGray
             }
             exit 1
         }
     } else {
         Write-Host "  No keys registered for $provider." -ForegroundColor Red
-        Write-Host "    armory jutsu add $provider [name] [api-key]" -ForegroundColor DarkGray
+        Write-Host "    armory masamune add $provider [name] [api-key]" -ForegroundColor DarkGray
         exit 1
     }
 }
@@ -231,7 +231,7 @@ if (-not $name) {
 $vault = Load-Vault
 if (-not $vault.PSObject.Properties[$provider] -or -not $vault.$provider.PSObject.Properties[$name]) {
     Write-Host "  Key not found: $provider/$name" -ForegroundColor Red
-    Write-Host "    armory jutsu add $provider $name [api-key]" -ForegroundColor DarkGray
+    Write-Host "    armory masamune add $provider $name [api-key]" -ForegroundColor DarkGray
     exit 1
 }
 
@@ -239,8 +239,9 @@ $apiKey = $vault.$provider.$name
 Apply-Swap $provider $apiKey
 
 Write-Host ""
-Write-Host "  Jutsu activated. Chakra nature: $provider ($name)" -ForegroundColor Magenta
+Write-Host "  Masamune drawn. Chakra nature: $provider ($name)" -ForegroundColor Magenta
 Write-Host "  Model: $($providerDefs[$provider].defaultModel)" -ForegroundColor DarkGray
 Write-Host "  Restart gateway to take effect." -ForegroundColor Yellow
 Write-Host ""
+
 
