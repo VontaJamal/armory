@@ -77,7 +77,7 @@ if (-not (Test-Path $RepoPath)) {
 }
 
 $findings = @()
-$repos = Get-ChildItem -Path $RepoPath -Directory -ErrorAction SilentlyContinue
+$repos = @(Get-ChildItem -Path $RepoPath -Directory -ErrorAction SilentlyContinue)
 if ($repos.Count -eq 0) {
     $repos = @((Get-Item $RepoPath))
 }
