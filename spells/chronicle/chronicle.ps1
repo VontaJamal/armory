@@ -38,7 +38,7 @@ function Expand-ArmoryPath {
 
     $expanded = [Environment]::ExpandEnvironmentVariables($PathValue)
     if ($expanded.StartsWith("~")) {
-        $trimmed = $expanded.Substring(1).TrimStart("/", "\\")
+        $trimmed = $expanded.Substring(1).TrimStart('/','\')
         if ($trimmed) {
             return (Join-Path $HOME $trimmed)
         }

@@ -22,9 +22,9 @@ if (-not (Test-Path $chronicleScript)) {
 }
 
 function Invoke-Chronicle {
-    param([string[]]$Args)
+    param([string[]]$ScriptArgs)
 
-    $invokeArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $chronicleScript) + @($Args)
+    $invokeArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $chronicleScript) + @($ScriptArgs)
     $output = & $runner.Source @invokeArgs 2>&1 | Out-String
     [PSCustomObject]@{
         ExitCode = $LASTEXITCODE
@@ -91,17 +91,17 @@ try {
     }
     $payload | ConvertTo-Json -Depth 5 | Set-Content -Path $reposFile -Encoding UTF8
 
-    $helpResult = Invoke-Chronicle -Args @("-Help")
+    $helpResult = Invoke-Chronicle -ScriptArgs @("-Help")
     Assert-Exit -Name "chronicle help" -Expected 0 -Result $helpResult
 
-    $tableResult = Invoke-Chronicle -Args @("-ReposFile", $reposFile)
+    $tableResult = Invoke-Chronicle -ScriptArgs @("-ReposFile", $reposFile)
     Assert-Exit -Name "chronicle table" -Expected 0 -Result $tableResult
     if ($tableResult.Output -notmatch "clean-repo") {
         Write-Host "Scenario failed: chronicle table output missing clean-repo" -ForegroundColor Red
         exit 1
     }
 
-    $jsonResult = Invoke-Chronicle -Args @("-ReposFile", $reposFile, "-Format", "json")
+    $jsonResult = Invoke-Chronicle -ScriptArgs @("-ReposFile", $reposFile, "-Format", "json")
     Assert-Exit -Name "chronicle json" -Expected 0 -Result $jsonResult
 
     $parsed = $null
@@ -125,7 +125,7 @@ try {
     }
 
     $missingAllowlist = Join-Path $tempRoot "fresh-repos.json"
-    $missingResult = Invoke-Chronicle -Args @("-ReposFile", $missingAllowlist)
+    $missingResult = Invoke-Chronicle -ScriptArgs @("-ReposFile", $missingAllowlist)
     Assert-Exit -Name "chronicle missing allowlist" -Expected 0 -Result $missingResult
     if (-not (Test-Path $missingAllowlist)) {
         Write-Host "Scenario failed: missing allowlist file was not created" -ForegroundColor Red
