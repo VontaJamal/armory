@@ -105,6 +105,10 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/run-chronicle-tests.ps1
 
+      - name: Run quartermaster smoke tests
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/quartermaster-smoke.ps1
+
   release-validate:
     name: release-validate
     runs-on: ubuntu-latest

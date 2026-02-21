@@ -15,6 +15,21 @@ requesting approval, equipping safely, and reporting results in the active mode 
 5. Install selected loadout with dependency resolution.
 6. Report completion in active mode tone.
 
+Primary automation route:
+
+- `<commandWord> quartermaster scout -Task "<task>"`
+- `<commandWord> quartermaster plan -Task "<task>"`
+- `<commandWord> quartermaster equip -FromLastPlan -Approve`
+- `<commandWord> quartermaster report -FromLastPlan`
+
+Armory path discovery order for quartermaster:
+
+1. `-ArmoryRoot`
+2. `~/.armory/config.json` (`repoRoot`)
+3. `ARMORY_REPO_ROOT`
+4. common paths (`./armory`, `../armory`, `~/armory`, `~/Documents/Code Repos/armory`)
+5. one-time prompt and persistence
+
 ## Shared Mode Contract
 
 Single shared flag:

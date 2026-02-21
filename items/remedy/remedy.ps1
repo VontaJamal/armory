@@ -183,13 +183,15 @@ foreach ($c in $selectedChecks) {
         "scripts" {
             $required = @(
                 "awakening.ps1",
+                "setup.ps1",
                 "rename-command-word.ps1",
                 "weapons/scan/scan.ps1",
                 "weapons/truesight/truesight.ps1",
                 "spells/cure/cure.ps1",
                 "spells/chronicle/chronicle.ps1",
                 "bard/bard.ps1",
-                "items/remedy/remedy.ps1"
+                "items/remedy/remedy.ps1",
+                "items/quartermaster/quartermaster.ps1"
             )
 
             $missing = @()
@@ -246,6 +248,7 @@ foreach ($c in $selectedChecks) {
                 "scripts/ci/help-smoke.ps1",
                 "scripts/ci/run-fixture-tests.ps1",
                 "scripts/ci/run-chronicle-tests.ps1",
+                "scripts/ci/quartermaster-smoke.ps1",
                 "scripts/ci/check_remote_url.ps1",
                 "scripts/ci/secret_hygiene.py",
                 "scripts/validate_shop_catalog.py",

@@ -116,6 +116,49 @@
       ]
     },
     {
+      "id": "quartermaster",
+      "class": "item",
+      "name": "Quartermaster",
+      "plainDescription": "Agent-first automation loop for Armory refresh, shortlist planning, approval-gated equip, and reporting.",
+      "flavorLine": "The field quartermaster who scouts, stocks, and equips the party before battle.",
+      "scriptPath": "items/quartermaster/quartermaster.ps1",
+      "readmePath": "items/quartermaster/README.md",
+      "status": "active",
+      "owner": "community",
+      "addedOn": "2026-02-21",
+      "display": {
+        "saga": {
+          "name": "Quartermaster",
+          "description": "Scout, plan, equip, and report with one command path from any front."
+        },
+        "civ": {
+          "name": "Armory Automation Loop",
+          "description": "Refreshes Armory, builds a shortlist/cart, enforces approval, and reports results."
+        }
+      },
+      "install": {
+        "entrypointPath": "items/quartermaster/quartermaster.ps1",
+        "bundlePaths": [
+          "items/quartermaster/quartermaster.ps1",
+          "items/quartermaster/README.md"
+        ],
+        "dependencies": [
+          "remedy",
+          "chronicle"
+        ],
+        "platforms": [
+          "windows"
+        ]
+      },
+      "tags": [
+        "agent",
+        "automation",
+        "scout",
+        "loadout",
+        "install"
+      ]
+    },
+    {
       "id": "mognet",
       "class": "idea",
       "name": "Mognet",

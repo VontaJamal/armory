@@ -9,8 +9,11 @@ Civilian Mode keeps language direct and plain while preserving all functionality
 ## 5-Minute Setup
 
 ```powershell
-# 1) Install dispatcher
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord armory
+# 1) Run civilian bootstrap (recommended)
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+
+# Optional explicit command word
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -Mode civ -CommandWord armory
 
 # 2) Confirm Civilian Mode
 armory civs on
@@ -36,10 +39,10 @@ Manual path:
 Agent-first path:
 
 1. Agent refreshes local Armory clone: `git -C <armoryRepoRoot> pull --ff-only`.
-2. Agent reads manifest/catalog and returns shortlist.
-3. Human approves install plan.
-4. Agent installs selected tools.
-5. Agent reports back in active mode tone.
+2. Agent runs `quartermaster scout` and returns shortlist.
+3. Agent runs `quartermaster plan` to build the install cart.
+4. Human approves install, then agent runs `quartermaster equip -FromLastPlan -Approve`.
+5. Agent runs `quartermaster report -FromLastPlan` in active mode tone.
 
 ### Same System, Two Voices
 
@@ -78,7 +81,7 @@ Mode is shared across dispatcher, dashboard, installer, and agent reporting.
 
 ## Troubleshooting
 
-1. `armory` command not found: re-run `awakening.ps1`, then open a new shell session.
+1. `armory` command not found: re-run `setup.ps1` (or `awakening.ps1`), then open a new shell session.
 2. Dashboard loads but no entries appear: rebuild manifest with `python3 scripts/build_armory_manifest.py --out docs/data/armory-manifest.v1.json`.
 3. Agent cannot refresh Armory clone: verify repo path and remote access, then run `git -C <armoryRepoRoot> pull --ff-only` manually.
 4. Installer hash mismatch: regenerate installer from current dashboard state and confirm manifest ref aligns with repository head.

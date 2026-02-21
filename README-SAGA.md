@@ -9,8 +9,11 @@ Crystal Saga Mode keeps the instructions clear, then adds light flavor so the ex
 ## 5-Minute Setup
 
 ```powershell
-# 1) Install dispatcher
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord armory
+# 1) Receive the Crystal (level one)
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1
+
+# Optional explicit command word
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord crystal
 
 # 2) Confirm Crystal Saga Mode
 armory civs off
@@ -36,10 +39,10 @@ Manual path:
 Agent-first path:
 
 1. Agent refreshes local Armory clone: `git -C <armoryRepoRoot> pull --ff-only`.
-2. Agent reads manifest/catalog and returns shortlist.
-3. Human approves the loadout.
-4. Agent equips selected tools.
-5. Agent reports back in active mode tone.
+2. Agent runs `quartermaster scout` and returns shortlist.
+3. Agent runs `quartermaster plan` to build the cart/loadout.
+4. Human approves equip, then agent runs `quartermaster equip -FromLastPlan -Approve`.
+5. Agent runs `quartermaster report -FromLastPlan` in active mode tone.
 
 ### Same System, Two Voices
 
@@ -78,7 +81,7 @@ Mode is shared across dispatcher, dashboard, installer, and agent reporting.
 
 ## Troubleshooting
 
-1. `armory` command not found: re-run `awakening.ps1`, then open a new shell session.
+1. `armory` command not found: re-run `awakening.ps1` (or `setup.ps1`), then open a new shell session.
 2. Dashboard loads but no entries appear: rebuild manifest with `python3 scripts/build_armory_manifest.py --out docs/data/armory-manifest.v1.json`.
 3. Agent cannot refresh Armory clone: verify repo path and remote access, then run `git -C <armoryRepoRoot> pull --ff-only` manually.
 4. Installer hash mismatch: regenerate installer from current dashboard state and confirm manifest ref aligns with repository head.
