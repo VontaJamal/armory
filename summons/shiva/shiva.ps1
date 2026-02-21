@@ -1,198 +1,222 @@
+<#
+.SYNOPSIS
+    Shiva - Diamond Dust - System state snapshot & diff
+.EXAMPLE
+    .\shiva.ps1              Take a snapshot
+    .\shiva.ps1 --diff       Compare last two snapshots
+    .\shiva.ps1 --list       List all snapshots
+#>
 param(
-    [string]$Name,
-    [string]$Diff,
-    [switch]$List
+    [switch]$Help
 )
 
-$ErrorActionPreference = "Continue"
-$snapshotDir = Join-Path $env:USERPROFILE ".armory\snapshots"
-if (-not (Test-Path $snapshotDir)) { New-Item -ItemType Directory -Path $snapshotDir -Force | Out-Null }
+$snapshotDir = Join-Path $env:USERPROFILE ".shiva\snapshots"
+$isDiff = $args -contains "--diff"
+$isList = $args -contains "--list"
 
-$repoSearchPaths = @("D:\Code Repos")
+function Write-Banner {
+    Write-Host ""
+    Write-Host "  ❄️ " -NoNewline -ForegroundColor Cyan
+    Write-Host "Diamond Dust" -ForegroundColor White
+    Write-Host "  ─────────────────────────────" -ForegroundColor DarkGray
+}
 
-function Get-Snapshot {
-    $snap = @{}
-    
-    $services = @()
-    $svcList = sc.exe query state= all 2>$null
-    $currentSvc = $null
-    foreach ($line in ($svcList -split "`n")) {
-        if ($line -match "SERVICE_NAME:\s+(.+)") { $currentSvc = $Matches[1].Trim() }
-        if ($line -match "STATE\s+:\s+\d+\s+(\w+)" -and $currentSvc) {
-            $services += @{ name = $currentSvc; state = $Matches[1] }
-            $currentSvc = $null
+if ($Help) {
+    Write-Host @"
+
+  ❄️ Shiva — Diamond Dust
+  Freeze your system state. Compare snapshots to find what changed.
+
+  Usage:
+    .\shiva.ps1              Take a snapshot
+    .\shiva.ps1 --diff       Compare last two snapshots
+    .\shiva.ps1 --diff a b   Compare two specific files
+    .\shiva.ps1 --list       List all snapshots
+    .\shiva.ps1 -Help        This message
+
+"@
+    exit 0
+}
+
+# Ensure snapshot dir exists
+if (-not (Test-Path $snapshotDir)) { New-Item -Path $snapshotDir -ItemType Directory -Force | Out-Null }
+
+Write-Banner
+
+# ── List ────────────────────────────────────────────────
+if ($isList) {
+    $files = Get-ChildItem $snapshotDir -Filter "*.json" | Sort-Object Name -Descending
+    if ($files.Count -eq 0) {
+        Write-Host "`n  No snapshots yet. Run .\shiva.ps1 to create one." -ForegroundColor Yellow
+    } else {
+        Write-Host ""
+        foreach ($f in $files) {
+            $size = [math]::Round($f.Length / 1KB, 1)
+            Write-Host "    $($f.BaseName)" -NoNewline -ForegroundColor White
+            Write-Host "  (${size} KB)" -ForegroundColor DarkGray
         }
     }
-    $snap["services"] = $services
-    
-    $procs = Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 20 |
-        ForEach-Object { @{ name = $_.ProcessName; memMB = [math]::Round($_.WorkingSet64/1MB,1); pid = $_.Id } }
-    $snap["processes"] = @($procs)
-    
-    $disks = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Used -gt 0 } |
-        ForEach-Object { @{ drive = $_.Name; freeGB = [math]::Round($_.Free/1GB,1); totalGB = [math]::Round(($_.Used+$_.Free)/1GB,1); pct = [math]::Round($_.Free/($_.Used+$_.Free)*100,1) } }
-    $snap["disk"] = @($disks)
-    
-    $ports = @()
-    netstat -an 2>$null | Select-String "LISTENING" | ForEach-Object {
-        if ($_ -match ':(\d+)\s+.*LISTENING') { $ports += [int]$Matches[1] }
+    Write-Host ""
+    exit 0
+}
+
+# ── Diff ────────────────────────────────────────────────
+if ($isDiff) {
+    $diffIdx = [Array]::IndexOf($args, "--diff")
+    $diffArgs = @($args | Select-Object -Skip ($diffIdx + 1) | Where-Object { $_ -notmatch "^--" })
+
+    if ($diffArgs.Count -ge 2) {
+        $file1 = $diffArgs[0]; $file2 = $diffArgs[1]
+        if (-not (Test-Path $file1)) { $file1 = Join-Path $snapshotDir $file1 }
+        if (-not (Test-Path $file2)) { $file2 = Join-Path $snapshotDir $file2 }
+    } else {
+        $files = Get-ChildItem $snapshotDir -Filter "*.json" | Sort-Object Name -Descending | Select-Object -First 2
+        if ($files.Count -lt 2) {
+            Write-Host "`n  Need at least 2 snapshots to diff. Take more snapshots first." -ForegroundColor Yellow
+            Write-Host ""; exit 1
+        }
+        $file1 = $files[1].FullName; $file2 = $files[0].FullName
     }
-    $snap["ports"] = @($ports | Sort-Object -Unique)
-    
-    $repos = @()
-    foreach ($searchPath in $repoSearchPaths) {
-        if (-not (Test-Path $searchPath)) { continue }
-        Get-ChildItem $searchPath -Directory | ForEach-Object {
-            $gitDir = Join-Path $_.FullName ".git"
-            if (Test-Path $gitDir) {
-                Push-Location $_.FullName
-                $branch = git rev-parse --abbrev-ref HEAD 2>$null
-                $status = git status --porcelain 2>$null
-                $dirty = @($status).Count
-                if (-not $status) { $dirty = 0 }
-                $repos += @{ name = $_.Name; branch = $branch; dirty = $dirty }
-                Pop-Location
+
+    $old = Get-Content $file1 -Raw | ConvertFrom-Json
+    $new = Get-Content $file2 -Raw | ConvertFrom-Json
+
+    Write-Host "`n  Comparing:" -ForegroundColor DarkGray
+    Write-Host "    $(Split-Path $file1 -Leaf) → $(Split-Path $file2 -Leaf)" -ForegroundColor White
+
+    # Service diff
+    $svcChanges = @()
+    $oldSvcs = @{}; $old.services | ForEach-Object { $oldSvcs[$_.name] = $_.status }
+    $newSvcs = @{}; $new.services | ForEach-Object { $newSvcs[$_.name] = $_.status }
+    foreach ($k in $newSvcs.Keys) {
+        if ($oldSvcs.ContainsKey($k) -and $oldSvcs[$k] -ne $newSvcs[$k]) {
+            $svcChanges += @{ name = $k; from = $oldSvcs[$k]; to = $newSvcs[$k] }
+        }
+    }
+    if ($svcChanges.Count -gt 0) {
+        Write-Host "`n  SERVICES" -ForegroundColor Cyan
+        foreach ($c in $svcChanges) {
+            $color = if ($c.to -eq "Running") { "Green" } else { "Red" }
+            Write-Host "    $($c.name.PadRight(30))" -NoNewline -ForegroundColor White
+            Write-Host "$($c.from) → $($c.to)" -ForegroundColor $color
+        }
+    }
+
+    # Disk diff
+    $diskChanges = @()
+    $oldDisks = @{}; $old.disk | ForEach-Object { $oldDisks[$_.drive] = $_.freeGB }
+    $newDisks = @{}; $new.disk | ForEach-Object { $newDisks[$_.drive] = $_.freeGB }
+    foreach ($k in $newDisks.Keys) {
+        if ($oldDisks.ContainsKey($k)) {
+            $delta = [math]::Round($newDisks[$k] - $oldDisks[$k], 1)
+            if ([math]::Abs($delta) -ge 0.5) {
+                $diskChanges += @{ drive = $k; from = $oldDisks[$k]; to = $newDisks[$k]; delta = $delta }
             }
         }
     }
-    $snap["repos"] = @($repos)
-    
-    $envVars = @()
-    [System.Environment]::GetEnvironmentVariables("User").GetEnumerator() | ForEach-Object {
-        $val = $_.Value
-        if ($val.Length -gt 8) { $masked = $val.Substring(0,4) + "****" } else { $masked = "****" }
-        $envVars += @{ name = $_.Key; masked = $masked; length = $val.Length }
-    }
-    $snap["envVars"] = @($envVars)
-    
-    $tools = @()
-    foreach ($cmd in @("node", "python", "git", "nssm")) {
-        $found = Get-Command $cmd -ErrorAction SilentlyContinue
-        if ($found) {
-            $ver = ""
-            try { $ver = (& $cmd --version 2>$null | Select-Object -First 1).Trim() } catch {}
-            $tools += @{ name = $cmd; version = $ver }
+    if ($diskChanges.Count -gt 0) {
+        Write-Host "`n  DISK" -ForegroundColor Cyan
+        foreach ($c in $diskChanges) {
+            $sign = if ($c.delta -gt 0) { "+" } else { "" }
+            $color = if ($c.delta -lt 0) { "Yellow" } else { "Green" }
+            Write-Host "    $($c.drive)  $($c.from) GB → $($c.to) GB" -NoNewline -ForegroundColor White
+            Write-Host "  (${sign}$($c.delta) GB)" -ForegroundColor $color
         }
     }
-    $snap["tools"] = @($tools)
-    
-    $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
-    if ($os) {
-        $uptime = (Get-Date) - $os.LastBootUpTime
-        $snap["uptime"] = [string]([math]::Floor($uptime.TotalDays)) + "d " + $uptime.Hours + "h"
-    }
-    
-    $snap["timestamp"] = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-    return $snap
-}
 
-if ($List) {
-    Write-Host ""
-    Write-Host "  Snapshots" -ForegroundColor Cyan
-    Write-Host ""
-    $files = Get-ChildItem $snapshotDir -Filter "*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
-    if (-not $files -or $files.Count -eq 0) {
-        Write-Host "  (none yet)" -ForegroundColor DarkGray
-    } else {
-        foreach ($f in $files) {
-            $size = [math]::Round($f.Length / 1KB, 0)
-            Write-Host ("    " + $f.BaseName.PadRight(30) + " " + $size + " KB") -ForegroundColor White
+    # Port diff
+    $oldPorts = @($old.ports | ForEach-Object { $_.port }); $newPorts = @($new.ports | ForEach-Object { $_.port })
+    $addedPorts = $newPorts | Where-Object { $_ -notin $oldPorts }
+    $removedPorts = $oldPorts | Where-Object { $_ -notin $newPorts }
+    if ($addedPorts.Count -gt 0 -or $removedPorts.Count -gt 0) {
+        Write-Host "`n  PORTS" -ForegroundColor Cyan
+        foreach ($p in $addedPorts) {
+            $proc = ($new.ports | Where-Object { $_.port -eq $p }).process
+            Write-Host "    + :$p" -NoNewline -ForegroundColor Green
+            Write-Host "  now listening ($proc)" -ForegroundColor DarkGray
+        }
+        foreach ($p in $removedPorts) {
+            Write-Host "    - :$p" -NoNewline -ForegroundColor Red
+            Write-Host "  no longer listening" -ForegroundColor DarkGray
         }
     }
+
+    # Process diff
+    $oldProcs = @($old.processes | ForEach-Object { $_.name }) | Sort-Object -Unique
+    $newProcs = @($new.processes | ForEach-Object { $_.name }) | Sort-Object -Unique
+    $addedProcs = $newProcs | Where-Object { $_ -notin $oldProcs }
+    $removedProcs = $oldProcs | Where-Object { $_ -notin $newProcs }
+    if ($addedProcs.Count -gt 0 -or $removedProcs.Count -gt 0) {
+        Write-Host "`n  PROCESSES" -ForegroundColor Cyan
+        if ($addedProcs.Count -gt 0) {
+            Write-Host "    + $($addedProcs.Count) new: $($addedProcs[0..([Math]::Min(4,$addedProcs.Count-1))] -join ', ')" -ForegroundColor Green
+        }
+        if ($removedProcs.Count -gt 0) {
+            Write-Host "    - $($removedProcs.Count) gone: $($removedProcs[0..([Math]::Min(4,$removedProcs.Count-1))] -join ', ')" -ForegroundColor Red
+        }
+    }
+
+    if ($svcChanges.Count -eq 0 -and $diskChanges.Count -eq 0 -and $addedPorts.Count -eq 0 -and $removedPorts.Count -eq 0 -and $addedProcs.Count -eq 0 -and $removedProcs.Count -eq 0) {
+        Write-Host "`n  No significant changes detected." -ForegroundColor Green
+    }
+
     Write-Host ""
     exit 0
 }
 
-if ($Diff) {
-    $diffPath = Join-Path $snapshotDir ($Diff + ".json")
-    if (-not (Test-Path $diffPath)) {
-        Write-Host "  Snapshot not found: $Diff" -ForegroundColor Red
-        exit 1
-    }
-    $old = Get-Content $diffPath -Raw | ConvertFrom-Json
-    $now = Get-Snapshot
-    $changes = 0
-    
-    Write-Host ""
-    Write-Host "  Diamond Dust - Diff" -ForegroundColor Cyan
-    Write-Host ""
-    
-    foreach ($d in $now["disk"]) {
-        $oldDisk = $old.disk | Where-Object { $_.drive -eq $d.drive }
-        if ($oldDisk -and [math]::Abs($oldDisk.freeGB - $d.freeGB) -gt 0.5) {
-            $delta = [math]::Round($d.freeGB - $oldDisk.freeGB, 1)
-            Write-Host ("  DISK  " + $d.drive + ": " + $oldDisk.freeGB + " GB -> " + $d.freeGB + " GB (" + $delta + " GB)") -ForegroundColor Yellow
-            $changes++
+# ── Snapshot ────────────────────────────────────────────
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$outFile = Join-Path $snapshotDir "$timestamp.json"
+
+Write-Host "`n  Capturing system state..." -ForegroundColor DarkGray
+
+$snapshot = [ordered]@{
+    timestamp = (Get-Date -Format "o")
+    hostname  = $env:COMPUTERNAME
+    os        = (Get-CimInstance Win32_OperatingSystem).Caption
+    uptime    = ((Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime).ToString("d\.hh\:mm\:ss")
+    lastBoot  = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime.ToString("o")
+
+    services  = @(Get-Service | Where-Object { $_.StartType -ne 'Disabled' } | ForEach-Object {
+        [ordered]@{ name = $_.Name; status = $_.Status.ToString(); startType = $_.StartType.ToString() }
+    })
+
+    processes = @(Get-Process | Group-Object Name | ForEach-Object {
+        $mem = ($_.Group | Measure-Object WorkingSet64 -Sum).Sum
+        [ordered]@{ name = $_.Name; count = $_.Count; memoryMB = [math]::Round($mem / 1MB, 1) }
+    } | Sort-Object { $_.memoryMB } -Descending | Select-Object -First 50)
+
+    ports     = @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | ForEach-Object {
+        $proc = (Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).Name
+        [ordered]@{ port = $_.LocalPort; address = $_.LocalAddress; process = $proc; pid = $_.OwningProcess }
+    } | Sort-Object { $_.port } -Unique)
+
+    disk      = @(Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
+        [ordered]@{
+            drive   = $_.DeviceID
+            freeGB  = [math]::Round($_.FreeSpace / 1GB, 1)
+            totalGB = [math]::Round($_.Size / 1GB, 1)
+            pctFree = [math]::Round(($_.FreeSpace / $_.Size) * 100, 1)
         }
-    }
-    
-    foreach ($r in $now["repos"]) {
-        $oldRepo = $old.repos | Where-Object { $_.name -eq $r.name }
-        if ($oldRepo -and $oldRepo.dirty -ne $r.dirty) {
-            Write-Host ("  REPO  " + $r.name + ": " + $oldRepo.dirty + " dirty -> " + $r.dirty + " dirty") -ForegroundColor Yellow
-            $changes++
-        }
-    }
-    
-    foreach ($e in $now["envVars"]) {
-        $oldEnv = $old.envVars | Where-Object { $_.name -eq $e.name }
-        if (-not $oldEnv) {
-            Write-Host ("  ENV   + " + $e.name + " (added)") -ForegroundColor Green
-            $changes++
-        } elseif ($oldEnv.length -ne $e.length) {
-            Write-Host ("  ENV   ~ " + $e.name + " (changed)") -ForegroundColor Yellow
-            $changes++
-        }
-    }
-    
-    Write-Host ""
-    Write-Host "  -------------------------" -ForegroundColor DarkGray
-    if ($changes -eq 0) {
-        Write-Host "  No changes detected." -ForegroundColor Green
-    } else {
-        Write-Host "  $changes change(s) detected." -ForegroundColor Yellow
-    }
-    Write-Host ""
-    exit 0
+    })
+
+    envVars   = @([System.Environment]::GetEnvironmentVariables("User").Keys | Sort-Object)
+
+    network   = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+        Where-Object { $_.IPAddress -ne "127.0.0.1" } | ForEach-Object {
+        [ordered]@{ interface = $_.InterfaceAlias; ip = $_.IPAddress; prefix = $_.PrefixLength }
+    })
 }
 
-Write-Host ""
-Write-Host "  Diamond Dust" -ForegroundColor Cyan
-Write-Host ""
+$snapshot | ConvertTo-Json -Depth 5 | Set-Content $outFile -Encoding UTF8
 
-$snap = Get-Snapshot
-
-$running = @($snap["services"] | Where-Object { $_.state -eq "RUNNING" }).Count
-$stopped = @($snap["services"] | Where-Object { $_.state -eq "STOPPED" }).Count
-Write-Host "  SERVICES        $running running, $stopped stopped" -ForegroundColor White
-
-$topProc = $snap["processes"] | Select-Object -First 3
-$topParts = @()
-foreach ($p in $topProc) { $topParts += ($p.name + " " + $p.memMB + "MB") }
-Write-Host ("  PROCESSES       " + $snap["processes"].Count + " captured, top: " + ($topParts -join ", ")) -ForegroundColor White
-
-$diskParts = @()
-foreach ($d in $snap["disk"]) { $diskParts += ($d.drive + ": " + $d.freeGB + "GB") }
-Write-Host ("  DISK            " + ($diskParts -join ", ")) -ForegroundColor White
-
-Write-Host ("  PORTS           " + $snap["ports"].Count + " listening") -ForegroundColor White
-
-$cleanRepos = @($snap["repos"] | Where-Object { $_.dirty -eq 0 }).Count
-$dirtyRepos = @($snap["repos"] | Where-Object { $_.dirty -gt 0 }).Count
-Write-Host "  GIT REPOS       $cleanRepos clean, $dirtyRepos dirty" -ForegroundColor White
-
-Write-Host ("  ENV VARS        " + $snap["envVars"].Count + " user variables") -ForegroundColor White
-
-$toolParts = @()
-foreach ($t in $snap["tools"]) { $toolParts += ($t.name + " " + $t.version) }
-Write-Host ("  TOOLS           " + ($toolParts -join ", ")) -ForegroundColor White
-
-if ($snap["uptime"]) { Write-Host ("  UPTIME          " + $snap["uptime"]) -ForegroundColor White }
-
-$snapName = if ($Name) { $Name } else { Get-Date -Format "yyyy-MM-dd_HH-mm-ss" }
-$snapPath = Join-Path $snapshotDir ($snapName + ".json")
-$snap | ConvertTo-Json -Depth 10 | Set-Content $snapPath -Encoding UTF8
+$svcCount = $snapshot.services.Count
+$procCount = $snapshot.processes.Count
+$portCount = $snapshot.ports.Count
+$diskCount = $snapshot.disk.Count
 
 Write-Host ""
-Write-Host "  Saved: $snapPath" -ForegroundColor DarkGray
+Write-Host "  Snapshot saved: " -NoNewline -ForegroundColor Green
+Write-Host $outFile -ForegroundColor White
+Write-Host "  Captured: $svcCount services, $procCount processes, $portCount ports, $diskCount drives" -ForegroundColor DarkGray
 Write-Host ""

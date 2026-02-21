@@ -2,122 +2,89 @@
 
 ***Diamond Dust***
 
-**Freeze your entire system state into a snapshot. Compare snapshots to see exactly what changed.**
+**Freeze your system state into a snapshot. Compare snapshots to see what changed.**
 
-Shiva captures everything about your system at this exact moment — services, disk space, git repos, running processes, open ports, environment variables. Save it. Come back later. Compare. Know exactly what changed and when.
+Something broke between yesterday and today? Take snapshots, diff them, find the ghost.
+
+## What It Captures
+
+- **Services** — name, status, start type for all registered services
+- **Processes** — running process names and memory usage
+- **Ports** — all listening TCP ports and their owning processes
+- **Disk** — free space, total space, percent free per drive
+- **Environment** — variable names (not values) that are set
+- **Network** — active interfaces, IPs, gateway
+- **System** — hostname, OS version, uptime, last boot time
 
 ## Works Anywhere
 
-**No OpenClaw required.** Shiva snapshots any Windows machine. Use it before deployments, after changes, or just to have a record of what your system looks like right now.
+**No OpenClaw required.** Shiva works on any Windows machine with PowerShell 5.1+. Pure system introspection.
 
 ## Usage
 
 ```powershell
-# Take a snapshot
+# Take a snapshot (saved to ~/.shiva/snapshots/)
 .\shiva.ps1
 
-# Take a named snapshot
-.\shiva.ps1 -Name "before-deploy"
+# Compare the last two snapshots
+.\shiva.ps1 --diff
 
-# Compare two snapshots
-.\shiva.ps1 -Diff "before-deploy"
+# Compare two specific snapshots
+.\shiva.ps1 --diff snapshot1.json snapshot2.json
 
 # List all snapshots
-.\shiva.ps1 -List
+.\shiva.ps1 --list
 ```
-
-## What It Captures
-
-- **Services** — every registered service and its state
-- **Processes** — what's running right now (top 20 by memory)
-- **Disk Space** — free/total on every drive
-- **Ports** — all listening ports and which process owns them
-- **Git Repos** — status of every repo (clean, dirty, branch, ahead/behind)
-- **Environment Variables** — all user-level env vars (values masked)
-- **Installed Software** — key tools and their versions (Node, Python, Git, 7-Zip, etc.)
-- **Uptime** — how long since last reboot
 
 ## Output
 
 ```
   ❄️ Diamond Dust
 
-  Snapshot: 2026-02-20_23-55-00
-
-  SERVICES         4 running, 1 stopped
-  PROCESSES        47 active, top: chrome (1.2 GB), node (340 MB)
-  DISK             C: 11.3 GB (5.5%) | D: 89.2 GB (42%)
-  PORTS            8 listening (18789, 8420, 3000...)
-  GIT REPOS        8 clean, 2 dirty (armory +3, SyncLink +1)
-  ENV VARS         12 user variables set
-  TOOLS            node v24.13, python 3.11, git 2.44
-  UPTIME           4 days 7 hours
-
-  Saved to: ~/.armory/snapshots/2026-02-20_23-55-00.json
+  Snapshot saved: ~/.shiva/snapshots/2026-02-21_00-30-00.json
+  Captured: 47 services, 112 processes, 23 ports, 3 drives
 ```
 
-## Comparing Snapshots
-
-```powershell
-.\shiva.ps1 -Diff "before-deploy"
-```
+### Diff Output
 
 ```
   ❄️ Diamond Dust — Diff
 
-  Comparing: before-deploy → now
+  Comparing: 2026-02-20_22-00-00 → 2026-02-21_00-30-00
 
   SERVICES
-    + TradingDashboard    STOPPED → RUNNING
-  
+    + CryptoPipeline          STOPPED → RUNNING
+    - TradingDashboard        RUNNING → STOPPED
+
+  PORTS
+    + :8420                   now listening (node.exe)
+    - :3000                   no longer listening
+
   DISK
-    C: 14.1 GB → 11.3 GB  (-2.8 GB)
-  
-  GIT REPOS
-    armory               clean → dirty (+3 files)
-    SyncLink             dirty → clean (pushed)
-  
-  ENV VARS
-    + GITHUB_TOKEN        (added)
-    ~ ANTHROPIC_API_KEY   (changed)
-  
+    C:  12.1 GB → 11.3 GB    (-0.8 GB)
+
   PROCESSES
-    + ollama.exe          (new, 2.1 GB)
-
-  5 changes detected.
+    + 3 new: node, python, sshd
+    - 2 gone: chrome, explorer
 ```
 
-## Snapshot Storage
+## Configuration
 
-Snapshots are saved as JSON files in `~/.armory/snapshots/`. They're small (usually under 50KB) and stack up without taking meaningful disk space.
+No config needed. Shiva reads the system directly.
 
-```
-~/.armory/snapshots/
-  2026-02-20_23-55-00.json
-  before-deploy.json
-  after-cleanup.json
-```
-
-## Use Cases
-
-- **Before/after deployments** — snapshot before you change anything, compare after
-- **Debugging** — "it was working yesterday" — compare today's snapshot to yesterday's
-- **Auditing** — monthly system state records
-- **Migration** — snapshot old machine, set up new machine, compare to make sure nothing's missing
-- **Peace of mind** — you always know what your system looks like
+Snapshots stored at `~/.shiva/snapshots/` — clean them up when you want.
 
 ## Pairs With
 
-- **Ramuh** (Summon) — Ramuh diagnoses problems NOW. Shiva records state for LATER.
-- **Odin** (Summon) — Snapshot before cleanup, snapshot after. See what Odin cut.
-- **Bahamut** (Summon) — Snapshot the old machine before migrating. Compare after Bahamut deploys.
+- **Ramuh** (Summon) — Ramuh checks if things work. Shiva records what things look like.
+- **Odin** (Summon) — Diff to find bloat, then Odin cleans it.
+- **Sentinel** (Weapon) — Sentinel alerts on change. Shiva shows you the full before/after.
 
 ## Requirements
 
 - PowerShell 5.1+
-- Git (for repo status checks)
-- No admin rights needed
+- No admin rights needed (some service details may be limited)
 
 ---
 
-*"Frozen in time." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+*"Time stands still." — Part of [The Armory](https://github.com/VontaJamal/armory)*
