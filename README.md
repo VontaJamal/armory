@@ -17,6 +17,7 @@ Themed names stay for personality. Instructions stay plain-language first.
 - Deprecated `doctor` as an alias to `remedy` (two-release window). `esuna` remains a supported alias.
 - Added `civs` command for Civilian alias mode (`on`, `off`, `status`).
 - Civilian aliases are ON by default across commands. Jump to `Civilian Alias Map (for the uninitiated)` below.
+- New scripts in this wave are written for Windows + macOS PowerShell compatibility.
 
 ## Start Here In 5 Minutes
 

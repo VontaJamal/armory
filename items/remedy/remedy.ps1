@@ -334,11 +334,19 @@ $failCount = @($results | Where-Object { $_.Status -eq "FAIL" }).Count
 $warnCount = @($results | Where-Object { $_.Status -eq "WARN" }).Count
 $passCount = @($results | Where-Object { $_.Status -eq "PASS" }).Count
 
+$hostName = if ($env:COMPUTERNAME) {
+    $env:COMPUTERNAME
+} elseif ($env:HOSTNAME) {
+    $env:HOSTNAME
+} else {
+    [System.Net.Dns]::GetHostName()
+}
+
 $summaryLines = @()
 $summaryLines += "Remedy Environment Check"
 $summaryLines += "------------------------"
 $summaryLines += "Timestamp: $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))"
-$summaryLines += "Host: $env:COMPUTERNAME"
+$summaryLines += "Host: $hostName"
 $summaryLines += ""
 $summaryLines += (($results | Select-Object Check, Status, Message | Format-Table -AutoSize | Out-String).TrimEnd())
 $summaryLines += ""
@@ -347,7 +355,7 @@ $summaryLines += "Summary: PASS=$passCount WARN=$warnCount FAIL=$failCount"
 if ($Detailed) {
     $payload = [ordered]@{
         generatedAt = (Get-Date).ToString("o")
-        host = $env:COMPUTERNAME
+        host = $hostName
         counts = [ordered]@{
             pass = $passCount
             warn = $warnCount

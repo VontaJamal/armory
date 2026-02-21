@@ -25,6 +25,7 @@ This file is also the release counter for deprecation windows (see `POLICIES/DEP
 - Dispatcher routes now include `remedy`, `alexander`, and `gate`.
 - `esuna` now routes to Remedy as a supported long-term alias.
 - Added full dispatcher-wide Civilian alias layer with mode control via `civs`.
+- New scripts in this wave target Windows + macOS PowerShell compatibility.
 
 ### Deprecated
 - `doctor.ps1` is now a compatibility alias to `items/remedy/remedy.ps1` and begins a two-release deprecation window.

@@ -44,7 +44,15 @@ if ($Help) {
     exit 0
 }
 
-$configPath = Join-Path $env:USERPROFILE ".armory\config.json"
+$userHome = if ($env:USERPROFILE) {
+    $env:USERPROFILE
+} elseif ($HOME) {
+    $HOME
+} else {
+    [Environment]::GetFolderPath("UserProfile")
+}
+$configDir = Join-Path $userHome ".armory"
+$configPath = Join-Path $configDir "config.json"
 if (-not (Test-Path $configPath)) {
     Write-Host "  Missing Armory config: $configPath" -ForegroundColor Red
     Write-Host "  Run awakening.ps1 first to initialize your command word." -ForegroundColor Yellow
