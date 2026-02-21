@@ -9,9 +9,12 @@ This file is also the release counter for deprecation windows (see `POLICIES/DEP
 ### Added
 - CI baseline with catalog validation, help smoke checks, and fixture tests.
 - Shop validator, `materia-forge`, and `shop/list-shop` command support.
+- Release hardening workflows: manual release dispatch, release validation, and secret hygiene enforcement.
+- Branch protection and release policy docs.
 
 ### Changed
 - Documentation expanded for contributor workflow and policy references.
+- CI required checks expanded to include `secret-hygiene` and `release-validate`.
 
 ## [2026-02-21] - Baseline
 

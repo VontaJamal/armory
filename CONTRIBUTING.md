@@ -10,6 +10,8 @@ The Armory is Final Fantasy-themed, but every addition must solve a real operati
 2. Read [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md) for required README section structure.
 3. Read [`shop/ADD-TO-SHOP.md`](shop/ADD-TO-SHOP.md) for full-tool and idea-only submission rules.
 4. Read [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md) for rename and alias lifecycle.
+5. Read [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md) for release gates.
+6. Read [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md) for required status checks.
 
 ## Two Contribution Paths
 
@@ -57,9 +59,12 @@ Run these checks from repo root:
 
 ```bash
 python3 scripts/validate_shop_catalog.py
+python3 scripts/ci/secret_hygiene.py
+python3 scripts/release/validate_release.py --mode ci
 ```
 
 ```powershell
+pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
 ```
@@ -73,6 +78,8 @@ If your environment does not have PowerShell or 7-Zip, call that out in your PR 
 3. Docs must be copy-paste friendly for non-experts.
 4. New links must resolve in-repo.
 5. Rename migrations must follow the two-release policy in [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md).
+6. Release tags must follow semver format `vMAJOR.MINOR.PATCH`.
+7. Release gating checks are mandatory and defined in [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md).
 
 ## PR Template Notes
 

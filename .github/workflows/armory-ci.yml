@@ -6,7 +6,7 @@ on:
 
 jobs:
   catalog-validate:
-    name: Validate shop catalog
+    name: catalog-validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,8 +15,22 @@ jobs:
       - name: Validate catalog schema and paths
         run: python3 scripts/validate_shop_catalog.py
 
+  secret-hygiene:
+    name: secret-hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run secret hygiene scanner
+        run: python3 scripts/ci/secret_hygiene.py
+
+      - name: Ensure remote URL has no embedded credentials
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/check_remote_url.ps1
+
   powershell-smoke:
-    name: PowerShell help smoke
+    name: powershell-smoke
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -27,7 +41,7 @@ jobs:
         run: pwsh -NoProfile -File scripts/ci/help-smoke.ps1
 
   fixture-tests:
-    name: Fixture tests
+    name: fixture-tests
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -56,3 +70,15 @@ jobs:
       - name: Run fixture tests
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/run-fixture-tests.ps1 -SevenZipPath "$env:SEVEN_ZIP_PATH"
+
+  release-validate:
+    name: release-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate changelog and release baseline
+        run: python3 scripts/release/validate_release.py --mode ci

@@ -40,7 +40,7 @@ Themed names are for personality. Instructions are plain-language first.
 - [`weapons/scan/`](weapons/scan/) - fast security scan.
 - [`weapons/truesight/`](weapons/truesight/) - deep security scan.
 - [`weapons/jutsu/`](weapons/jutsu/) - macOS zsh key-swap and gateway helper.
-- [`weapons/warp/`](weapons/warp/) - one-command SSH into any machine. No memorizing IPs or keys.
+- `weapons/warp/` (planned) - one-command SSH into any machine. No memorizing IPs or keys.
 
 ## Spells (scheduled automation)
 
@@ -52,6 +52,7 @@ Themed names are for personality. Instructions are plain-language first.
 ## Audio Layer
 
 - [`bard/`](bard/) - optional sound effects and themes.
+
 ## Quick Start (Windows PowerShell 5.1)
 
 ```powershell
@@ -92,22 +93,43 @@ powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Nam
 
 ## CI And Validation
 
-CI runs three required checks:
+CI runs five required checks:
 
-1. `shop/catalog.json` validation (`scripts/validate_shop_catalog.py`)
-2. PowerShell help-smoke checks (`scripts/ci/help-smoke.ps1`)
-3. Fixture tests for `scan`, `truesight`, and `cure` (`scripts/ci/run-fixture-tests.ps1`)
+1. `catalog-validate` (`scripts/validate_shop_catalog.py`)
+2. `secret-hygiene` (`scripts/ci/secret_hygiene.py` + `scripts/ci/check_remote_url.ps1`)
+3. `powershell-smoke` (`scripts/ci/help-smoke.ps1`)
+4. `fixture-tests` (`scripts/ci/run-fixture-tests.ps1`)
+5. `release-validate` (`scripts/release/validate_release.py --mode ci`)
 
 Local commands:
 
 ```bash
 python3 scripts/validate_shop_catalog.py
+python3 scripts/ci/secret_hygiene.py
+python3 scripts/release/validate_release.py --mode ci
 ```
 
 ```powershell
+pwsh -File .\scripts\ci\check_remote_url.ps1
 pwsh -File .\scripts\ci\help-smoke.ps1
 pwsh -File .\scripts\ci\run-fixture-tests.ps1 -SevenZipPath "C:\Program Files\7-Zip\7z.exe"
 ```
+
+## Release Flow
+
+Releases are manual and gated.
+
+1. Add a semver section to `CHANGELOG.md` (for example `## [v1.2.0]`).
+2. Run preflight checks locally.
+3. Run GitHub workflow `Armory Release` with:
+4. `version` set to `vMAJOR.MINOR.PATCH`.
+5. `target_branch` set to `main` (default).
+6. `dry_run` first, then real release.
+
+Policy docs:
+
+- [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
+- [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)
 
 ## Compatibility Aliases (One Release)
 
@@ -131,3 +153,5 @@ Deprecation lifecycle is documented in [`POLICIES/DEPRECATION.md`](POLICIES/DEPR
 - Contribution workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - README contract for each tool: [`DOCS-CONTRACT.md`](DOCS-CONTRACT.md)
 - Deprecation lifecycle policy: [`POLICIES/DEPRECATION.md`](POLICIES/DEPRECATION.md)
+- Release lifecycle policy: [`POLICIES/RELEASE.md`](POLICIES/RELEASE.md)
+- Branch protection baseline: [`POLICIES/BRANCH-PROTECTION.md`](POLICIES/BRANCH-PROTECTION.md)

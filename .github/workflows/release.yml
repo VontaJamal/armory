@@ -1,0 +1,135 @@
+name: Armory Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (vMAJOR.MINOR.PATCH)"
+        required: true
+        type: string
+      target_branch:
+        description: "Branch to release from"
+        required: true
+        default: "main"
+        type: string
+      dry_run:
+        description: "Validate only; do not tag or publish"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: read
+      actions: read
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Resolve commit SHA
+        id: sha
+        run: echo "value=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate release gates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/release/validate_release.py \
+            --mode release \
+            --version "${{ inputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --commit-sha "${{ steps.sha.outputs.value }}" \
+            --required-check "catalog-validate" \
+            --required-check "secret-hygiene" \
+            --required-check "powershell-smoke" \
+            --required-check "fixture-tests" \
+            --required-check "release-validate"
+
+      - name: Build release notes from changelog
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          version = "${{ inputs.version }}"
+          changelog = Path("CHANGELOG.md")
+          text = changelog.read_text(encoding="utf-8").splitlines()
+
+          heading = f"## [{version}]"
+          start = None
+          for i, line in enumerate(text):
+              if line.strip() == heading:
+                  start = i + 1
+                  break
+
+          if start is None:
+              raise SystemExit(f"Missing changelog section for {version}")
+
+          end = len(text)
+          for j in range(start, len(text)):
+              if re.match(r"^## \[[^\]]+\]", text[j].strip()):
+                  end = j
+                  break
+
+          body = "\n".join(text[start:end]).strip()
+          if not body:
+              raise SystemExit(f"Changelog section for {version} is empty")
+
+          Path("RELEASE_NOTES.md").write_text(body + "\n", encoding="utf-8")
+          PY
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "Dry run complete. No tag or release created."
+          echo "Version: ${{ inputs.version }}"
+          echo "Branch: ${{ inputs.target_branch }}"
+          echo "SHA:    ${{ steps.sha.outputs.value }}"
+
+      - name: Configure git identity
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create tag (optional signing)
+        if: ${{ !inputs.dry_run }}
+        run: |
+          VERSION="${{ inputs.version }}"
+          SHA="${{ steps.sha.outputs.value }}"
+          SIGNED="false"
+
+          if git config --get user.signingkey >/dev/null 2>&1 && command -v gpg >/dev/null 2>&1; then
+            if git tag -s "$VERSION" "$SHA" -m "Release $VERSION"; then
+              SIGNED="true"
+            fi
+          fi
+
+          if [ "$SIGNED" != "true" ]; then
+            git tag -a "$VERSION" "$SHA" -m "Release $VERSION (unsigned fallback)"
+          fi
+
+          echo "signed=$SIGNED" >> "$GITHUB_OUTPUT"
+        id: tag
+
+      - name: Push tag
+        if: ${{ !inputs.dry_run }}
+        run: git push origin "${{ inputs.version }}"
+
+      - name: Publish GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.version }}" \
+            --target "${{ steps.sha.outputs.value }}" \
+            --title "${{ inputs.version }}" \
+            --notes-file RELEASE_NOTES.md
