@@ -56,3 +56,9 @@ Both guides use the same commands and system behavior; only language/presentatio
 - [Contributing](CONTRIBUTING.md)
 - [Documentation contract](DOCS-CONTRACT.md)
 - [Policies](POLICIES/RELEASE.md), [Branch protection](POLICIES/BRANCH-PROTECTION.md), [Deprecation](POLICIES/DEPRECATION.md)
+
+---
+
+## Protected by the [Seven Shadows](https://github.com/VontaJamal/seven-shadow-system)
+
+Part of [Sovereign](https://github.com/VontaJamal) - The Shadow Dominion.
