@@ -5,6 +5,16 @@ on:
   pull_request:
 
 jobs:
+  docs-validate:
+    name: docs-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate README selector hub and companion parity
+        run: python3 scripts/ci/validate_readmes.py
+
   catalog-validate:
     name: catalog-validate
     runs-on: ubuntu-latest
@@ -14,6 +24,12 @@ jobs:
 
       - name: Validate catalog schema and paths
         run: python3 scripts/validate_shop_catalog.py
+
+      - name: Build manifest from catalog
+        run: python3 scripts/build_armory_manifest.py
+
+      - name: Check manifest determinism
+        run: python3 scripts/ci/check_manifest_determinism.py
 
   secret-hygiene:
     name: secret-hygiene
@@ -29,6 +45,16 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/check_remote_url.ps1
 
+  seven-shadow-trust-guard:
+    name: seven-shadow-trust-guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate trust store placeholders in bundle mode
+        run: python3 scripts/ci/validate_trust_store.py
+
   powershell-smoke:
     name: powershell-smoke
     runs-on: windows-latest
@@ -39,6 +65,10 @@ jobs:
       - name: Run help smoke checks
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/help-smoke.ps1
+
+      - name: Run mode contract smoke checks
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/mode-contract-smoke.ps1
 
   fixture-tests:
     name: fixture-tests
@@ -74,6 +104,10 @@ jobs:
       - name: Run chronicle fixture tests
         shell: pwsh
         run: pwsh -NoProfile -File scripts/ci/run-chronicle-tests.ps1
+
+      - name: Run quartermaster smoke tests
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/ci/quartermaster-smoke.ps1
 
   release-validate:
     name: release-validate

@@ -1,0 +1,90 @@
+name: Seven Shadow System
+
+on:
+  pull_request_review:
+    types: [submitted, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: seven-shadow-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    if: >
+      (github.event_name != 'issue_comment' || github.event.issue.pull_request != null) &&
+      (
+        github.event_name != 'issue_comment' ||
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: governance/seven-shadow-system/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: governance/seven-shadow-system
+
+      - name: Build Seven Shadow System
+        run: npm run build
+        working-directory: governance/seven-shadow-system
+
+      - name: Validate trust store placeholders in bundle mode
+        run: python3 scripts/ci/validate_trust_store.py
+
+      - name: Run Seven Shadow System
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          POLICY_ARGS=(--policy .seven-shadow/policy.json)
+
+          if [[ -f .seven-shadow/policy.bundle.json ]]; then
+            POLICY_ARGS=(
+              --policy-bundle .seven-shadow/policy.bundle.json
+              --policy-schema governance/seven-shadow-system/schemas/policy-v2.schema.json
+            )
+
+            if [[ -f .seven-shadow/policy-trust-store.json ]]; then
+              POLICY_ARGS+=(--policy-trust-store .seven-shadow/policy-trust-store.json)
+            else
+              echo "Found .seven-shadow/policy.bundle.json but missing .seven-shadow/policy-trust-store.json"
+              echo "Either add the trust store file or switch back to .seven-shadow/policy.json mode."
+              exit 1
+            fi
+          fi
+
+          node governance/seven-shadow-system/dist/src/sevenShadowSystem.js \
+            "${POLICY_ARGS[@]}" \
+            --event "$GITHUB_EVENT_PATH" \
+            --event-name "$GITHUB_EVENT_NAME" \
+            --report .seven-shadow/reports/github-report \
+            --report-format all \
+            --redact
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: seven-shadow-system-report
+          path: |
+            .seven-shadow/reports/github-report.json
+            .seven-shadow/reports/github-report.md
+            .seven-shadow/reports/github-report.sarif

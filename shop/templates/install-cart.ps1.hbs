@@ -1,0 +1,17 @@
+# Armory one-shot installer template
+# Tokenized fields are replaced by dashboard checkout generator.
+
+param(
+  [ValidateSet('saga','civ')]
+  [string]$Mode,
+  [switch]$Civ,
+  [switch]$Saga,
+  [switch]$NoTelemetry,
+  [string]$InstallRoot = (Join-Path $PWD 'armory-loadout')
+)
+
+# {{MODE_RESOLVER}}
+# {{BUNDLE_DOWNLOAD_LOOP}}
+# {{HASH_VERIFICATION}}
+# {{TELEMETRY_EMIT}}
+# {{MODE_AWARE_REPORT}}

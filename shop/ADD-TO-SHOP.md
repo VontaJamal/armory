@@ -19,6 +19,9 @@ Use this when you have a useful concept but no script yet.
    - `status: "idea"`
    - `owner`
    - `addedOn` (`YYYY-MM-DD`)
+   - `display` (both `saga` and `civ` variants)
+   - `install` (`entrypointPath: null`, empty `bundlePaths`)
+   - `tags`
 2. Add or update a short note in `shop/SHOP.md`.
 3. Run validator: `python3 scripts/validate_shop_catalog.py`
 
@@ -32,6 +35,7 @@ Use this when you are shipping code now.
 4. Add at least one welcoming Civilian alias for dispatcher commands (when applicable).
 5. Add catalog entry with `status: "active"`.
 6. Ensure `scriptPath` and `readmePath` exist and are repo-relative.
+7. Populate `display`, `install`, and `tags` fields for schema v2.
 7. Run validator and smoke checks.
 
 ## Recommended: Use Materia Forge
@@ -53,6 +57,9 @@ powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Nam
 - `class`: `summon|weapon|spell|item|audio|idea`
 - `scriptPath`: nullable, repo-relative path
 - `readmePath`: nullable, repo-relative path
+- `display`: object with `saga` and `civ` text variants
+- `install`: object with entrypoint, bundle paths, dependencies, platforms
+- `tags`: non-empty array of strings
 - `status`: `active|idea|planned|deprecated`
 - `addedOn`: `YYYY-MM-DD`
 
@@ -60,6 +67,8 @@ powershell -ExecutionPolicy Bypass -File .\materia-forge.ps1 -Category idea -Nam
 
 ```bash
 python3 scripts/validate_shop_catalog.py
+python3 scripts/build_armory_manifest.py
+python3 scripts/ci/check_manifest_determinism.py
 ```
 
 ```powershell

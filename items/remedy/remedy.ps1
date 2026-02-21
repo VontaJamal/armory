@@ -4,7 +4,7 @@
 #>
 
 param(
-    [ValidateSet("config", "wrapper", "scripts", "repos", "ci", "remote", "deps")]
+    [ValidateSet("config", "wrapper", "scripts", "repos", "ci", "shadow", "remote", "deps")]
     [string[]]$Check,
     [switch]$Detailed,
     [string]$Output,
@@ -109,7 +109,7 @@ function Add-Result {
     }) | Out-Null
 }
 
-$allChecks = @("config", "wrapper", "scripts", "repos", "ci", "remote", "deps")
+$allChecks = @("config", "wrapper", "scripts", "repos", "ci", "shadow", "remote", "deps")
 $selectedChecks = if ($Check -and $Check.Count -gt 0) { @($Check | Select-Object -Unique) } else { $allChecks }
 
 foreach ($c in $selectedChecks) {
@@ -131,6 +131,14 @@ foreach ($c in $selectedChecks) {
             if (-not $config.repoRoot) {
                 $issues += "missing repoRoot"
             }
+            if (-not ($config.PSObject.Properties.Name -contains "mode")) {
+                $issues += "missing mode (expected saga|civ)"
+            } else {
+                $modeValue = [string]$config.mode
+                if ($modeValue -notin @("saga", "civ", "lore", "crystal")) {
+                    $issues += "invalid mode (expected saga|civ)"
+                }
+            }
 
             if ($issues.Count -gt 0) {
                 Add-Result -CheckName "config" -Status "FAIL" -Message "Armory config present but invalid" -Details $issues
@@ -138,7 +146,8 @@ foreach ($c in $selectedChecks) {
                 Add-Result -CheckName "config" -Status "PASS" -Message "Armory config is valid" -Details @(
                     "commandWord=$($config.commandWord)",
                     "installDir=$($config.installDir)",
-                    "repoRoot=$($config.repoRoot)"
+                    "repoRoot=$($config.repoRoot)",
+                    "mode=$([string]$config.mode)"
                 )
             }
         }
@@ -174,13 +183,15 @@ foreach ($c in $selectedChecks) {
         "scripts" {
             $required = @(
                 "awakening.ps1",
+                "setup.ps1",
                 "rename-command-word.ps1",
                 "weapons/scan/scan.ps1",
                 "weapons/truesight/truesight.ps1",
                 "spells/cure/cure.ps1",
                 "spells/chronicle/chronicle.ps1",
                 "bard/bard.ps1",
-                "items/remedy/remedy.ps1"
+                "items/remedy/remedy.ps1",
+                "items/quartermaster/quartermaster.ps1"
             )
 
             $missing = @()
@@ -237,9 +248,12 @@ foreach ($c in $selectedChecks) {
                 "scripts/ci/help-smoke.ps1",
                 "scripts/ci/run-fixture-tests.ps1",
                 "scripts/ci/run-chronicle-tests.ps1",
+                "scripts/ci/quartermaster-smoke.ps1",
                 "scripts/ci/check_remote_url.ps1",
                 "scripts/ci/secret_hygiene.py",
                 "scripts/validate_shop_catalog.py",
+                "scripts/build_armory_manifest.py",
+                "scripts/ci/check_manifest_determinism.py",
                 "scripts/release/validate_release.py"
             )
 
@@ -254,6 +268,20 @@ foreach ($c in $selectedChecks) {
                 Add-Result -CheckName "ci" -Status "FAIL" -Message "CI helper files missing" -Details $missingCi
             } else {
                 Add-Result -CheckName "ci" -Status "PASS" -Message "CI helper files are present" -Details @("count=$($requiredCiFiles.Count)")
+            }
+        }
+
+        "shadow" {
+            $shadowPath = Join-Path $repoRoot "governance\seven-shadow-system"
+            if (Test-Path $shadowPath) {
+                Add-Result -CheckName "shadow" -Status "PASS" -Message "Seven Shadow System repository detected" -Details @(
+                    "path=$shadowPath",
+                    "Run real checks from Seven Shadow before release sign-off"
+                )
+            } else {
+                Add-Result -CheckName "shadow" -Status "WARN" -Message "Seven Shadow System not found in expected path" -Details @(
+                    "expected=$shadowPath"
+                )
             }
         }
 

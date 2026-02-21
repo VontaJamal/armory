@@ -1,0 +1,274 @@
+{
+  "agentFlow": {
+    "approvalRequired": true,
+    "refreshCommand": "git -C <armoryRepoRoot> pull --ff-only",
+    "requiredSequence": [
+      "refresh_armory_clone",
+      "scout_and_shortlist",
+      "request_approval",
+      "equip_selected_loadout",
+      "report_in_active_mode"
+    ]
+  },
+  "catalogVersion": 2,
+  "entries": [
+    {
+      "addedOn": "2026-02-21",
+      "class": "summon",
+      "display": {
+        "civ": {
+          "description": "Runs read-only release checks and returns pass/fail status.",
+          "name": "Release Preflight Gate"
+        },
+        "saga": {
+          "description": "Summon the fortress gate to judge release readiness before deployment.",
+          "name": "Alexander"
+        }
+      },
+      "id": "alexander",
+      "install": {
+        "bundlePaths": [
+          "summons/alexander/alexander.ps1",
+          "summons/alexander/README.md"
+        ],
+        "bundleUrls": [
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/alexander.ps1",
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/README.md"
+        ],
+        "checksums": {
+          "summons/alexander/README.md": "b6145b6a528e53c123d0815488a0ad214b3e5aec7f1e4f6c694e68913b8554d6",
+          "summons/alexander/alexander.ps1": "68420598eca7df5c7e0f2266db33488e070a43034ab38f2e46301769728e2b5f"
+        },
+        "dependencies": [],
+        "entrypointPath": "summons/alexander/alexander.ps1",
+        "platforms": [
+          "windows"
+        ]
+      },
+      "owner": "community",
+      "source": {
+        "readmePath": "summons/alexander/README.md",
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/README.md",
+        "scriptPath": "summons/alexander/alexander.ps1",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/summons/alexander/alexander.ps1"
+      },
+      "status": "active",
+      "tags": [
+        "release",
+        "preflight",
+        "validation"
+      ]
+    },
+    {
+      "addedOn": "2026-02-21",
+      "class": "spell",
+      "display": {
+        "civ": {
+          "description": "Collects cross-repo branch, dirty-state, and commit pulse details.",
+          "name": "Repo Intelligence"
+        },
+        "saga": {
+          "description": "Read the living record of repo fronts, drift, and momentum.",
+          "name": "Chronicle"
+        }
+      },
+      "id": "chronicle",
+      "install": {
+        "bundlePaths": [
+          "spells/chronicle/chronicle.ps1",
+          "spells/chronicle/README.md"
+        ],
+        "bundleUrls": [
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/chronicle.ps1",
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/README.md"
+        ],
+        "checksums": {
+          "spells/chronicle/README.md": "c7d0e6a0f95fc9b0856a4b09c8fe06696caf311f0c19da5f499f12051c22ce50",
+          "spells/chronicle/chronicle.ps1": "71d3762bcb9c3ec903f999ed76008e74a3b96a05c117f90731882b4f59e23bea"
+        },
+        "dependencies": [],
+        "entrypointPath": "spells/chronicle/chronicle.ps1",
+        "platforms": [
+          "windows"
+        ]
+      },
+      "owner": "community",
+      "source": {
+        "readmePath": "spells/chronicle/README.md",
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/README.md",
+        "scriptPath": "spells/chronicle/chronicle.ps1",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/spells/chronicle/chronicle.ps1"
+      },
+      "status": "active",
+      "tags": [
+        "git",
+        "status",
+        "reporting"
+      ]
+    },
+    {
+      "addedOn": "2026-02-21",
+      "class": "idea",
+      "display": {
+        "civ": {
+          "description": "An idea for centralized routing, retry, and digest formatting of tool outputs.",
+          "name": "Notification Relay"
+        },
+        "saga": {
+          "description": "An idea for a moogle relay network across tool events.",
+          "name": "Mognet"
+        }
+      },
+      "id": "mognet",
+      "install": {
+        "bundlePaths": [],
+        "bundleUrls": [],
+        "checksums": {},
+        "dependencies": [],
+        "entrypointPath": null,
+        "platforms": []
+      },
+      "owner": "community",
+      "source": {
+        "readmePath": null,
+        "readmeUrl": null,
+        "scriptPath": null,
+        "scriptUrl": null
+      },
+      "status": "idea",
+      "tags": [
+        "idea",
+        "notifications"
+      ]
+    },
+    {
+      "addedOn": "2026-02-21",
+      "class": "item",
+      "display": {
+        "civ": {
+          "description": "Refreshes Armory, builds a shortlist/cart, enforces approval, and reports results.",
+          "name": "Armory Automation Loop"
+        },
+        "saga": {
+          "description": "Scout, plan, equip, and report with one command path from any front.",
+          "name": "Quartermaster"
+        }
+      },
+      "id": "quartermaster",
+      "install": {
+        "bundlePaths": [
+          "items/quartermaster/quartermaster.ps1",
+          "items/quartermaster/README.md"
+        ],
+        "bundleUrls": [
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/quartermaster.ps1",
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/README.md"
+        ],
+        "checksums": {
+          "items/quartermaster/README.md": "1b932b34e18e9429f5fa8d7310bd926889bbe66ab9b6a99466999085250d0079",
+          "items/quartermaster/quartermaster.ps1": "98c7315b37ca94d94ed07449ad034543b1a9ef23ff65bce872dbf6bacb731571"
+        },
+        "dependencies": [
+          "remedy",
+          "chronicle"
+        ],
+        "entrypointPath": "items/quartermaster/quartermaster.ps1",
+        "platforms": [
+          "windows"
+        ]
+      },
+      "owner": "community",
+      "source": {
+        "readmePath": "items/quartermaster/README.md",
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/README.md",
+        "scriptPath": "items/quartermaster/quartermaster.ps1",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/quartermaster/quartermaster.ps1"
+      },
+      "status": "active",
+      "tags": [
+        "agent",
+        "automation",
+        "scout",
+        "loadout",
+        "install"
+      ]
+    },
+    {
+      "addedOn": "2026-02-21",
+      "class": "item",
+      "display": {
+        "civ": {
+          "description": "Runs read-only checks for Armory config, wrappers, CI helpers, and dependencies.",
+          "name": "Environment Health Check"
+        },
+        "saga": {
+          "description": "Use field medicine to diagnose Armory setup and operational drift.",
+          "name": "Remedy"
+        }
+      },
+      "id": "remedy",
+      "install": {
+        "bundlePaths": [
+          "items/remedy/remedy.ps1",
+          "items/remedy/README.md"
+        ],
+        "bundleUrls": [
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/remedy.ps1",
+          "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/README.md"
+        ],
+        "checksums": {
+          "items/remedy/README.md": "2d08d7848090436d496fa5b9c7e7d2746a8d915a312042a9cd6f2a142896eb8d",
+          "items/remedy/remedy.ps1": "0b69be7751e0ffac2d5fe448d53e842dd715f1c84e51f296885df6a88fd27c2a"
+        },
+        "dependencies": [],
+        "entrypointPath": "items/remedy/remedy.ps1",
+        "platforms": [
+          "windows"
+        ]
+      },
+      "owner": "community",
+      "source": {
+        "readmePath": "items/remedy/README.md",
+        "readmeUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/README.md",
+        "scriptPath": "items/remedy/remedy.ps1",
+        "scriptUrl": "https://raw.githubusercontent.com/VontaJamal/armory/187b3428a526f66080dadaf020a9d819374d16e1/items/remedy/remedy.ps1"
+      },
+      "status": "active",
+      "tags": [
+        "diagnostics",
+        "health",
+        "read-only"
+      ]
+    }
+  ],
+  "generatedAt": "2026-02-21T16:08:55-05:00",
+  "manifestVersion": 1,
+  "modeContract": {
+    "aliases": {
+      "civ": "Civilian Mode",
+      "saga": "Crystal Saga Mode"
+    },
+    "allowed": [
+      "saga",
+      "civ"
+    ],
+    "default": "saga",
+    "key": "mode",
+    "normalization": {
+      "crystal": "saga",
+      "lore": "saga"
+    }
+  },
+  "ref": "187b3428a526f66080dadaf020a9d819374d16e1",
+  "repo": "VontaJamal/armory",
+  "telemetry": {
+    "enabledByDefault": true,
+    "endpoint": "",
+    "eventsPath": "/v1/events",
+    "optOut": {
+      "dashboardSetting": "telemetryOptOut=true",
+      "env": "ARMORY_TELEMETRY=off",
+      "installerFlag": "-NoTelemetry"
+    }
+  }
+}

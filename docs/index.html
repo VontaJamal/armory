@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Armory Shopfront</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <header class="hero">
+    <div class="title-wrap">
+      <p class="kicker">Agent-First Repository Interface</p>
+      <h1 id="heroTitle">The Armory Shopfront</h1>
+      <p id="heroSubtitle">Scout, approve, equip, and return to the fight.</p>
+    </div>
+    <div class="mode-panel">
+      <div class="mode-heading">Mode</div>
+      <div class="mode-toggle" id="modeToggle" role="group" aria-label="Mode toggle">
+        <button id="modeSaga" class="mode-btn">Crystal Saga Mode</button>
+        <button id="modeCiv" class="mode-btn">Civilian Mode</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="callout" id="modeCallout">
+    <strong>Prefer plain language?</strong>
+    <span>Switch to Civilian Mode. You can switch back any time.</span>
+  </section>
+
+  <main class="layout">
+    <section class="catalog">
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Search tools, tags, and descriptions" />
+        <select id="classFilter">
+          <option value="">All divisions</option>
+          <option value="summon">Summons</option>
+          <option value="weapon">Weapons</option>
+          <option value="spell">Spells</option>
+          <option value="item">Items</option>
+          <option value="audio">Audio</option>
+          <option value="idea">Ideas</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="planned">Planned</option>
+          <option value="idea">Idea</option>
+          <option value="deprecated">Deprecated</option>
+        </select>
+        <button id="replayTour" class="ghost-btn">Take Tour Again</button>
+      </div>
+      <div id="catalogGrid" class="card-grid"></div>
+    </section>
+
+    <aside class="cart">
+      <h2>Loadout Cart</h2>
+      <p id="cartHint">Select tools to build your loadout.</p>
+      <ul id="cartList"></ul>
+
+      <div class="approval">
+        <label>
+          <input id="approveCheck" type="checkbox" />
+          I approve this loadout.
+        </label>
+      </div>
+
+      <button id="checkoutBtn" class="primary-btn" disabled>Generate Installer</button>
+      <p class="meta" id="checkoutMeta"></p>
+
+      <label class="telemetry-optout">
+        <input id="telemetryOptOut" type="checkbox" />
+        Opt out of anonymous telemetry
+      </label>
+    </aside>
+  </main>
+
+  <div id="tourOverlay" class="tour-overlay hidden" aria-hidden="true">
+    <div class="tour-card">
+      <h3 id="tourTitle"></h3>
+      <p id="tourBody"></p>
+      <div class="tour-actions">
+        <button id="tourSkip" class="ghost-btn">Skip</button>
+        <button id="tourNext" class="primary-btn">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

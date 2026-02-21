@@ -4,6 +4,8 @@ This repository is the shopfront. Every useful Final Fantasy-themed tool can be 
 
 Use this file as the human-readable shelf and [`catalog.json`](catalog.json) as the machine-readable source.
 
+For agent-first no-clone usage, use [`../docs/data/armory-manifest.v1.json`](../docs/data/armory-manifest.v1.json).
+
 ## Browse The Catalog
 
 ```powershell
@@ -21,6 +23,9 @@ powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format json
 
 # Markdown output for docs or PR comments
 powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Format markdown
+
+# Civilian wording view
+powershell -ExecutionPolicy Bypass -File .\shop\list-shop.ps1 -Mode civ
 ```
 
 ## How To Add Something
