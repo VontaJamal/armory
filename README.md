@@ -66,16 +66,30 @@ Guides and reference docs that save you hours.
 
 ## Custom Command Word
 
-Name your CLI anything during setup:
+Instead of typing `armory swap`, `armory reload`, etc. — pick a short alias that feels like yours:
 
 ```
 armory init
 
-  What's your command word?
-  > faye
+  ⚔️  Armory Setup
 
-  Done. Your weapons respond to "faye" now.
+  Pick a command name. This is the word you'll type
+  to run any Armory tool from your terminal.
+
+  Examples: armory, ops, forge, faye, kit
+
+  Command name: faye
+
+  ✓ Alias created.
+
+  You can now run:
+    faye swap anthropic work    Swap an API key
+    faye reload                 Restart your gateway
+    faye list                   Show stored keys
+    faye help                   See all commands
 ```
+
+Don't like your name? Run `armory init` again anytime.
 
 ## Contributing
 
