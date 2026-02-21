@@ -12,6 +12,7 @@ Full systems deployed with one command.
 
 | Summon | Flavor | What It Does |
 |--------|--------|-------------|
+| [**Bahamut**](summons/bahamut/) | *Megaflare* | Full empire deployment — every agent, every config, every channel, restored from one backup |
 | [**Ifrit**](summons/ifrit/) | *Hellfire* | Spawn a fully configured AI agent — workspace, personality, memory, config, ready for orders |
 | [**Odin**](summons/odin/) | *Zantetsuken* | One-slash system cleanup — zombie processes, stale sessions, bloated logs, all cut |
 
