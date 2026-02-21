@@ -1,172 +1,166 @@
 <#
 .SYNOPSIS
-  Bahamut — Megaflare. Full empire deployment from backup.
-.USAGE
-  .\bahamut.ps1 -BackupPath "backup.7z" -Password "secret"
-  .\bahamut.ps1  (interactive mode)
+  Bahamut - restore OpenClaw environment from encrypted backup.
 #>
 
 param(
     [string]$BackupPath,
-    [string]$Password
+    [string]$Password,
+    [switch]$Help,
+    [switch]$Sound,
+    [switch]$NoSound
 )
 
 $ErrorActionPreference = "Stop"
 $ocBase = "$env:USERPROFILE\.openclaw"
 $tempExtract = "$env:TEMP\bahamut-deploy"
+$sevenZip = "C:\Program Files\7-Zip\7z.exe"
 
-# --- Interactive mode ---
-if (-not $BackupPath) {
+$hookCandidates = @(
+    (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
+    (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
+)
+foreach ($h in $hookCandidates) {
+    if (Test-Path $h) { . $h; break }
+}
+$soundContext = $null
+if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
+    $soundContext = Initialize-ArmorySound -Sound:$Sound -NoSound:$NoSound
+    Invoke-ArmoryCue -Context $soundContext -Type start
+}
+
+function Show-Help {
     Write-Host ""
-    Write-Host "  Summoning Bahamut..." -ForegroundColor Magenta
+    Write-Host "  Bahamut" -ForegroundColor Cyan
+    Write-Host "  -----------------------------" -ForegroundColor DarkGray
     Write-Host ""
-    $BackupPath = Read-Host "  Backup archive path"
-    $securePass = Read-Host "  Encryption password" -AsSecureString
-    $Password = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePass))
+    Write-Host "  Usage:"
+    Write-Host "    .\\bahamut.ps1 -BackupPath C:\\Backups\\latest.7z"
+    Write-Host "    .\\bahamut.ps1 -BackupPath C:\\Backups\\latest.7z -Password your-password"
+    Write-Host ""
+}
+
+if ($Help -or -not $BackupPath) {
+    Show-Help
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+    exit 0
 }
 
 if (-not (Test-Path $BackupPath)) {
-    Write-Host "  Backup not found: $BackupPath" -ForegroundColor Red
+    Write-Host "  backup not found: $BackupPath" -ForegroundColor Red
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
     exit 1
 }
 
-# Check 7-Zip
-$7z = "C:\Program Files\7-Zip\7z.exe"
-if (-not (Test-Path $7z)) {
+if (-not (Test-Path $sevenZip)) {
     Write-Host "  7-Zip required. Install: choco install 7zip" -ForegroundColor Red
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
     exit 1
 }
+
+if (-not $Password) {
+    $securePass = Read-Host "  Encryption password" -AsSecureString
+    $Password = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePass))
+}
+
+if (Test-Path $tempExtract) {
+    Remove-Item $tempExtract -Recurse -Force -ErrorAction SilentlyContinue
+}
+New-Item -ItemType Directory -Path $tempExtract -Force | Out-Null
 
 Write-Host ""
+Write-Host "  Bahamut restore" -ForegroundColor Cyan
+Write-Host "  -----------------------------" -ForegroundColor DarkGray
 
-# --- Step 1: Extract ---
-Write-Host "  [1/8] Extracting archive...         " -NoNewline
-if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
-& $7z x $BackupPath -o"$tempExtract" -p"$Password" -y | Out-Null
+Write-Host "  [1/8] Extracting archive..." -NoNewline
+& $sevenZip x $BackupPath ("-o" + $tempExtract) ("-p" + $Password) -y | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "FAILED (wrong password?)" -ForegroundColor Red
+    Write-Host " FAIL" -ForegroundColor Red
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
     exit 1
 }
-Write-Host "done" -ForegroundColor Green
+Write-Host " pass" -ForegroundColor Green
 
-# --- Step 2: Restore openclaw.json ---
-Write-Host "  [2/8] Restoring openclaw.json...     " -NoNewline
-$configSource = Get-ChildItem $tempExtract -Recurse -Filter "openclaw.json" | Select-Object -First 1
+Write-Host "  [2/8] Restoring openclaw.json..." -NoNewline
+$configSource = Get-ChildItem $tempExtract -Recurse -Filter "openclaw.json" -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($configSource) {
-    Copy-Item $configSource.FullName "$ocBase\openclaw.json" -Force
-    Write-Host "done" -ForegroundColor Green
+    if (-not (Test-Path $ocBase)) { New-Item -ItemType Directory -Path $ocBase -Force | Out-Null }
+    Copy-Item $configSource.FullName (Join-Path $ocBase "openclaw.json") -Force
+    Write-Host " pass" -ForegroundColor Green
 } else {
-    Write-Host "not found in backup" -ForegroundColor Yellow
+    Write-Host " warn" -ForegroundColor Yellow
 }
 
-# --- Step 3: Restore secrets ---
-Write-Host "  [3/8] Restoring secrets vault...     " -NoNewline
-$secretsSource = Get-ChildItem $tempExtract -Recurse -Directory -Filter "secrets" | Select-Object -First 1
+Write-Host "  [3/8] Restoring secrets..." -NoNewline
+$secretsSource = Get-ChildItem $tempExtract -Recurse -Directory -Filter "secrets" -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($secretsSource) {
-    if (-not (Test-Path "$ocBase\secrets")) { New-Item -ItemType Directory -Path "$ocBase\secrets" -Force | Out-Null }
-    Copy-Item "$($secretsSource.FullName)\*" "$ocBase\secrets\" -Recurse -Force
-    Write-Host "done" -ForegroundColor Green
+    $targetSecrets = Join-Path $ocBase "secrets"
+    if (-not (Test-Path $targetSecrets)) { New-Item -ItemType Directory -Path $targetSecrets -Force | Out-Null }
+    Copy-Item (Join-Path $secretsSource.FullName "*") $targetSecrets -Recurse -Force
+    Write-Host " pass" -ForegroundColor Green
 } else {
-    Write-Host "not found in backup" -ForegroundColor Yellow
+    Write-Host " warn" -ForegroundColor Yellow
 }
 
-# --- Step 4: Deploy agent workspaces ---
-Write-Host "  [4/8] Deploying agent workspaces...  " -NoNewline
-$workspaces = Get-ChildItem $tempExtract -Recurse -Directory -Filter "workspace-*"
-$agentCount = 0
+Write-Host "  [4/8] Restoring workspaces..." -NoNewline
+$workspaces = Get-ChildItem $tempExtract -Recurse -Directory -Filter "workspace*" -ErrorAction SilentlyContinue
+$count = 0
 foreach ($ws in $workspaces) {
-    $targetPath = "$ocBase\$($ws.Name)"
-    if (-not (Test-Path $targetPath)) { New-Item -ItemType Directory -Path $targetPath -Force | Out-Null }
-    Copy-Item "$($ws.FullName)\*" "$targetPath\" -Recurse -Force
-    $agentCount++
+    $target = Join-Path $ocBase $ws.Name
+    if (-not (Test-Path $target)) { New-Item -ItemType Directory -Path $target -Force | Out-Null }
+    Copy-Item (Join-Path $ws.FullName "*") $target -Recurse -Force -ErrorAction SilentlyContinue
+    $count++
 }
-# Also restore main workspace
-$mainWs = Get-ChildItem $tempExtract -Recurse -Directory -Filter "workspace" | Where-Object { $_.Name -eq "workspace" } | Select-Object -First 1
-if ($mainWs) {
-    if (-not (Test-Path "$ocBase\workspace")) { New-Item -ItemType Directory -Path "$ocBase\workspace" -Force | Out-Null }
-    Copy-Item "$($mainWs.FullName)\*" "$ocBase\workspace\" -Recurse -Force
-    $agentCount++
-}
-Write-Host "$agentCount workspaces restored" -ForegroundColor Green
+Write-Host (" pass ({0})" -f $count) -ForegroundColor Green
 
-# --- Step 5: Register gateway service ---
-Write-Host "  [5/8] Registering gateway service... " -NoNewline
-$nssmPath = Get-Command nssm -ErrorAction SilentlyContinue
-if ($nssmPath) {
-    $existing = sc.exe query OpenClawGateway 2>&1
-    if ($existing -match "RUNNING|STOPPED|PAUSED") {
-        Write-Host "already registered" -ForegroundColor DarkGray
-    } else {
-        $nodePath = (Get-Command node).Source
-        $ocPath = "$env:APPDATA\npm\node_modules\openclaw\dist\index.js"
-        if (Test-Path $ocPath) {
-            nssm install OpenClawGateway $nodePath $ocPath "gateway" "start" | Out-Null
-            nssm set OpenClawGateway AppDirectory $env:USERPROFILE | Out-Null
-            nssm set OpenClawGateway Start SERVICE_AUTO_START | Out-Null
-            Write-Host "done" -ForegroundColor Green
+Write-Host "  [5/8] Checking gateway service..." -NoNewline
+$gw = sc.exe query OpenClawGateway 2>&1
+if ($gw -match "RUNNING|STOPPED|PAUSED") {
+    Write-Host " pass" -ForegroundColor Green
+} else {
+    Write-Host " warn" -ForegroundColor Yellow
+}
+
+Write-Host "  [6/8] Checking Telegram config..." -NoNewline
+$configPath = Join-Path $ocBase "openclaw.json"
+if (Test-Path $configPath) {
+    try {
+        $cfgText = [System.IO.File]::ReadAllText($configPath)
+        $cfg = $cfgText | ConvertFrom-Json
+        if ($cfg.channels.telegram.enabled) {
+            Write-Host " pass" -ForegroundColor Green
         } else {
-            Write-Host "openclaw not found at expected path" -ForegroundColor Yellow
+            Write-Host " warn" -ForegroundColor Yellow
         }
+    } catch {
+        Write-Host " warn" -ForegroundColor Yellow
     }
 } else {
-    Write-Host "nssm not installed (choco install nssm)" -ForegroundColor Yellow
+    Write-Host " warn" -ForegroundColor Yellow
 }
 
-# --- Step 6: Telegram config ---
-Write-Host "  [6/8] Configuring Telegram...        " -NoNewline
-$config = Get-Content "$ocBase\openclaw.json" -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-if ($config -and $config.channels.telegram.enabled) {
-    Write-Host "configured (from backup)" -ForegroundColor Green
+Write-Host "  [7/8] Detecting cron files..." -NoNewline
+$cronFiles = Get-ChildItem $tempExtract -Recurse -Filter "cron*.json" -ErrorAction SilentlyContinue
+if ($cronFiles) {
+    Write-Host (" pass ({0})" -f $cronFiles.Count) -ForegroundColor Green
 } else {
-    Write-Host "check openclaw.json manually" -ForegroundColor Yellow
+    Write-Host " warn" -ForegroundColor Yellow
 }
 
-# --- Step 7: Restore cron jobs ---
-Write-Host "  [7/8] Restoring cron jobs...         " -NoNewline
-$cronSource = Get-ChildItem $tempExtract -Recurse -Filter "cron*.json" -ErrorAction SilentlyContinue
-if ($cronSource) {
-    Write-Host "$($cronSource.Count) cron files found — import via openclaw cron" -ForegroundColor Green
-} else {
-    Write-Host "recreate manually (cron jobs don't survive gateway restarts)" -ForegroundColor Yellow
-}
-
-# --- Step 8: Sync scripts ---
-Write-Host "  [8/8] Setting up sync scripts...     " -NoNewline
-$syncScript = Get-ChildItem $tempExtract -Recurse -Filter "sync-workspace*" -ErrorAction SilentlyContinue
+Write-Host "  [8/8] Sync helper check..." -NoNewline
+$syncScript = Get-ChildItem $tempExtract -Recurse -Filter "sync-workspace*" -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($syncScript) {
-    Copy-Item $syncScript[0].FullName "$ocBase\" -Force
-    Write-Host "done" -ForegroundColor Green
+    Copy-Item $syncScript.FullName $ocBase -Force
+    Write-Host " pass" -ForegroundColor Green
 } else {
-    Write-Host "configure manually for your network" -ForegroundColor Yellow
+    Write-Host " warn" -ForegroundColor Yellow
 }
 
-# --- Cleanup temp ---
 Remove-Item $tempExtract -Recurse -Force -ErrorAction SilentlyContinue
 
-# --- Summary ---
 Write-Host ""
-Write-Host "  Megaflare." -ForegroundColor Magenta
+Write-Host "  restore complete" -ForegroundColor Green
 Write-Host ""
 
-# Read config for summary
-$config = Get-Content "$ocBase\openclaw.json" -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-if ($config) {
-    $agents = ($config.agents.list | ForEach-Object { $_.name -or $_.id }) -join ", "
-    Write-Host "  Agents:    $agents" -ForegroundColor White
-}
-
-# Check gateway
-$gwStatus = sc.exe query OpenClawGateway 2>&1
-if ($gwStatus -match "RUNNING") {
-    Write-Host "  Gateway:   RUNNING" -ForegroundColor Green
-} elseif ($gwStatus -match "STOPPED") {
-    Write-Host "  Gateway:   STOPPED (run: nssm start OpenClawGateway)" -ForegroundColor Yellow
-} else {
-    Write-Host "  Gateway:   not registered" -ForegroundColor DarkGray
-}
-
-Write-Host ""
-Write-Host "  Your empire is restored." -ForegroundColor White
-Write-Host "  Restart the gateway to go live." -ForegroundColor Yellow
-Write-Host ""
+if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+exit 0

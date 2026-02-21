@@ -1,53 +1,72 @@
-﻿# ðŸ“Š Libra
+# Libra (Daily Operations Report)
 
-**Automated daily intel report delivered to Telegram.**
+## What This Does
 
-Libra scans your system every night and delivers a full status report â€” storage, services, GitHub activity, and anything that needs attention. You wake up knowing exactly where things stand.
+Builds a daily operations intelligence report: disk, services, memory-heavy processes, uptime, updates, git working tree health, and key presence checks.
 
-## What It Reports
+Libra is operations-focused. It does not run secret scanning.
 
-- **System health** â€” CPU, memory, disk space, uptime
-- **Service status** â€” all registered services running or not
-- **Storage warnings** â€” flags drives under 15% free
-- **GitHub pulse** â€” recent commits across your active repos
-- **Maintenance items** â€” zombie processes, stale logs, cleanup opportunities
+## Who This Is For
 
-## Setup (OpenClaw Cron)
+- You want a daily infrastructure pulse.
+- You need a short operations report for morning or evening review.
 
-```json
-{
-  "name": "Libra â€” Daily Intel",
-  "enabled": true,
-  "schedule": { "cron": "0 23 * * *" },
-  "sessionTarget": "isolated",
-  "payload": {
-    "kind": "agentTurn",
-    "message": "Run the daily intel analysis. Check system health (disk space, services, uptime), recent GitHub commits across all active repos, and flag anything that needs attention. Deliver a clean summary.",
-    "deliver": true,
-    "channel": "telegram",
-    "to": "channel:YOUR_CHANNEL_ID"
-  }
-}
+## Quick Start
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1
 ```
 
-## How It Works
+## Common Tasks
 
-This is an **agent-driven spell** â€” instead of a static script, it tells your OpenClaw agent to analyze and report. The agent uses its tools (exec, web_fetch, etc.) to gather data and writes a human-readable summary.
+```powershell
+# Save report to file
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Output "C:\Reports\libra.txt"
 
-## Customization
+# Send report to Telegram
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Telegram
+```
 
-Change the cron schedule to match your timezone and preference:
-- `0 23 * * *` â€” 11 PM daily
-- `0 7 * * *` â€” 7 AM daily (morning briefing style)
-- `0 7,23 * * *` â€” twice daily
+## Flags
 
-## Tips
+| Flag | Default | Description |
+|---|---|---|
+| `-Output <path>` | none | Write report to file instead of stdout |
+| `-Telegram` | off | Send report to configured Telegram chat |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-- Use your strongest model for intel reports â€” the analysis quality matters
-- Route to a dedicated channel so reports don't clutter your main chat
-- Add custom checks by editing the message prompt
+## Config
 
----
+Top config block controls:
 
-*Know your system inside out. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+- Telegram token/chat id
+- git repo directories to inspect
+- API key variable names to check
 
+## Output And Exit Codes
+
+- `0`: report generated.
+- `1`: fatal collection or output failure.
+
+## Troubleshooting
+
+- Missing update count on older systems: script reports unavailable status.
+- Telegram send failed: verify token/chat id.
+
+## Automation Examples
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spells\libra\libra.ps1 -Output "C:\Reports\daily-libra.txt"
+```
+
+## FAQ
+
+**Why no security findings here?**
+Security scanning belongs to Scan/Truesight/Protect to keep roles clear.
+
+## Migration Notes
+
+Libra scope is now strictly operations intelligence.

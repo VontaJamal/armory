@@ -1,56 +1,66 @@
-﻿# ðŸ‘ï¸ Scan
+# Scan (Fast Security Scan)
 
-**Security audit for your repos and secrets.**
+## What This Does
 
-Cast Scan on your codebase and see everything exposed â€” leaked API keys, tracked `.env` files, secrets in git history.
+Runs a fast manual scan for secret patterns and risky repository hygiene issues.
 
-## What It Checks
+## Who This Is For
 
-- All local git repos for tracked secrets (API keys, tokens, passwords)
-- `.env` files â€” are they gitignored or accidentally committed?
-- Public vs private repo classification
-- Environment variable exposure
-- Common secret patterns (AWS, Anthropic, OpenAI, Stripe, etc.)
+- You want a quick local security pass before commit/push.
+- You need immediate visibility into obvious key leaks.
 
-## Usage
+## Quick Start
 
 ```powershell
-# Scan all repos in a directory
-.\scan.ps1 -RepoPath "D:\Code Repos"
-
-# Deep scan â€” checks git history too
-.\deep-scan.ps1 -RepoPath "D:\Code Repos"
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1 -Help
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1 -RepoPath "D:\Code Repos"
 ```
 
-## Output
+## Common Tasks
 
-```
-SECRETS SCAN REPORT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-Public repos:  16 â€” CLEAN
-Private repos:  3 â€” .env present but NOT tracked
-Local only:     4 â€” not on GitHub
+```powershell
+# Scan current repo root
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1 -RepoPath "."
 
-Leaked secrets: 0
-Exposed .env:   0
-
-Status: ALL CLEAR
+# Verbose output
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1 -RepoPath "D:\Code Repos" -Verbose
 ```
 
-## What It Catches
+## Flags
 
-- API keys in source code (Anthropic, OpenAI, Google, AWS, Stripe, Twilio)
-- Bot tokens (Telegram, Discord, Slack)
-- Database connection strings
-- Private keys and certificates
-- `.env` files committed to git
+| Flag | Default | Description |
+|---|---|---|
+| `-RepoPath <path>` | `D:\Code Repos` | Root path to scan |
+| `-Verbose` | off | Print extra details |
+| `-Sound` | off | Enable sound cues |
+| `-NoSound` | off | Disable sound cues |
+| `-Help` | off | Print usage and exit |
 
-## Requirements
+## Config
 
-- PowerShell 5.1+
-- Git installed
+Patterns are embedded in script and can be extended in code.
 
----
+## Output And Exit Codes
 
-*Find problems before they find you. â€” Part of [The Armory](https://github.com/VontaJamal/armory)*
+- `0`: scan completed with no critical findings.
+- `1`: findings detected or critical runtime failure.
 
+## Troubleshooting
+
+- Slow scan: narrow `-RepoPath` to a smaller directory.
+- False positives: tune regex patterns in script config block.
+
+## Automation Examples
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\weapons\scan\scan.ps1 -RepoPath "D:\Code Repos"
+```
+
+## FAQ
+
+**How is this different from Truesight?**
+Scan is faster and intended for quick manual checks. Truesight is deeper and broader.
+
+## Migration Notes
+
+- `deep-scan.ps1` is now a wrapper alias to `..\truesight\truesight.ps1`.

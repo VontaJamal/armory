@@ -1,6 +1,8 @@
 <#
 .SYNOPSIS
     Ramuh - Judgment Bolt - Full system diagnostic
+.DESCRIPTION
+    Tests network, SSH, services, API keys, disk space, gateway, and ports in one shot.
 .EXAMPLE
     .\ramuh.ps1
     .\ramuh.ps1 -Network
@@ -14,10 +16,25 @@ param(
     [switch]$Keys,
     [switch]$Disk,
     [switch]$All,
-    [switch]$Help
+    [switch]$Help,
+    [switch]$Sound,
+    [switch]$NoSound
 )
 
-# -- Config -------------------------------------------------------
+$hookCandidates = @(
+    (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
+    (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
+)
+foreach ($h in $hookCandidates) {
+    if (Test-Path $h) { . $h; break }
+}
+$soundContext = $null
+if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
+    $soundContext = Initialize-ArmorySound -Sound:$Sound -NoSound:$NoSound
+    Invoke-ArmoryCue -Context $soundContext -Type start
+}
+
+# -- Config ----------------------------------------------
 $config = @{
     machines = @(
         @{ name = "local"; host = "127.0.0.1" },
@@ -33,154 +50,166 @@ $config = @{
     dashboardPort = 8420
 }
 
-# -- Helpers -------------------------------------------------------
-function Write-Section($msg) { Write-Host ("`n  " + $msg) -ForegroundColor Cyan }
+# -- Colors ----------------------------------------------
+function Write-Pass($msg) { Write-Host "    $msg" -ForegroundColor Green }
+function Write-Fail($msg) { Write-Host "    $msg" -ForegroundColor Red }
+function Write-Warn($msg) { Write-Host "    $msg" -ForegroundColor Yellow }
+function Write-Section($msg) { Write-Host "`n  $msg" -ForegroundColor Cyan }
 function Write-Banner {
     Write-Host ""
-    Write-Host "  " -NoNewline
-    Write-Host "Judgment Bolt" -ForegroundColor Yellow
+    Write-Host "  [ok] " -NoNewline -ForegroundColor Yellow
+    Write-Host "Judgment Bolt" -ForegroundColor White
     Write-Host "  -----------------------------" -ForegroundColor DarkGray
 }
 
-function Write-Check {
-    param([string]$Label, [string]$Status, [string]$Color, [int]$Pad = 40)
-    Write-Host ("    " + $Label.PadRight($Pad)) -NoNewline -ForegroundColor White
-    Write-Host $Status -ForegroundColor $Color
-}
-
 if ($Help) {
-    Write-Host ""
-    Write-Host "  Ramuh -- Judgment Bolt"
-    Write-Host "  Full system diagnostic in one command."
-    Write-Host ""
-    Write-Host "  Usage:"
-    Write-Host "    .\ramuh.ps1              Run all checks"
-    Write-Host "    .\ramuh.ps1 -Network     Network + SSH only"
-    Write-Host "    .\ramuh.ps1 -Services    Windows services only"
-    Write-Host "    .\ramuh.ps1 -Keys        API key validation only"
-    Write-Host "    .\ramuh.ps1 -Disk        Disk space only"
-    Write-Host "    .\ramuh.ps1 -Help        This message"
-    Write-Host ""
+    Write-Host @"
+
+  [ok] Ramuh - Judgment Bolt
+  Full system diagnostic in one command.
+
+  Usage:
+    .\ramuh.ps1              Run all checks
+    .\ramuh.ps1 -Network     Network + SSH only
+    .\ramuh.ps1 -Services    Windows services only
+    .\ramuh.ps1 -Keys        API key validation only
+    .\ramuh.ps1 -Disk        Disk space only
+    .\ramuh.ps1 -Help        This message
+
+"@
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
     exit 0
 }
 
+# Default to all if no flags
 $runAll = (-not $Network -and -not $Services -and -not $Keys -and -not $Disk) -or $All
-$issues = [System.Collections.ArrayList]::new()
+$issues = @()
 
 Write-Banner
 
-# -- Network -------------------------------------------------------
+# -- Network ---------------------------------------------
 if ($runAll -or $Network) {
     Write-Section "NETWORK"
     foreach ($m in $config.machines) {
         try {
             $ping = Test-Connection -ComputerName $m.host -Count 1 -ErrorAction Stop
             $ms = $ping.ResponseTime
-            Write-Check "$($m.host) ($($m.name))" "pass ${ms}ms" "Green"
-        }
-        catch {
-            Write-Check "$($m.host) ($($m.name))" "FAIL unreachable" "Red"
-            [void]$issues.Add("Cannot reach $($m.name) ($($m.host))")
+            Write-Pass "$($m.host.PadRight(22)) ($($m.name))".PadRight(40) + "[ok]  ${ms}ms"
+            Write-Host "    $($m.host.PadRight(22))" -NoNewline -ForegroundColor White
+            Write-Host " ($($m.name))".PadRight(18) -NoNewline -ForegroundColor DarkGray
+            Write-Host "[ok]  ${ms}ms" -ForegroundColor Green
+        } catch {
+            Write-Host "    $($m.host.PadRight(22))" -NoNewline -ForegroundColor White
+            Write-Host " ($($m.name))".PadRight(18) -NoNewline -ForegroundColor DarkGray
+            Write-Host "x  unreachable" -ForegroundColor Red
+            $issues += "Cannot reach $($m.name) ($($m.host))"
         }
     }
 
-    # DNS
+    # DNS check
     Write-Host ""
     try {
-        Resolve-DnsName google.com -ErrorAction Stop | Out-Null
-        Write-Check "DNS resolution" "pass" "Green"
-    }
-    catch {
-        Write-Check "DNS resolution" "FAIL" "Red"
-        [void]$issues.Add("DNS resolution failed")
+        $dns = Resolve-DnsName google.com -ErrorAction Stop | Select-Object -First 1
+        Write-Host "    DNS resolution".PadRight(40) -NoNewline -ForegroundColor White
+        Write-Host "[ok]  working" -ForegroundColor Green
+    } catch {
+        Write-Host "    DNS resolution".PadRight(40) -NoNewline -ForegroundColor White
+        Write-Host "x  failed" -ForegroundColor Red
+        $issues += "DNS resolution failed"
     }
 
     # SSH
     Write-Section "SSH"
     foreach ($s in $config.sshHosts) {
-        $label = "$($s.user)@$($s.host)"
         try {
-            $result = ssh -o ConnectTimeout=5 -o BatchMode=yes $label "echo ok" 2>&1
-            if ("$result" -match "ok") {
-                Write-Check $label "pass connected" "Green"
-            }
-            else {
+            $result = ssh -o ConnectTimeout=5 -o BatchMode=yes "$($s.user)@$($s.host)" "echo ok" 2>&1
+            if ($result -match "ok") {
+                Write-Host "    $($s.user)@$($s.host)".PadRight(40) -NoNewline -ForegroundColor White
+                Write-Host "[ok]  connected" -ForegroundColor Green
+            } else {
                 throw "no response"
             }
-        }
-        catch {
-            Write-Check $label "FAIL" "Red"
-            [void]$issues.Add("SSH to $label failed")
+        } catch {
+            Write-Host "    $($s.user)@$($s.host)".PadRight(40) -NoNewline -ForegroundColor White
+            Write-Host "x  failed" -ForegroundColor Red
+            $issues += "SSH to $($s.user)@$($s.host) failed"
         }
     }
 }
 
-# -- Services -------------------------------------------------------
+# -- Services --------------------------------------------
 if ($runAll -or $Services) {
     Write-Section "SERVICES"
     foreach ($svc in $config.services) {
-        $svcObj = Get-Service -Name $svc -ErrorAction SilentlyContinue
-        if ($svcObj) {
-            if ($svcObj.Status -eq 'Running') {
-                Write-Check $svc "pass RUNNING" "Green"
+        try {
+            $status = (Get-Service -Name $svc -ErrorAction Stop).Status
+            if ($status -eq 'Running') {
+                Write-Host "    $($svc.PadRight(36))" -NoNewline -ForegroundColor White
+                Write-Host "[ok]  RUNNING" -ForegroundColor Green
+            } else {
+                Write-Host "    $($svc.PadRight(36))" -NoNewline -ForegroundColor White
+                Write-Host "x  $status" -ForegroundColor Red
+                $issues += "$svc is $status"
             }
-            else {
-                Write-Check $svc ("FAIL " + $svcObj.Status) "Red"
-                [void]$issues.Add("$svc is $($svcObj.Status)")
-            }
-        }
-        else {
-            # Try NSSM
-            $nssmOut = $null
-            try { $nssmOut = & nssm status $svc 2>&1 } catch {}
-            if ($nssmOut -match "SERVICE_RUNNING") {
-                Write-Check $svc "pass RUNNING (nssm)" "Green"
-            }
-            elseif ($nssmOut) {
-                Write-Check $svc ("FAIL " + ($nssmOut -replace "`n"," ").Trim()) "Red"
-                [void]$issues.Add("$svc is not running")
-            }
-            else {
-                Write-Check $svc "-- not found" "DarkGray"
+        } catch {
+            # Not a Windows service - try NSSM
+            try {
+                $nssm = & nssm status $svc 2>&1
+                if ($nssm -match "SERVICE_RUNNING") {
+                    Write-Host "    $($svc.PadRight(36))" -NoNewline -ForegroundColor White
+                    Write-Host "[ok]  RUNNING" -ForegroundColor Green
+                } else {
+                    Write-Host "    $($svc.PadRight(36))" -NoNewline -ForegroundColor White
+                    Write-Host "x  $nssm" -ForegroundColor Red
+                    $issues += "$svc is not running"
+                }
+            } catch {
+                Write-Host "    $($svc.PadRight(36))" -NoNewline -ForegroundColor White
+                Write-Host "-  not found" -ForegroundColor DarkGray
             }
         }
     }
 }
 
-# -- API Keys -------------------------------------------------------
+# -- API Keys --------------------------------------------
 if ($runAll -or $Keys) {
     Write-Section "API KEYS"
     foreach ($key in $config.apiKeys) {
         $val = [System.Environment]::GetEnvironmentVariable($key, "User")
         if (-not $val) { $val = [System.Environment]::GetEnvironmentVariable($key, "Process") }
+        
         if ($val) {
             $masked = $val.Substring(0, [Math]::Min(8, $val.Length)) + "..."
-            Write-Check $key "pass set ($masked)" "Green"
-        }
-        else {
-            Write-Check $key "-- not set" "Yellow"
+            Write-Host "    $($key.PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "[ok]  set ($masked)" -ForegroundColor Green
+        } else {
+            Write-Host "    $($key.PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "-  not set" -ForegroundColor Yellow
         }
     }
 }
 
-# -- Disk -------------------------------------------------------
+# -- Disk ------------------------------------------------
 if ($runAll -or $Disk) {
     Write-Section "DISK"
-    Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object { $_.Size -gt 0 } | ForEach-Object {
+    Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
         $freeGB = [math]::Round($_.FreeSpace / 1GB, 1)
+        $totalGB = [math]::Round($_.Size / 1GB, 1)
         $pct = [math]::Round(($_.FreeSpace / $_.Size) * 100, 1)
         $label = "$($_.DeviceID)  ${freeGB} GB free (${pct}%)"
+        
         if ($pct -lt $config.diskWarningPercent) {
-            Write-Check $label "WARNING low" "Yellow"
-            [void]$issues.Add("Disk $($_.DeviceID) is at ${pct}% free")
-        }
-        else {
-            Write-Check $label "pass healthy" "Green"
+            Write-Host "    $($label.PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "warn  low" -ForegroundColor Yellow
+            $issues += "Disk $($_.DeviceID) is at ${pct}% free"
+        } else {
+            Write-Host "    $($label.PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "[ok]  healthy" -ForegroundColor Green
         }
     }
 }
 
-# -- Ports -------------------------------------------------------
+# -- Ports -----------------------------------------------
 if ($runAll) {
     Write-Section "PORTS"
     $ports = @(
@@ -188,28 +217,28 @@ if ($runAll) {
         @{ port = $config.dashboardPort; name = "Dashboard" }
     )
     foreach ($p in $ports) {
-        $label = "$($p.name) (:$($p.port))"
-        $listening = Get-NetTCPConnection -LocalPort $p.port -ErrorAction SilentlyContinue |
-            Where-Object { $_.State -eq "Listen" }
+        $listening = Get-NetTCPConnection -LocalPort $p.port -ErrorAction SilentlyContinue | Where-Object State -eq "Listen"
         if ($listening) {
-            Write-Check $label "pass listening" "Green"
-        }
-        else {
-            Write-Check $label "FAIL not listening" "Red"
-            [void]$issues.Add("$($p.name) port $($p.port) not listening")
+            Write-Host "    $("$($p.name) (:$($p.port))".PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "[ok]  listening" -ForegroundColor Green
+        } else {
+            Write-Host "    $("$($p.name) (:$($p.port))".PadRight(36))" -NoNewline -ForegroundColor White
+            Write-Host "x  not listening" -ForegroundColor Red
+            $issues += "$($p.name) port $($p.port) not listening"
         }
     }
 }
 
-# -- Summary -------------------------------------------------------
-Write-Host ("`n  -----------------------------") -ForegroundColor DarkGray
+# -- Summary ---------------------------------------------
+Write-Host "`n  -----------------------------" -ForegroundColor DarkGray
 if ($issues.Count -eq 0) {
-    Write-Host "  All clear. No issues found." -ForegroundColor Green
-}
-else {
+    Write-Host "  [ok] All clear. No issues found." -ForegroundColor Green
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+} else {
     Write-Host "  $($issues.Count) issue(s) found:" -ForegroundColor Yellow
     foreach ($i in $issues) {
         Write-Host "    x $i" -ForegroundColor Red
     }
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
 }
 Write-Host ""

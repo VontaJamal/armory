@@ -1,100 +1,70 @@
-# ⚔️ Masamune / Jutsu
+# Jutsu (macOS zsh Key Swap)
 
-***The One Cut***
+## What This Does
 
-**Vault and hot-swap AI provider API keys with one command. Restarts your gateway automatically — even on a remote machine.**
+Provides zsh commands for key vault operations and optional gateway restart on macOS.
 
-Got 3 Anthropic keys and need to rotate? One command swaps the key and bounces the gateway, wherever it lives.
+## Who This Is For
 
-## What It Does
+- You run a zsh-based workflow on macOS.
+- You want shell-native key swapping.
 
-- **Named key vault** — store multiple keys per provider (`anthropic/work`, `anthropic/personal`)
-- **One-command swap** — changes the active key and restarts the gateway
-- **SSH-aware restart** — gateway on another machine? It SSHs over and restarts it there
-- **Setup wizard** — first run asks where your gateway lives, remembers forever
-
-## Works Anywhere
-
-**No OpenClaw required** for key management. The gateway restart feature works with OpenClaw but the vault stands alone.
-
-## Versions
-
-| Platform | File | Status |
-|----------|------|--------|
-| macOS/Linux (zsh) | `jutsu.sh` | ✅ Alpha |
-| Windows (PowerShell) | `jutsu.ps1` | ✅ Stable |
-
-## Usage (zsh — Alpha)
+## Quick Start
 
 ```bash
-# First time — tell it where your gateway runs
-jutsu setup
-
-# Add keys to the vault
-jutsu add anthropic work sk-ant-abc123...
-jutsu add anthropic personal sk-ant-xyz789...
-jutsu add openai main sk-openai-...
-
-# List stored keys
-jutsu list
-
-# Swap key + restart gateway (one command)
-jutsu swap anthropic work
-
-# Just restart gateway (no key swap)
-jutsu reload
-
-# Remove a key
-jutsu remove anthropic old-key
+chmod +x ./weapons/jutsu/jutsu.sh
+./weapons/jutsu/jutsu.sh help
+./weapons/jutsu/jutsu.sh add anthropic work sk-ant-example
 ```
 
-## Setup
+## Common Tasks
 
 ```bash
-# Copy to your path
-cp jutsu.sh /usr/local/bin/jutsu
-chmod +x /usr/local/bin/jutsu
-
-# Or alias it to your command word
-echo 'alias faye="/path/to/jutsu.sh"' >> ~/.zshrc
+./weapons/jutsu/jutsu.sh list
+./weapons/jutsu/jutsu.sh swap anthropic work
+./weapons/jutsu/jutsu.sh reload
 ```
 
-### Gateway Config
+## Flags
 
-On first `jutsu setup`:
+Jutsu uses subcommands.
 
+| Command | Description |
+|---|---|
+| `setup` | Configure gateway target |
+| `add` | Add a named key |
+| `list` | List keys |
+| `remove` | Remove key |
+| `swap` | Activate key + restart gateway |
+| `reload` | Restart gateway only |
+| `help` | Print usage |
+
+## Config
+
+- `~/.jutsu/vault.json`
+- `~/.jutsu/config`
+
+## Output And Exit Codes
+
+- `0`: command succeeded.
+- `1`: command failed due to input/config/runtime issue.
+
+## Troubleshooting
+
+- SSH errors: rerun `setup` and verify host/user/key.
+- Missing python3: required for JSON mutation helpers.
+
+## Automation Examples
+
+```bash
+./weapons/jutsu/jutsu.sh swap anthropic work
 ```
-  Where does your gateway run?
-  (If it's this machine, just press Enter)
 
-  Gateway host [local]: 192.168.1.188
-  SSH user: devon
-  SSH key path (optional): ~/.ssh/id_ed25519
+## FAQ
 
-  ✓ Gateway set to devon@192.168.1.188 via SSH
-```
+**Is Jutsu required on Windows?**
+No. Use Masamune + Awakening on Windows.
 
-Config saved to `~/.jutsu/config`. Edit anytime or re-run setup.
+## Migration Notes
 
-## How It Works
-
-1. Keys stored in `~/.jutsu/vault.json` (base64-encoded, chmod 600)
-2. `swap` decodes the key → exports to env var → restarts gateway
-3. Gateway restart checks config: local = `openclaw gateway restart`, remote = SSH + restart
-4. Provider → env var mapping: `anthropic` → `ANTHROPIC_API_KEY`, `openai` → `OPENAI_API_KEY`, etc.
-
-## Pairs With
-
-- **Ramuh** (Summon) — After swapping, run Ramuh to verify the new key works
-- **Sentinel** (Weapon) — Sentinel will catch if a key swap breaks something
-
-## Requirements
-
-- zsh (macOS default) or bash
-- python3 (for JSON vault operations)
-- SSH client (for remote gateway restart)
-- OpenClaw (optional, for gateway restart)
-
----
-
-*"One cut. Clean." — Part of [The Armory](https://github.com/VontaJamal/armory)*
+No rename for this tool.

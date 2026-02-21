@@ -1,45 +1,14 @@
-# Service health check with Telegram alerting
-# Checks NSSM services and sends alerts when something's down
-#
-# Usage: .\service-health-check.ps1
-# Schedule with Task Scheduler or OpenClaw cron
+<#
+.SYNOPSIS
+  Legacy alias wrapper for aegis.
+#>
 
-# Customize these
-$services = @("CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard", "OpenClawGateway")
-$botToken = $env:TELEGRAM_BOT_TOKEN  # or read from secrets file
-$chatId = $env:TELEGRAM_CHAT_ID
-
-$down = @()
-
-foreach ($svc in $services) {
-    try {
-        $result = sc.exe query $svc 2>&1
-        if ($result -match "RUNNING") {
-            # All good
-        } elseif ($result -match "STOPPED|PAUSED") {
-            $down += "$svc is STOPPED/PAUSED"
-        } else {
-            $down += "$svc status unknown"
-        }
-    } catch {
-        $down += "$svc query failed"
-    }
+Write-Host "  sentinel.ps1 is a compatibility alias. Use aegis.ps1 for new setups." -ForegroundColor Yellow
+$target = Join-Path $PSScriptRoot "..\aegis\aegis.ps1"
+if (-not (Test-Path $target)) {
+    Write-Host "  Missing target script: $target" -ForegroundColor Red
+    exit 1
 }
 
-if ($down.Count -gt 0) {
-    $message = "Service Alert:`n" + ($down -join "`n")
-    Write-Output $message
-    
-    if ($botToken -and $chatId) {
-        $body = @{
-            chat_id = $chatId
-            text = $message
-        } | ConvertTo-Json
-        
-        Invoke-RestMethod -Uri "https://api.telegram.org/bot$botToken/sendMessage" `
-            -Method Post -ContentType "application/json" -Body $body | Out-Null
-        Write-Output "Alert sent to Telegram"
-    }
-} else {
-    Write-Output "All services healthy"
-}
+powershell -ExecutionPolicy Bypass -File $target @args
+exit $LASTEXITCODE

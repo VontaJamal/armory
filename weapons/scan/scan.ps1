@@ -1,149 +1,139 @@
-﻿$ErrorActionPreference = "Continue"
-Write-Output "=== SHADOW COURT SECURITY AUDIT ==="
-Write-Output "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-Write-Output ""
+<#
+.SYNOPSIS
+  Scan - fast manual security scan for local repositories.
+#>
 
-# 1. Secrets scan across all repos
-Write-Output "=== 1. SECRETS SCAN ==="
-$repos = Get-ChildItem "D:\Code Repos" -Directory
+param(
+    [string]$RepoPath = "D:\Code Repos",
+    [switch]$Verbose,
+    [switch]$Help,
+    [switch]$Sound,
+    [switch]$NoSound
+)
+
+$ErrorActionPreference = "Continue"
+
+$hookCandidates = @(
+    (Join-Path $PSScriptRoot "..\..\bard\lib\bard-hooks.ps1"),
+    (Join-Path $PSScriptRoot "..\bard\lib\bard-hooks.ps1")
+)
+foreach ($h in $hookCandidates) {
+    if (Test-Path $h) { . $h; break }
+}
+$soundContext = $null
+if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
+    $soundContext = Initialize-ArmorySound -Sound:$Sound -NoSound:$NoSound
+    Invoke-ArmoryCue -Context $soundContext -Type start
+}
+
+$config = @{
+    fileExtensions = "\\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$"
+    ignorePathPattern = "[\\/](\\.git|node_modules|\\.venv|dist|__pycache__)[\\/]"
+    patterns = @(
+        @{ level = "CRITICAL"; name = "Telegram token"; regex = "\\d{8,12}:[A-Za-z0-9_-]{30,}" },
+        @{ level = "CRITICAL"; name = "Provider API key"; regex = "(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})" },
+        @{ level = "CRITICAL"; name = "Private key"; regex = "PRIVATE KEY" },
+        @{ level = "WARNING"; name = "Hardcoded password"; regex = "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{6,}['\"]" }
+    )
+}
+
+function Show-Help {
+    Write-Host ""
+    Write-Host "  Scan" -ForegroundColor Yellow
+    Write-Host "  -----------------------------" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "  Usage:"
+    Write-Host "    .\\scan.ps1"
+    Write-Host "    .\\scan.ps1 -RepoPath \"D:\\Code Repos\""
+    Write-Host "    .\\scan.ps1 -Verbose"
+    Write-Host ""
+}
+
+function Add-Finding {
+    param([string]$Level, [string]$Repo, [string]$File, [string]$Message)
+    [PSCustomObject]@{
+        Level = $Level
+        Repo = $Repo
+        File = $File
+        Message = $Message
+    }
+}
+
+if ($Help) {
+    Show-Help
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+    exit 0
+}
+
+if (-not (Test-Path $RepoPath)) {
+    Write-Host "  RepoPath not found: $RepoPath" -ForegroundColor Red
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
+    exit 1
+}
+
+$repos = Get-ChildItem -Path $RepoPath -Directory -ErrorAction SilentlyContinue
+if ($repos.Count -eq 0) {
+    $repos = @((Get-Item $RepoPath))
+}
+
 $findings = @()
 
+Write-Host ""
+Write-Host "  Scan" -ForegroundColor Yellow
+Write-Host "  -----------------------------" -ForegroundColor DarkGray
+Write-Host "  Root: $RepoPath" -ForegroundColor DarkGray
+Write-Host ""
+
 foreach ($repo in $repos) {
+    if ($Verbose) {
+        Write-Host "  scanning repo: $($repo.FullName)" -ForegroundColor DarkGray
+    }
+
     $files = Get-ChildItem $repo.FullName -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-        $_.FullName -notmatch '[\\/](\.git|node_modules|\.venv|dist|__pycache__)[\\/]' -and
-        $_.Extension -match '\.(md|ts|js|json|yml|yaml|sh|ps1|html|css|py|toml|txt|env|cfg|ini)$'
+        $_.FullName -notmatch $config.ignorePathPattern -and $_.Extension -match $config.fileExtensions
     }
+
     foreach ($f in $files) {
-        $content = Get-Content $f.FullName -Raw -ErrorAction SilentlyContinue
+        $content = $null
+        try {
+            $content = [System.IO.File]::ReadAllText($f.FullName)
+        } catch {
+            continue
+        }
+
         if (-not $content) { continue }
-        
-        # Telegram bot tokens
-        if ($content -match '\d{8,12}:[A-Za-z0-9_-]{30,}') {
-            $findings += "CRITICAL|$($repo.Name)|$($f.Name)|Telegram bot token detected"
-        }
-        # API keys
-        if ($content -match '(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})') {
-            $findings += "CRITICAL|$($repo.Name)|$($f.Name)|API key pattern: $($Matches[1].Substring(0,[Math]::Min(15,$Matches[1].Length)))..."
-        }
-        # Private keys
-        if ($content -match 'PRIVATE KEY') {
-            $findings += "CRITICAL|$($repo.Name)|$($f.Name)|Private key found"
-        }
-        # Hardcoded passwords
-        if ($content -match '(?i)(password|passwd)\s*[:=]\s*[''"][^''"]{6,}[''"]') {
-            $findings += "WARNING|$($repo.Name)|$($f.Name)|Possible hardcoded password"
+
+        foreach ($p in $config.patterns) {
+            if ($content -match $p.regex) {
+                $findings += Add-Finding -Level $p.level -Repo $repo.Name -File $f.FullName -Message $p.name
+            }
         }
     }
-    
-    # Check for .env files
-    $envFiles = Get-ChildItem $repo.FullName -Recurse -Filter ".env" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+
+    $envFiles = Get-ChildItem $repo.FullName -Recurse -Filter ".env" -File -ErrorAction SilentlyContinue | Where-Object {
+        $_.FullName -notmatch "[\\/]\\.git[\\/]"
+    }
+
     foreach ($ef in $envFiles) {
-        $findings += "WARNING|$($repo.Name)|$($ef.Name)|.env file exists in repo"
+        $findings += Add-Finding -Level "WARNING" -Repo $repo.Name -File $ef.FullName -Message ".env file exists"
     }
 }
 
 if ($findings.Count -eq 0) {
-    Write-Output "  ALL REPOS CLEAN - No secrets detected"
-} else {
-    foreach ($f in $findings) {
-        $parts = $f.Split('|')
-        $icon = if ($parts[0] -eq "CRITICAL") { "RED" } else { "YEL" }
-        Write-Output "  [$icon] $($parts[0]): $($parts[1])/$($parts[2]) - $($parts[3])"
-    }
+    Write-Host "  no findings" -ForegroundColor Green
+    Write-Host ""
+    if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type success }
+    exit 0
 }
 
-# 2. .gitignore audit
-Write-Output ""
-Write-Output "=== 2. GITIGNORE AUDIT ==="
-foreach ($repo in $repos) {
-    $gi = Join-Path $repo.FullName ".gitignore"
-    if (Test-Path $gi) {
-        $content = Get-Content $gi -Raw
-        $missing = @()
-        if ($content -notmatch '\.env') { $missing += ".env" }
-        if ($content -notmatch 'node_modules') { $missing += "node_modules" }
-        if ($missing.Count -gt 0) {
-            Write-Output "  [YEL] WARNING: $($repo.Name) missing: $($missing -join ', ')"
-        }
-    } else {
-        # Only warn for repos with actual code
-        $hasCode = Get-ChildItem $repo.FullName -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -match '\.(ts|js|py|rs)$' }
-        if ($hasCode) {
-            Write-Output "  [YEL] WARNING: $($repo.Name) has no .gitignore"
-        }
-    }
+foreach ($f in $findings) {
+    $color = if ($f.Level -eq "CRITICAL") { "Red" } else { "Yellow" }
+    Write-Host ("  [{0}] {1} - {2}" -f $f.Level, $f.File, $f.Message) -ForegroundColor $color
 }
 
-# 3. Public repos check
-Write-Output ""
-Write-Output "=== 3. PUBLIC REPOS ==="
-try {
-    $token = "$env:GITHUB_TOKEN"
-    $publicRepos = Invoke-RestMethod -Uri "https://api.github.com/users/VontaJamal/repos?per_page=100&type=public" -Headers @{Authorization="token $token"}
-    Write-Output "  Public repos: $($publicRepos.Count)"
-    foreach ($r in $publicRepos) {
-        Write-Output "  - $($r.name)"
-    }
-    
-    $allRepos = Invoke-RestMethod -Uri "https://api.github.com/user/repos?per_page=100&type=all" -Headers @{Authorization="token $token"}
-    $privateRepos = $allRepos | Where-Object { $_.private -eq $true }
-    Write-Output "  Private repos: $($privateRepos.Count)"
-    foreach ($r in $privateRepos) {
-        Write-Output "  - $($r.name) (PRIVATE)"
-    }
-} catch {
-    Write-Output "  ERROR: Could not fetch repos - $_"
-}
+Write-Host ""
+Write-Host "  findings: $($findings.Count)" -ForegroundColor Red
+Write-Host ""
 
-# 4. Git config check
-Write-Output ""
-Write-Output "=== 4. GIT CONFIG ==="
-$gitConfig = git config --global --list 2>&1
-if ($gitConfig -match 'credential') {
-    Write-Output "  [YEL] Credential helper configured: check for plain text storage"
-} else {
-    Write-Output "  No credential helper - clean"
-}
-if ($gitConfig -match 'password|token|secret') {
-    Write-Output "  [RED] CRITICAL: Possible secrets in git config!"
-} else {
-    Write-Output "  No secrets in git config - clean"
-}
-
-# 5. SSH check
-Write-Output ""
-Write-Output "=== 5. SSH KEYS ==="
-$sshDir = "$env:USERPROFILE\.ssh"
-if (Test-Path $sshDir) {
-    $keys = Get-ChildItem $sshDir -ErrorAction SilentlyContinue
-    foreach ($k in $keys) {
-        $perms = (Get-Acl $k.FullName).AccessToString
-        Write-Output "  $($k.Name) - exists"
-    }
-    $authKeys = Join-Path $sshDir "authorized_keys"
-    if (Test-Path $authKeys) {
-        $count = (Get-Content $authKeys | Where-Object { $_.Trim() -and -not $_.StartsWith('#') }).Count
-        Write-Output "  authorized_keys: $count entries"
-    }
-} else {
-    Write-Output "  No .ssh directory"
-}
-
-# 6. Windows services check
-Write-Output ""
-Write-Output "=== 6. WINDOWS SERVICES ==="
-$services = @("CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard", "OpenClawGateway")
-foreach ($svc in $services) {
-    $result = sc.exe query $svc 2>&1
-    if ($result -match "RUNNING") {
-        Write-Output "  ${svc}: RUNNING"
-    } elseif ($result -match "STOPPED") {
-        Write-Output "  ${svc}: STOPPED"
-    } else {
-        Write-Output "  ${svc}: NOT FOUND"
-    }
-}
-
-Write-Output ""
-Write-Output "=== AUDIT COMPLETE ==="
-
+if ($soundContext) { Invoke-ArmoryCue -Context $soundContext -Type fail }
+exit 1
