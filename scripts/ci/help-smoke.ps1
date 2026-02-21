@@ -18,7 +18,9 @@ if (-not $runner) {
 
 $targets = @(
     @{ Name = "awakening help"; Path = "awakening.ps1"; Args = @("-Help") },
+    @{ Name = "setup help"; Path = "setup.ps1"; Args = @("-Help") },
     @{ Name = "civs help"; Path = "civs.ps1"; Args = @("-Help") },
+    @{ Name = "quartermaster help"; Path = "items/quartermaster/quartermaster.ps1"; Args = @("-Help") },
     @{ Name = "remedy help"; Path = "items/remedy/remedy.ps1"; Args = @("-Help") },
     @{ Name = "doctor help"; Path = "doctor.ps1"; Args = @("-Help") },
     @{ Name = "init alias help"; Path = "init.ps1"; Args = @("-Help") },

@@ -17,11 +17,11 @@ Use this sequence for Armory work:
 
 1. Refresh Armory clone:
    - `git -C <armoryRepoRoot> pull --ff-only`
-2. Read catalog/manifest.
-3. Return shortlist for current repository problem.
+2. Run `quartermaster scout -Task "<task>"`.
+3. Run `quartermaster plan -Task "<task>"` and return shortlist/cart.
 4. Wait for explicit approval.
-5. Equip approved loadout.
-6. Report completion in active mode tone (`mode=saga|civ`).
+5. Run `quartermaster equip -FromLastPlan -Approve`.
+6. Run `quartermaster report -FromLastPlan` in active mode tone (`mode=saga|civ`).
 
 If pull fails, stop and report immediately.
 
@@ -46,6 +46,15 @@ From your main agent to a sub-agent:
 
 ```
 sessions_send(sessionKey="agent:cipher:main", message="Scout Armory for this repo issue and report a shortlist")
+```
+
+Quartermaster command pattern:
+
+```
+<commandWord> quartermaster scout -Task "repo issue summary"
+<commandWord> quartermaster plan -Task "repo issue summary"
+<commandWord> quartermaster equip -FromLastPlan -Approve
+<commandWord> quartermaster report -FromLastPlan
 ```
 
 From any agent, check active sessions:

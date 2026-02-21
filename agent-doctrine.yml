@@ -26,6 +26,26 @@ agent_flow:
   - step: report
     required: true
     tone: mode_aware
+  - step: quartermaster_default_route
+    required: true
+    commands:
+      - "<commandWord> quartermaster scout -Task \"<task>\""
+      - "<commandWord> quartermaster plan -Task \"<task>\""
+      - "<commandWord> quartermaster equip -FromLastPlan -Approve"
+      - "<commandWord> quartermaster report -FromLastPlan"
+
+path_discovery:
+  resolver_order:
+    - armory_root_flag
+    - config_repo_root
+    - env_ARMORY_REPO_ROOT
+    - common_paths
+    - one_time_prompt
+  common_paths:
+    - ./armory
+    - ../armory
+    - ~/armory
+    - ~/Documents/Code Repos/armory
 
 seven_shadow:
   expected_path: governance/seven-shadow-system

@@ -27,13 +27,15 @@ function Show-Usage {
     Write-Host "  -----------------------------" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "  Set a command word for Armory tools."
+    Write-Host "  Crystal Saga onboarding begins with receiving the crystal at level one."
     Write-Host ""
     Write-Host "  Usage:"
     Write-Host "    .\\awakening.ps1"
+    Write-Host "    .\\awakening.ps1 -CommandWord crystal"
     Write-Host "    .\\awakening.ps1 -CommandWord faye"
     Write-Host "    .\\awakening.ps1 -CommandWord forge -InstallDir C:\\Tools\\bin"
     Write-Host ""
-    Write-Host "  Examples for command word: armory, ops, forge, faye, kit"
+    Write-Host "  Examples for command word: crystal, armory, ops, forge, faye, kit"
     Write-Host ""
 }
 
@@ -45,7 +47,14 @@ if ($Help) {
 
 if (-not $CommandWord) {
     Show-Usage
-    $CommandWord = Read-Host "  Command word"
+    Write-Host "  Receive the Crystal and begin the journey." -ForegroundColor Yellow
+    $defaultWord = "crystal"
+    $entered = Read-Host ("  Command word [{0}]" -f $defaultWord)
+    if ($entered) {
+        $CommandWord = $entered
+    } else {
+        $CommandWord = $defaultWord
+    }
 }
 
 if (-not $CommandWord -or $CommandWord -notmatch "^[a-zA-Z][a-zA-Z0-9-]{1,20}$") {
@@ -122,6 +131,7 @@ $cmdLines = @(
     "if /I `"%ACTION%`"==`"regen`" goto :regen",
     "if /I `"%ACTION%`"==`"morning-report`" (set `"CIV_TARGET=regen`" & goto :civsRoute)",
     "if /I `"%ACTION%`"==`"chronicle`" goto :chronicle",
+    "if /I `"%ACTION%`"==`"quartermaster`" goto :quartermaster",
     "if /I `"%ACTION%`"==`"status`" (set `"CIV_TARGET=chronicle`" & goto :civsRoute)",
     "if /I `"%ACTION%`"==`"repo-status`" (set `"CIV_TARGET=chronicle`" & goto :civsRoute)",
     "if /I `"%ACTION%`"==`"bard`" goto :bard",
@@ -131,7 +141,7 @@ $cmdLines = @(
     "if /I `"%ACTION%`"==`"preflight`" (set `"CIV_TARGET=alexander`" & goto :civsRoute)",
     "if /I `"%ACTION%`"==`"init`" goto :init",
     "if /I `"%ACTION%`"==`"awakening`" goto :init",
-    "if /I `"%ACTION%`"==`"setup`" (set `"CIV_TARGET=init`" & goto :civsRoute)",
+    "if /I `"%ACTION%`"==`"setup`" goto :setup",
     "echo Unknown command: %ACTION%",
     "goto :help",
     ":civsRoute",
@@ -218,6 +228,9 @@ $cmdLines = @(
     ":chronicle",
     "powershell -ExecutionPolicy Bypass -File `"%ARMORY_ROOT%\\spells\\chronicle\\chronicle.ps1`" %*",
     "exit /b %errorlevel%",
+    ":quartermaster",
+    "powershell -ExecutionPolicy Bypass -File `"%ARMORY_ROOT%\\items\\quartermaster\\quartermaster.ps1`" %*",
+    "exit /b %errorlevel%",
     ":bard",
     "powershell -ExecutionPolicy Bypass -File `"%ARMORY_ROOT%\\bard\\bard.ps1`" %*",
     "exit /b %errorlevel%",
@@ -226,6 +239,9 @@ $cmdLines = @(
     "exit /b %errorlevel%",
     ":init",
     "powershell -ExecutionPolicy Bypass -File `"%ARMORY_ROOT%\\awakening.ps1`" %*",
+    "exit /b %errorlevel%",
+    ":setup",
+    "powershell -ExecutionPolicy Bypass -File `"%ARMORY_ROOT%\\setup.ps1`" %*",
     "exit /b %errorlevel%",
     ":help",
     "echo.",
@@ -236,15 +252,15 @@ $cmdLines = @(
     "echo     bahamut, ifrit, odin, ramuh, shiva, alexander, gate",
     "echo     phoenix-down, save-point",
     "echo     aegis, sentinel, scan, truesight, deep-scan",
-    "echo     libra, cure, protect, regen, chronicle, status",
-    "echo     bard, init, awakening",
+    "echo     libra, cure, protect, regen, chronicle, quartermaster, status",
+    "echo     bard, init, awakening, setup",
     "echo     civs on^|off^|status",
     "echo.",
     "echo   Civilian aliases (for the uninitiated):",
     "echo     keys-list, catalog, scaffold, rename-cmd, health, restart, keys",
     "echo     restore, create-agent, cleanup, diagnose, snapshot, preflight",
     "echo     backup, backup-bootstrap, services, secret-scan, deep-security-scan",
-    "echo     ops-report, backup-check, scheduled-scan, morning-report, repo-status, audio, setup",
+    "echo     ops-report, backup-check, scheduled-scan, morning-report, repo-status, audio",
     "echo.",
     "exit /b 0"
 )

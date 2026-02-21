@@ -7,9 +7,11 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $awakening = Join-Path $repoRoot "awakening.ps1"
+$setup = Join-Path $repoRoot "setup.ps1"
 $civs = Join-Path $repoRoot "civs.ps1"
 
 if (-not (Test-Path $awakening)) { throw "Missing awakening.ps1" }
+if (-not (Test-Path $setup)) { throw "Missing setup.ps1" }
 if (-not (Test-Path $civs)) { throw "Missing civs.ps1" }
 
 $psRunner = Get-Command powershell -ErrorAction SilentlyContinue
@@ -28,15 +30,34 @@ try {
     $env:USERPROFILE = $tempHome
     $env:HOME = $tempHome
 
-    & $psRunner.Source -NoProfile -ExecutionPolicy Bypass -File $awakening -CommandWord "armtest" -InstallDir $installDir -NoSound
-    if ($LASTEXITCODE -ne 0) { throw "awakening.ps1 failed" }
+    # Fresh clone civilian lane: setup.ps1 should initialize wrapper/config in civ mode.
+    & $psRunner.Source -NoProfile -ExecutionPolicy Bypass -File $setup -Mode "civ" -CommandWord "armsetup" -InstallDir $installDir -NoSound
+    if ($LASTEXITCODE -ne 0) { throw "setup.ps1 civ bootstrap failed" }
 
     $configPath = Join-Path $tempHome ".armory\config.json"
+    if (-not (Test-Path $configPath)) { throw "config.json not created by setup.ps1" }
+
+    $cfg = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+    if ([string]$cfg.mode -ne "civ") {
+        throw "expected setup civ mode=civ, got: $($cfg.mode)"
+    }
+
+    $setupWrapper = Join-Path $installDir "armsetup.cmd"
+    if (-not (Test-Path $setupWrapper)) { throw "setup wrapper missing: $setupWrapper" }
+
+    # Fresh clone saga lane: awakening.ps1 with crystal command word defaults to saga.
+    Remove-Item -Path $configPath -Force -ErrorAction Stop
+    & $psRunner.Source -NoProfile -ExecutionPolicy Bypass -File $awakening -CommandWord "crystal" -InstallDir $installDir -NoSound
+    if ($LASTEXITCODE -ne 0) { throw "awakening.ps1 failed" }
+
     if (-not (Test-Path $configPath)) { throw "config.json not created" }
 
     $cfg = Get-Content -Path $configPath -Raw | ConvertFrom-Json
     if ([string]$cfg.mode -ne "saga") {
         throw "expected default mode=saga, got: $($cfg.mode)"
+    }
+    if ([string]$cfg.commandWord -ne "crystal") {
+        throw "expected saga commandWord=crystal after awakening"
     }
 
     & $psRunner.Source -NoProfile -ExecutionPolicy Bypass -File $civs on -NoSound

@@ -4,6 +4,16 @@ Practical command-line tools for backups, security checks, service health, diagn
 
 [![Armory CI](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml/badge.svg)](https://github.com/VontaJamal/armory/actions/workflows/armory-ci.yml)
 
+## First Run (10 Seconds)
+
+```powershell
+# Civilian start (plain language onboarding)
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+
+# Crystal Saga start (Receive the Crystal)
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1
+```
+
 ## Choose Your Path
 
 | Crystal Saga Mode | Civilian Mode |
@@ -15,13 +25,16 @@ Practical command-line tools for backups, security checks, service health, diagn
 ## Shared Essentials
 
 ```powershell
-# 1) Install dispatcher
-powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord armory
+# 1) Civilian-first bootstrap
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
 
-# 2) Check active mode
+# 2) Crystal Saga bootstrap (power-user lane)
+powershell -ExecutionPolicy Bypass -File .\awakening.ps1 -CommandWord crystal
+
+# 3) Check active mode
 armory civs status
 
-# 3) Switch modes
+# 4) Switch modes
 armory civs off   # Crystal Saga Mode (mode=saga)
 armory civs on    # Civilian Mode (mode=civ)
 ```
@@ -38,6 +51,15 @@ Use this pattern with Codex/OpenClaw:
 
 `Scout Armory for this task, return a shortlist, wait for my approval, equip selected tools, and report back in active mode.`
 
+Concrete CLI route:
+
+```powershell
+armory quartermaster scout -Task "release readiness for this repo"
+armory quartermaster plan -Task "release readiness for this repo"
+armory quartermaster equip -FromLastPlan -Approve
+armory quartermaster report -FromLastPlan
+```
+
 ## Full Guides
 
 1. [Crystal Saga Guide](README-SAGA.md)
@@ -50,6 +72,7 @@ Both guides use the same commands and system behavior; only language/presentatio
 - [Machine manifest](docs/data/armory-manifest.v1.json)
 - [Shop catalog](shop/catalog.json)
 - [Dashboard app](docs/index.html)
+- [Quartermaster automation](items/quartermaster/README.md)
 - [Agent contract](AGENTS.md)
 - [Agent doctrine](agent-doctrine.yml)
 - [Telemetry contract](docs/TELEMETRY.md)
