@@ -18,6 +18,8 @@ if (-not $runner) {
 
 $targets = @(
     @{ Name = "awakening help"; Path = "awakening.ps1"; Args = @("-Help") },
+    @{ Name = "civs help"; Path = "civs.ps1"; Args = @("-Help") },
+    @{ Name = "remedy help"; Path = "items/remedy/remedy.ps1"; Args = @("-Help") },
     @{ Name = "doctor help"; Path = "doctor.ps1"; Args = @("-Help") },
     @{ Name = "init alias help"; Path = "init.ps1"; Args = @("-Help") },
     @{ Name = "rename command help"; Path = "rename-command-word.ps1"; Args = @("-Help") },
@@ -30,6 +32,7 @@ $targets = @(
     @{ Name = "odin help"; Path = "summons/odin/odin.ps1"; Args = @("-Help") },
     @{ Name = "ramuh help"; Path = "summons/ramuh/ramuh.ps1"; Args = @("-Help") },
     @{ Name = "shiva help"; Path = "summons/shiva/shiva.ps1"; Args = @("-Help") },
+    @{ Name = "alexander help"; Path = "summons/alexander/alexander.ps1"; Args = @("-Help") },
 
     @{ Name = "masamune usage (no arg)"; Path = "weapons/masamune/masamune.ps1"; Args = @() },
     @{ Name = "phoenix-down help"; Path = "weapons/phoenix-down/phoenix-down.ps1"; Args = @("-Help") },

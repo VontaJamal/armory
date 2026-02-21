@@ -29,9 +29,10 @@ Use this when you are shipping code now.
 1. Create tool directory under the right category.
 2. Add script and README.
 3. Follow `DOCS-CONTRACT.md` section requirements.
-4. Add catalog entry with `status: "active"`.
-5. Ensure `scriptPath` and `readmePath` exist and are repo-relative.
-6. Run validator and smoke checks.
+4. Add at least one welcoming Civilian alias for dispatcher commands (when applicable).
+5. Add catalog entry with `status: "active"`.
+6. Ensure `scriptPath` and `readmePath` exist and are repo-relative.
+7. Run validator and smoke checks.
 
 ## Recommended: Use Materia Forge
 
