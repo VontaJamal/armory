@@ -33,7 +33,7 @@ $config = @{
         @{ level = "CRITICAL"; name = "Telegram token"; regex = "\\d{8,12}:[A-Za-z0-9_-]{30,}" },
         @{ level = "CRITICAL"; name = "Provider API key"; regex = "(sk_[a-zA-Z0-9]{20,}|sk-ant-[a-zA-Z0-9]{20,}|gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9]{30,})" },
         @{ level = "CRITICAL"; name = "Private key"; regex = "PRIVATE KEY" },
-        @{ level = "WARNING"; name = "Hardcoded password"; regex = "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{6,}['\"]" }
+        @{ level = "WARNING"; name = "Hardcoded password"; regex = '(?i)(password|passwd|pwd)\s*[:=]\s*[''"][^''"]{6,}[''"]' }
     )
 }
 

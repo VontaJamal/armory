@@ -88,7 +88,7 @@ foreach ($dir in $targetDirs) {
         if ($content -match "PRIVATE KEY") {
             $findings += "CRITICAL|$($f.FullName)|Private key text"
         }
-        if ($content -match "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{4,}['\"]") {
+        if ($content -match '(?i)(password|passwd|pwd)\s*[:=]\s*[''"][^''"]{4,}[''"]') {
             $findings += "WARNING|$($f.FullName)|Hardcoded password pattern"
         }
     }

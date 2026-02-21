@@ -99,7 +99,7 @@ foreach ($repo in $repos) {
         if ($content -match "PRIVATE KEY") {
             $findings += Add-Finding -Level "CRITICAL" -Repo $repo.Name -File $f.FullName -Message "Private key text"
         }
-        if ($content -match "(?i)(password|passwd|pwd)\\s*[:=]\\s*['\"][^'\"]{4,}['\"]") {
+        if ($content -match '(?i)(password|passwd|pwd)\s*[:=]\s*[''"][^''"]{4,}[''"]') {
             $findings += Add-Finding -Level "WARNING" -Repo $repo.Name -File $f.FullName -Message "Hardcoded password pattern"
         }
     }

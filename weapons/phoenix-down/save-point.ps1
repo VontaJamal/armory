@@ -84,65 +84,65 @@ $controllerBody = @"
 param([Parameter(Position=0)][string]
 `$Action)
 
-`$repoRoot = \"$repoRoot\"
-`$backupScript = Join-Path `$repoRoot \"weapons\\phoenix-down\\phoenix-down.ps1\"
-`$backupDir = \"$backupDir\"
-`$passwordFile = \"$passwordFile\"
-`$restoreSource = \"$openclawDir\"
-`$sevenZip = \"C:\\Program Files\\7-Zip\\7z.exe\"
-`$commandWord = \"$Name\"
-`$restoreCommand = \"$Command\"
+`$repoRoot = `"$repoRoot`"
+`$backupScript = Join-Path `$repoRoot `"weapons\\phoenix-down\\phoenix-down.ps1`"
+`$backupDir = `"$backupDir`"
+`$passwordFile = `"$passwordFile`"
+`$restoreSource = `"$openclawDir`"
+`$sevenZip = `"C:\\Program Files\\7-Zip\\7z.exe`"
+`$commandWord = `"$Name`"
+`$restoreCommand = `"$Command`"
 
-if (-not `$Action) { `$Action = \"help\" }
+if (-not `$Action) { `$Action = `"help`" }
 
 switch (`$Action.ToLower()) {
-    \"$Command\" {
-        `$latest = Get-ChildItem `$backupDir -Filter \"*.7z\" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    `"$Command`" {
+        `$latest = Get-ChildItem `$backupDir -Filter `"*.7z`" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         if (-not `$latest) {
-            Write-Host \"No backups found in `$backupDir\" -ForegroundColor Red
+            Write-Host `"No backups found in `$backupDir`" -ForegroundColor Red
             exit 1
         }
         if (-not (Test-Path `$sevenZip)) {
-            Write-Host \"7-Zip required. Install: choco install 7zip\" -ForegroundColor Red
+            Write-Host `"7-Zip required. Install: choco install 7zip`" -ForegroundColor Red
             exit 1
         }
         if (-not (Test-Path `$passwordFile)) {
-            Write-Host \"Password file missing: `$passwordFile\" -ForegroundColor Red
+            Write-Host `"Password file missing: `$passwordFile`" -ForegroundColor Red
             exit 1
         }
         `$password = [System.IO.File]::ReadAllText(`$passwordFile).Trim()
-        `$temp = Join-Path `$env:TEMP (\"save-point-restore-\" + (Get-Date -Format \"yyyyMMddHHmmss\"))
+        `$temp = Join-Path `$env:TEMP (`"save-point-restore-`" + (Get-Date -Format `"yyyyMMddHHmmss`"))
         New-Item -ItemType Directory -Path `$temp -Force | Out-Null
-        & `$sevenZip x `$latest.FullName (\"-o\" + `$temp) (\"-p\" + `$password) -y | Out-Null
+        & `$sevenZip x `$latest.FullName (`"-o`" + `$temp) (`"-p`" + `$password) -y | Out-Null
         if (`$LASTEXITCODE -ne 0) {
-            Write-Host \"Restore failed during extraction\" -ForegroundColor Red
+            Write-Host `"Restore failed during extraction`" -ForegroundColor Red
             Remove-Item `$temp -Recurse -Force -ErrorAction SilentlyContinue
             exit 1
         }
-        Copy-Item (Join-Path `$temp \"*\") `$restoreSource -Recurse -Force -ErrorAction SilentlyContinue
+        Copy-Item (Join-Path `$temp `"*`") `$restoreSource -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item `$temp -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host \"Restored from: `$(`$latest.Name)\" -ForegroundColor Green
+        Write-Host `"Restored from: `$(`$latest.Name)`" -ForegroundColor Green
         exit 0
     }
-    \"backup\" {
+    `"backup`" {
         powershell -ExecutionPolicy Bypass -File `$backupScript -BackupSource `$restoreSource -BackupDest `$backupDir -PasswordFile `$passwordFile -MaxBackups $KeepCount
         exit `$LASTEXITCODE
     }
-    \"status\" {
-        `$backups = Get-ChildItem `$backupDir -Filter \"*.7z\" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
-        Write-Host \"Backups: `$(`$backups.Count)\" -ForegroundColor White
+    `"status`" {
+        `$backups = Get-ChildItem `$backupDir -Filter `"*.7z`" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
+        Write-Host `"Backups: `$(`$backups.Count)`" -ForegroundColor White
         if (`$backups.Count -gt 0) {
             `$latest = `$backups[0]
-            Write-Host \"Latest: `$(`$latest.Name)\" -ForegroundColor DarkGray
-            Write-Host \"Updated: `$(`$latest.LastWriteTime)\" -ForegroundColor DarkGray
+            Write-Host `"Latest: `$(`$latest.Name)`" -ForegroundColor DarkGray
+            Write-Host `"Updated: `$(`$latest.LastWriteTime)`" -ForegroundColor DarkGray
         }
         exit 0
     }
     default {
-        Write-Host \"Usage:\" -ForegroundColor White
-        Write-Host \"  `$commandWord `$restoreCommand\" -ForegroundColor DarkGray
-        Write-Host \"  `$commandWord backup\" -ForegroundColor DarkGray
-        Write-Host \"  `$commandWord status\" -ForegroundColor DarkGray
+        Write-Host `"Usage:`" -ForegroundColor White
+        Write-Host `"  `$commandWord `$restoreCommand`" -ForegroundColor DarkGray
+        Write-Host `"  `$commandWord backup`" -ForegroundColor DarkGray
+        Write-Host `"  `$commandWord status`" -ForegroundColor DarkGray
         exit 0
     }
 }
@@ -150,7 +150,7 @@ switch (`$Action.ToLower()) {
 Set-Content -Path $controllerPath -Value $controllerBody -Encoding UTF8
 
 $cmdPath = Join-Path $binDir ("{0}.cmd" -f $Name)
-$cmdBody = "@echo off`r`npowershell -ExecutionPolicy Bypass -File \"$controllerPath\" %*"
+$cmdBody = "@echo off`r`npowershell -ExecutionPolicy Bypass -File `"$controllerPath`" %*"
 Set-Content -Path $cmdPath -Value $cmdBody -Encoding ASCII
 
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
