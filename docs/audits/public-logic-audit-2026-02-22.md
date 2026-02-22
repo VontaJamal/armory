@@ -23,15 +23,21 @@
 ## Command Matrix
 | Check | Result | Notes |
 |---|---|---|
-| Pending baseline checks | Pending | To be filled during wave execution |
+| Docs local path parity scan | PASS | Referenced local script/bin paths in markdown resolve |
+| `python3 scripts/ci/validate_readmes.py` | PASS | README selector hub and companion parity valid |
+| `python3 scripts/validate_shop_catalog.py` | PASS | Catalog schema and paths valid |
+| `python3 scripts/build_armory_manifest.py` | PASS | Manifest generation succeeded |
+| `python3 scripts/ci/check_manifest_determinism.py` | PASS | Manifest output deterministic per current source state |
+| `python3 scripts/ci/secret_hygiene.py` | PASS | Secret hygiene checks passed |
+| `python3 scripts/ci/validate_trust_store.py` | PASS | Trust store checks passed (bundle mode absent) |
 
 ## Findings Register
 | Severity | Area | Repro | Status | Fix |
 |---|---|---|---|---|
-| None yet | - | - | Open | In progress |
+| P3 | Manifest workflow ergonomics | Running `build_armory_manifest.py` updates commit-pinned URLs and generated metadata | Mitigated | Verified deterministic behavior; kept source unchanged for this wave to avoid commit-ref churn |
 
 ## Residual Risks / Follow-ups
-- Pending deep audit pass.
+- If manifest regeneration is needed in future waves, run it as an intentional release-adjacent change and review generated commit reference updates.
 
 ## Attestation
 - This wave is maintenance and hardening only.
