@@ -88,17 +88,24 @@ Source: [@johann_sath](https://x.com/johann_sath/status/2025440759416045702) —
 
 **How to never hit the limit:**
 1. Add "you are the orchestrator. subagents execute." to SOUL.md — main session stays lean, heavy work runs in fresh context windows
+2. Use BRAIN.md as external memory — agent reads & writes instead of remembering everything in-context
+3. Set up heartbeats as fast check-ins (<3s) that don't load files unless idle
+4. Run cron jobs isolated — each one gets its own session, never bloats main thread
+5. Delegate everything — subagent spawns, does the work, reports back, context dies
 
-**What we already do right:**
-- SOUL.md explicitly says "Default to spawning sub-agents for implementation work"
-- Faye orchestrates, agents execute — this is our architecture
-- Pre-compaction alerts in HEARTBEAT.md (warn at ~80%)
+"My main session runs 24/7 & rarely passes 30K context. The trick isn't a bigger window. It's never needing one."
 
-**What we could do better:**
-- Be MORE aggressive about spawning sub-agents for ANY implementation work
-- Coding tasks, file edits, research — all should be sub-agent work
-- Main session should be almost purely conversational + orchestration
-- Every coding task > 2 minutes = spawn it, don't do it inline
+**Score card — what we do vs what he recommends:**
+- ✅ #1 — SOUL.md says "orchestrator, not worker." But we violate it constantly (built 221B, Fanfare, show bible edits all inline tonight)
+- ✅ #2 — We use MEMORY.md + daily files. Same concept as BRAIN.md
+- ⚠️ #3 — Our heartbeats load HEARTBEAT.md + check relay queue. Could be leaner. Should NOT load SOUL.md or MEMORY.md on heartbeat
+- ✅ #4 — Cron jobs already run isolated sessions
+- ❌ #5 — This is where we're weakest. Faye does too much inline. Need to spawn aggressively
+
+**Action items:**
+- ENFORCE sub-agent spawning for all coding/editing tasks > 2 min
+- Audit heartbeat to ensure it stays under 3s and doesn't load heavy files
+- Main session target: stay under 30K context like Johann does
 
 ---
 
