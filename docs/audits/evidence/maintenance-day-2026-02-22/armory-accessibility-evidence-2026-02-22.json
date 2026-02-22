@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-02-22T20:51:10.200Z",
+  "url": "http://127.0.0.1:4173/docs/index.html",
+  "checks": {
+    "labelsPresent": true,
+    "keyboardReachability": true,
+    "checkoutEnabledAfterApproval": true,
+    "checkoutTabReachablePostApproval": true,
+    "tourDialogSemantics": true,
+    "tourInitialFocusNext": true,
+    "tourEscapeCloses": true,
+    "tourFocusRestored": true,
+    "modePressedSemantics": true,
+    "focusVisiblePresent": true,
+    "searchHasAccessibleName": true,
+    "removeButtonAccessibleName": true,
+    "dialogAnnounced": true,
+    "noRuntimeErrors": true
+  },
+  "tabSeen": [
+    "add_button_activated",
+    "approveCheck",
+    "classFilter",
+    "modeCiv",
+    "modeSaga",
+    "remove_button_seen",
+    "replayTour",
+    "searchInput",
+    "statusFilter"
+  ],
+  "runtimeErrors": [],
+  "voiceOverManual": {
+    "status": "not_run",
+    "reason": "VoiceOver validation requires interactive local assistive-tech session"
+  },
+  "summary": "pass",
+  "failures": []
+}

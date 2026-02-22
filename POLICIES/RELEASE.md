@@ -30,11 +30,19 @@ Required inputs:
 
 A release is blocked unless all required checks passed for the target commit:
 
-1. `catalog-validate`
-2. `secret-hygiene`
-3. `powershell-smoke`
-4. `fixture-tests`
-5. `release-validate`
+1. `docs-validate`
+2. `catalog-validate`
+3. `secret-hygiene`
+4. `seven-shadow-trust-guard`
+5. `mac-runtime-smoke`
+6. `release-validate`
+
+## Courtesy Checks (Non-Blocking)
+
+These can run as informational checks but are not required release gates:
+
+1. `powershell-smoke`
+2. `fixture-tests`
 
 ## Changelog Requirements
 
@@ -57,8 +65,11 @@ Published GitHub release notes are extracted from the matching version section i
 ## Preflight Commands (Local)
 
 ```bash
+python3 scripts/ci/validate_readmes.py
 python3 scripts/validate_shop_catalog.py
 python3 scripts/ci/secret_hygiene.py
+python3 scripts/ci/validate_trust_store.py
+bash scripts/ci/mac-smoke.sh
 python3 scripts/release/validate_release.py --mode ci
 ```
 

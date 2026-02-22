@@ -16,11 +16,19 @@ This is the required GitHub branch protection baseline for `main`.
 
 Configure these as required checks on `main`:
 
-1. `catalog-validate`
-2. `secret-hygiene`
-3. `powershell-smoke`
-4. `fixture-tests`
-5. `release-validate`
+1. `docs-validate`
+2. `catalog-validate`
+3. `secret-hygiene`
+4. `seven-shadow-trust-guard`
+5. `mac-runtime-smoke`
+6. `release-validate`
+
+## Courtesy Checks (Non-Blocking)
+
+These can run as informational checks but are not required for merge:
+
+1. `powershell-smoke`
+2. `fixture-tests`
 
 ## Recommended Extras
 

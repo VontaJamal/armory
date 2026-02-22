@@ -1,0 +1,146 @@
+{
+  "timestamp": "2026-02-22T20:31:01.390Z",
+  "url": "http://127.0.0.1:4173/docs/index.html",
+  "checks": {
+    "labelsPresent": true,
+    "keyboardReachabilityPreApproval": true,
+    "keyboardSeenPreApproval": [
+      "addButtonActivated",
+      "approveCheck",
+      "cartRemoveButton",
+      "classFilter",
+      "replayTour",
+      "searchInput",
+      "statusFilter"
+    ],
+    "approvalChecked": true,
+    "checkoutEnabledAfterApproval": true,
+    "keyboardReachabilityCheckoutPostApproval": true,
+    "tourOpensAsDialog": true,
+    "tourInitialFocus": true,
+    "tourEscapeCloses": true,
+    "tourFocusRestored": true,
+    "modePressedState": {
+      "civPressed": "true",
+      "sagaPressedAfterCiv": "false",
+      "sagaPressed": "true",
+      "civPressedAfterSaga": "false"
+    },
+    "modePressedStateValid": true
+  },
+  "tabTrace": [
+    {
+      "id": "modeSaga",
+      "tag": "BUTTON",
+      "text": "Crystal Saga Mode",
+      "ariaLabel": "",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "modeCiv",
+      "tag": "BUTTON",
+      "text": "Civilian Mode",
+      "ariaLabel": "",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "searchInput",
+      "tag": "INPUT",
+      "text": "",
+      "ariaLabel": "",
+      "type": "search",
+      "disabled": null
+    },
+    {
+      "id": "classFilter",
+      "tag": "SELECT",
+      "text": "All divisions Summons Weapons Spells Items Audio Ideas",
+      "ariaLabel": "",
+      "type": "",
+      "disabled": null
+    },
+    {
+      "id": "statusFilter",
+      "tag": "SELECT",
+      "text": "All statuses Active Planned Idea Deprecated",
+      "ariaLabel": "",
+      "type": "",
+      "disabled": null
+    },
+    {
+      "id": "replayTour",
+      "tag": "BUTTON",
+      "text": "Take Tour Again",
+      "ariaLabel": "",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "Add To Cart",
+      "ariaLabel": "Add Alexander to cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "ariaLabel": "Remove Alexander from cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "Add To Cart",
+      "ariaLabel": "Add Chronicle to cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "Add To Cart",
+      "ariaLabel": "Add Quartermaster to cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "Add To Cart",
+      "ariaLabel": "Add Remedy to cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "text": "x",
+      "ariaLabel": "Remove Alexander from cart",
+      "type": "button",
+      "disabled": null
+    },
+    {
+      "id": "approveCheck",
+      "tag": "INPUT",
+      "text": "",
+      "ariaLabel": "",
+      "type": "checkbox",
+      "disabled": null
+    },
+    {
+      "id": "checkoutBtn",
+      "tag": "BUTTON",
+      "text": "Generate Installer",
+      "ariaLabel": "",
+      "type": "button",
+      "disabled": null
+    }
+  ],
+  "summary": "pass"
+}
