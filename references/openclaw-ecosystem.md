@@ -81,4 +81,25 @@ When you find a tool, tweet, repo, or pattern that could benefit the Sovereign e
 
 ---
 
+## Context Window Management
+Source: [@johann_sath](https://x.com/johann_sath/status/2025440759416045702) — 21K views, 248 likes
+
+**Problem:** Most OpenClaw users hit 150K context in 1 conversation and wonder why their agent gets dumber.
+
+**How to never hit the limit:**
+1. Add "you are the orchestrator. subagents execute." to SOUL.md — main session stays lean, heavy work runs in fresh context windows
+
+**What we already do right:**
+- SOUL.md explicitly says "Default to spawning sub-agents for implementation work"
+- Faye orchestrates, agents execute — this is our architecture
+- Pre-compaction alerts in HEARTBEAT.md (warn at ~80%)
+
+**What we could do better:**
+- Be MORE aggressive about spawning sub-agents for ANY implementation work
+- Coding tasks, file edits, research — all should be sub-agent work
+- Main session should be almost purely conversational + orchestration
+- Every coding task > 2 minutes = spawn it, don't do it inline
+
+---
+
 *Sharp tools, dumb agents. That's the pattern.*
