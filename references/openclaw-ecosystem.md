@@ -109,4 +109,19 @@ Source: [@johann_sath](https://x.com/johann_sath/status/2025440759416045702) —
 
 ---
 
+## Humanizer — AI Writing Detection Removal
+Source: [@dr_cintas](https://x.com/dr_cintas) | Repo: [blader/humanizer](https://github.com/blader/humanizer) — 5.7K stars, 426 forks
+
+Claude Code skill that removes signs of AI-generated writing from text using 24 detection patterns. `/humanizer` + paste text → sounds human.
+
+**Relevance to us:**
+- Content drops (tweet threads, READMs, blog posts) should not read like AI wrote them
+- Could integrate as an Armory spell — run content through humanizer before publishing
+- Useful for podcast scripts, store listings, any public-facing copy
+- 100% open source, installable as a skill
+
+**Potential Armory concept:** A "Glamour" spell — run any text through humanization before it goes public. Named after the FF spell that alters perception.
+
+---
+
 *Sharp tools, dumb agents. That's the pattern.*
