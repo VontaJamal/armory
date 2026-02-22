@@ -93,20 +93,59 @@ if (-not $focus -or $focus -eq "config") {
         }
     }
 
+    # Load .221b-ignore if present
+    $ignorePatterns = @()
+    $ignoreFile = Join-Path $targetPath ".221b-ignore"
+    if (Test-Path $ignoreFile) {
+        $ignorePatterns = Get-Content $ignoreFile -ErrorAction SilentlyContinue | Where-Object { $_ -and $_ -notmatch '^\s*#' }
+    }
+
     # Check for config files referencing paths that don't exist
+    # Skip: runtime data files, large output files, lock files
+    $dataFilePatterns = 'scan_results|news_crossref|run_cycle|_cache|_latest|_output|alert_output|trade_log|results_'
     $configFiles = Get-ChildItem $targetPath -Recurse -Include "*.json","*.yaml","*.yml","*.toml" -File |
-        Where-Object { $_.FullName -notmatch 'node_modules|\.git|dist|package-lock' } |
+        Where-Object {
+            $_.FullName -notmatch 'node_modules|\.git|dist|package-lock' -and
+            $_.Name -notmatch $dataFilePatterns
+        } |
         Select-Object -First 20
+
+    # Apply .221b-ignore patterns
+    if ($ignorePatterns.Count -gt 0) {
+        $configFiles = $configFiles | Where-Object {
+            $name = $_.Name
+            $skip = $false
+            foreach ($pat in $ignorePatterns) {
+                if ($name -like $pat) { $skip = $true; break }
+            }
+            -not $skip
+        }
+    }
+
     foreach ($cf in $configFiles) {
         $content = Get-Content $cf.FullName -Raw -ErrorAction SilentlyContinue
         if ($content) {
             $pathMatches = [regex]::Matches($content, '(?<=["\s:/])([A-Z]:\\[^"*<>|]+|/[a-z][^"*<>|\s]+)')
+            $fileDeductions = 0
             foreach ($pm in $pathMatches) {
                 $refPath = $pm.Value
-                if ($refPath.Length -gt 5 -and $refPath -notmatch 'node_modules|http|\.git' -and -not (Test-Path $refPath)) {
+                # Skip URLs, web paths, API endpoints
+                if ($refPath -match 'node_modules|\.git') { continue }
+                if ($refPath -match '(https?://|www\.|\.com/|\.org/|\.io/|\.co/|\.net/)') { continue }
+                if ($refPath -match '^/(v\d|api|rss|espn|www)') { continue }
+                if ($refPath.Length -le 5) { continue }
+                # Cap deductions per file to avoid noise from data files
+                if ($fileDeductions -ge 5) {
+                    Add-Deduction "Config" "Info" "Config file has many path references (capped)" `
+                        "$($cf.Name) has $($pathMatches.Count)+ path references - likely a data file, not config" `
+                        "Consider adding $($cf.Name) to .221b-ignore"
+                    break
+                }
+                if (-not (Test-Path $refPath)) {
                     Add-Deduction "Config" "WorthFixing" "Config references non-existent path" `
                         "$($cf.Name) references: $refPath" `
                         "File or directory was moved/deleted but config wasn't updated"
+                    $fileDeductions++
                 }
             }
         }
