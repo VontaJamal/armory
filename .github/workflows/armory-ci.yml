@@ -41,6 +41,9 @@ jobs:
       - name: Run secret hygiene scanner
         run: python3 scripts/ci/secret_hygiene.py
 
+      - name: Validate dashboard renderer security
+        run: python3 scripts/ci/validate_dashboard_security.py
+
       - name: Ensure remote URL has no embedded credentials
         run: bash scripts/ci/check_remote_url.sh
 

@@ -25,6 +25,10 @@ ensure_dirs() {
   chmod 600 "$VAULT_FILE" 2>/dev/null
 }
 
+jutsu_error() {
+  echo "  ${RED}✗${NC} $1" >&2
+}
+
 # ── Config ──────────────────────────────────────────────
 load_config() {
   GATEWAY_HOST="local"
@@ -82,7 +86,12 @@ vault_read() {
 }
 
 vault_write() {
-  echo "$1" > "$VAULT_FILE"
+  local payload="$1"
+  if [[ -z "$payload" ]]; then
+    jutsu_error "Vault update failed: empty payload"
+    return 1
+  fi
+  printf '%s\n' "$payload" > "$VAULT_FILE"
   chmod 600 "$VAULT_FILE" 2>/dev/null
 }
 
@@ -97,17 +106,45 @@ cmd_add() {
     return 1
   fi
 
-  local encoded=$(encode_key "$key")
-  local vault=$(vault_read)
-  local updated=$(echo "$vault" | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-p = '$provider'
-if p not in data: data[p] = {}
-data[p]['$name'] = '$encoded'
+  local encoded
+  encoded="$(encode_key "$key")"
+
+  local updated="" update_status=0
+  updated="$(
+    python3 - "$VAULT_FILE" "$provider" "$name" "$encoded" <<'PY'
+import json
+import pathlib
+import sys
+
+vault_path = pathlib.Path(sys.argv[1])
+provider, name, encoded = sys.argv[2], sys.argv[3], sys.argv[4]
+
+try:
+    data = json.loads(vault_path.read_text(encoding="utf-8"))
+except Exception as exc:
+    raise SystemExit(f"Vault parse failed: {exc}") from None
+
+if not isinstance(data, dict):
+    raise SystemExit("Vault JSON must be an object")
+
+bucket = data.get(provider)
+if bucket is None:
+    bucket = {}
+if not isinstance(bucket, dict):
+    raise SystemExit(f"Vault entry for provider '{provider}' must be an object")
+
+bucket[name] = encoded
+data[provider] = bucket
 print(json.dumps(data, indent=2))
-")
-  vault_write "$updated"
+PY
+  )" || update_status=$?
+
+  if [[ "$update_status" -ne 0 ]]; then
+    jutsu_error "Failed to add ${provider}/${name} to vault"
+    return 1
+  fi
+
+  vault_write "$updated" || return 1
   echo "  ${GREEN}✓${NC} Added ${WHITE}${provider}/${name}${NC}"
 }
 
@@ -141,17 +178,46 @@ cmd_remove() {
     return 1
   fi
 
-  local vault=$(vault_read)
-  local updated=$(echo "$vault" | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-p, n = '$provider', '$name'
-if p in data and n in data[p]:
-    del data[p][n]
-    if not data[p]: del data[p]
+  local updated="" update_status=0
+  updated="$(
+    python3 - "$VAULT_FILE" "$provider" "$name" <<'PY'
+import json
+import pathlib
+import sys
+
+vault_path = pathlib.Path(sys.argv[1])
+provider, name = sys.argv[2], sys.argv[3]
+
+try:
+    data = json.loads(vault_path.read_text(encoding="utf-8"))
+except Exception as exc:
+    raise SystemExit(f"Vault parse failed: {exc}") from None
+
+if not isinstance(data, dict):
+    raise SystemExit("Vault JSON must be an object")
+
+bucket = data.get(provider)
+if bucket is None:
+    print(json.dumps(data, indent=2))
+    raise SystemExit(0)
+if not isinstance(bucket, dict):
+    raise SystemExit(f"Vault entry for provider '{provider}' must be an object")
+
+if name in bucket:
+    del bucket[name]
+if not bucket:
+    del data[provider]
+
 print(json.dumps(data, indent=2))
-")
-  vault_write "$updated"
+PY
+  )" || update_status=$?
+
+  if [[ "$update_status" -ne 0 ]]; then
+    jutsu_error "Failed to remove ${provider}/${name} from vault"
+    return 1
+  fi
+
+  vault_write "$updated" || return 1
   echo "  ${GREEN}✓${NC} Removed ${WHITE}${provider}/${name}${NC}"
 }
 
@@ -160,26 +226,23 @@ restart_gateway() {
   load_config
 
   if [[ "$GATEWAY_METHOD" == "ssh" ]]; then
-    local ssh_cmd="ssh"
-    [[ -n "$SSH_KEY" ]] && ssh_cmd="ssh -i $SSH_KEY"
+    local -a ssh_cmd=(ssh)
+    [[ -n "$SSH_KEY" ]] && ssh_cmd+=(-i "$SSH_KEY")
     local target="${GATEWAY_USER}@${GATEWAY_HOST}"
 
     echo "  ${DIM}Restarting gateway on ${target}...${NC}"
 
     # Try openclaw first, fall back to nssm/sc
-    $ssh_cmd "$target" "openclaw gateway restart 2>/dev/null || nssm restart OpenClawGateway 2>/dev/null || sc stop OpenClawGateway && sc start OpenClawGateway" 2>&1
-
-    if [[ $? -eq 0 ]]; then
+    if "${ssh_cmd[@]}" "$target" "openclaw gateway restart 2>/dev/null || nssm restart OpenClawGateway 2>/dev/null || sc stop OpenClawGateway && sc start OpenClawGateway" 2>&1; then
       echo "  ${GREEN}✓${NC} Gateway restarted on ${WHITE}${GATEWAY_HOST}${NC}"
     else
       echo "  ${RED}✗${NC} Failed to restart gateway on ${GATEWAY_HOST}"
-      echo "  ${DIM}Check SSH access: $ssh_cmd $target${NC}"
+      echo "  ${DIM}Check SSH access: ${ssh_cmd[*]} ${target}${NC}"
       return 1
     fi
   else
     echo "  ${DIM}Restarting local gateway...${NC}"
-    openclaw gateway restart 2>/dev/null
-    if [[ $? -eq 0 ]]; then
+    if openclaw gateway restart 2>/dev/null; then
       echo "  ${GREEN}✓${NC} Gateway restarted locally"
     else
       echo "  ${RED}✗${NC} Failed to restart local gateway"
@@ -197,21 +260,51 @@ cmd_swap() {
     return 1
   fi
 
-  local vault=$(vault_read)
-  local encoded=$(echo "$vault" | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-p, n = '$provider', '$name'
-if p in data and n in data[p]:
-    print(data[p][n])
-" 2>/dev/null)
+  local encoded="" fetch_status=0
+  encoded="$(
+    python3 - "$VAULT_FILE" "$provider" "$name" <<'PY'
+import json
+import pathlib
+import sys
 
-  if [[ -z "$encoded" ]]; then
+vault_path = pathlib.Path(sys.argv[1])
+provider, name = sys.argv[2], sys.argv[3]
+
+try:
+    data = json.loads(vault_path.read_text(encoding="utf-8"))
+except Exception as exc:
+    raise SystemExit(f"Vault parse failed: {exc}") from None
+
+if not isinstance(data, dict):
+    raise SystemExit("Vault JSON must be an object")
+if provider not in data:
+    raise SystemExit(3)
+
+bucket = data[provider]
+if not isinstance(bucket, dict):
+    raise SystemExit(f"Vault entry for provider '{provider}' must be an object")
+if name not in bucket:
+    raise SystemExit(3)
+
+value = bucket[name]
+if not isinstance(value, str) or not value:
+    raise SystemExit(f"Vault entry for '{provider}/{name}' is empty or invalid")
+
+print(value)
+PY
+  )" || fetch_status=$?
+
+  if [[ "$fetch_status" -eq 3 ]]; then
     echo "  ${RED}✗${NC} Key ${WHITE}${provider}/${name}${NC} not found in vault"
     return 1
   fi
+  if [[ "$fetch_status" -ne 0 ]]; then
+    jutsu_error "Failed to read ${provider}/${name} from vault"
+    return 1
+  fi
 
-  local key=$(decode_key "$encoded")
+  local key
+  key="$(decode_key "$encoded")"
 
   # Map provider to env var
   local env_var=""
@@ -220,7 +313,7 @@ if p in data and n in data[p]:
     openai)    env_var="OPENAI_API_KEY" ;;
     google)    env_var="GOOGLE_API_KEY" ;;
     github)    env_var="GITHUB_TOKEN" ;;
-    *)         env_var="$(echo $provider | tr '[:lower:]' '[:upper:]')_API_KEY" ;;
+    *)         env_var="$(printf '%s' "$provider" | tr '[:lower:]' '[:upper:]')_API_KEY" ;;
   esac
 
   # Export to current shell

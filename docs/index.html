@@ -21,8 +21,8 @@
     <div class="mode-panel">
       <div class="mode-heading">Mode</div>
       <div class="mode-toggle" id="modeToggle" role="group" aria-label="Mode toggle">
-        <button id="modeSaga" class="mode-btn">Crystal Saga Mode</button>
-        <button id="modeCiv" class="mode-btn">Civilian Mode</button>
+        <button id="modeSaga" class="mode-btn" type="button" aria-pressed="false">Crystal Saga Mode</button>
+        <button id="modeCiv" class="mode-btn" type="button" aria-pressed="false">Civilian Mode</button>
       </div>
     </div>
   </header>
@@ -35,7 +35,9 @@
   <main class="layout">
     <section class="catalog">
       <div class="toolbar">
+        <label class="sr-only" for="searchInput">Search tools</label>
         <input id="searchInput" type="search" placeholder="Search tools, tags, and descriptions" />
+        <label class="sr-only" for="classFilter">Filter by division</label>
         <select id="classFilter">
           <option value="">All divisions</option>
           <option value="summon">Summons</option>
@@ -45,6 +47,7 @@
           <option value="audio">Audio</option>
           <option value="idea">Ideas</option>
         </select>
+        <label class="sr-only" for="statusFilter">Filter by status</label>
         <select id="statusFilter">
           <option value="">All statuses</option>
           <option value="active">Active</option>
@@ -52,7 +55,7 @@
           <option value="idea">Idea</option>
           <option value="deprecated">Deprecated</option>
         </select>
-        <button id="replayTour" class="ghost-btn">Take Tour Again</button>
+        <button id="replayTour" class="ghost-btn" type="button">Take Tour Again</button>
       </div>
       <div id="catalogGrid" class="card-grid"></div>
     </section>
@@ -60,32 +63,28 @@
     <aside class="cart">
       <h2>Loadout Cart</h2>
       <p id="cartHint">Select tools to build your loadout.</p>
-      <ul id="cartList"></ul>
+      <ul id="cartList" aria-live="polite"></ul>
 
       <div class="approval">
-        <label>
-          <input id="approveCheck" type="checkbox" />
-          I approve this loadout.
-        </label>
+        <input id="approveCheck" type="checkbox" />
+        <label for="approveCheck">I approve this loadout.</label>
       </div>
 
-      <button id="checkoutBtn" class="primary-btn" disabled>Generate Installer</button>
-      <p class="meta" id="checkoutMeta"></p>
+      <button id="checkoutBtn" class="primary-btn" type="button" disabled>Generate Installer</button>
+      <p class="meta" id="checkoutMeta" role="status" aria-live="polite"></p>
 
-      <label class="telemetry-optout">
-        <input id="telemetryOptOut" type="checkbox" />
-        Opt out of anonymous telemetry
-      </label>
+      <input id="telemetryOptOut" type="checkbox" />
+      <label class="telemetry-optout" for="telemetryOptOut">Opt out of anonymous telemetry</label>
     </aside>
   </main>
 
-  <div id="tourOverlay" class="tour-overlay hidden" aria-hidden="true">
+  <div id="tourOverlay" class="tour-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="tourTitle" aria-describedby="tourBody" tabindex="-1">
     <div class="tour-card">
       <h3 id="tourTitle"></h3>
       <p id="tourBody"></p>
       <div class="tour-actions">
-        <button id="tourSkip" class="ghost-btn">Skip</button>
-        <button id="tourNext" class="primary-btn">Next</button>
+        <button id="tourSkip" class="ghost-btn" type="button">Skip</button>
+        <button id="tourNext" class="primary-btn" type="button">Next</button>
       </div>
     </div>
   </div>

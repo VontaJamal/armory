@@ -81,7 +81,7 @@ armory_dispatch_route() {
   shift 4
 
   case "$cmd" in
-    ""|help)
+    ""|help|-h|--help)
       armory_dispatch_help "$command_word"
       ;;
     civs)

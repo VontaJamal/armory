@@ -36,7 +36,7 @@ powershell -ExecutionPolicy Bypass -File .\summons\alexander\alexander.ps1 -Outp
 
 | Flag | Default | Description |
 |---|---|---|
-| `-Skip <name[]>` | none | Skip selected checks (`catalog`, `secrets`, `remote`, `smoke`, `fixtures`, `chronicle`, `release`, `remedy`) |
+| `-Skip <name[]>` | none | Skip selected checks (`catalog`, `secrets`, `dashboard-security`, `remote`, `smoke`, `fixtures`, `chronicle`, `release`, `remedy`) |
 | `-Detailed` | off | Includes output payload for each invoked check |
 | `-Output <path>` | none | Writes report text to disk |
 | `-Sound` | off | Enables optional start/success/fail cues |
@@ -49,6 +49,7 @@ Alexander uses repo-local commands and scripts:
 
 - `scripts/validate_shop_catalog.py`
 - `scripts/ci/secret_hygiene.py`
+- `scripts/ci/validate_dashboard_security.py`
 - `scripts/ci/check_remote_url.ps1`
 - `scripts/ci/help-smoke.ps1`
 - `scripts/ci/run-fixture-tests.ps1`

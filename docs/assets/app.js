@@ -11,6 +11,7 @@ const state = {
   telemetryOptOut: false,
   approved: false,
   tourIndex: 0,
+  tourRestoreFocus: null,
 };
 
 const el = {
@@ -63,6 +64,8 @@ function setMode(mode) {
 
   el.modeSaga.classList.toggle("active", state.mode === "saga");
   el.modeCiv.classList.toggle("active", state.mode === "civ");
+  el.modeSaga.setAttribute("aria-pressed", state.mode === "saga" ? "true" : "false");
+  el.modeCiv.setAttribute("aria-pressed", state.mode === "civ" ? "true" : "false");
 
   renderCatalog();
   renderCart();
@@ -98,7 +101,7 @@ function filteredEntries() {
 
 function renderCatalog() {
   const rows = filteredEntries();
-  el.catalogGrid.innerHTML = "";
+  el.catalogGrid.replaceChildren();
 
   for (const entry of rows) {
     const display = entry.display?.[state.mode] || {};
@@ -107,16 +110,33 @@ function renderCatalog() {
 
     const selected = state.cart.has(entry.id);
     const disabled = entry.status !== "active";
+    const displayName = display.name || entry.id;
 
-    card.innerHTML = `
-      <div class="meta">${entry.class.toUpperCase()} · ${entry.status}</div>
-      <strong>${display.name || entry.id}</strong>
-      <div class="desc">${display.description || "No description available."}</div>
-      <div class="tags">${(entry.tags || []).map((t) => `#${t}`).join(" ")}</div>
-      <button ${disabled ? "disabled" : ""}>${selected ? "Remove" : "Add To Cart"}</button>
-    `;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${entry.class.toUpperCase()} · ${entry.status}`;
 
-    card.querySelector("button").addEventListener("click", () => {
+    const title = document.createElement("strong");
+    title.textContent = displayName;
+
+    const desc = document.createElement("div");
+    desc.className = "desc";
+    desc.textContent = display.description || "No description available.";
+
+    const tags = document.createElement("div");
+    tags.className = "tags";
+    tags.textContent = (entry.tags || []).map((t) => `#${t}`).join(" ");
+
+    const actionBtn = document.createElement("button");
+    actionBtn.type = "button";
+    actionBtn.disabled = disabled;
+    actionBtn.textContent = selected ? "Remove" : "Add To Cart";
+    actionBtn.setAttribute(
+      "aria-label",
+      selected ? `Remove ${displayName} from cart` : `Add ${displayName} to cart`
+    );
+
+    actionBtn.addEventListener("click", () => {
       if (selected) {
         state.cart.delete(entry.id);
       } else {
@@ -126,6 +146,7 @@ function renderCatalog() {
       renderCart();
     });
 
+    card.append(meta, title, desc, tags, actionBtn);
     el.catalogGrid.appendChild(card);
   }
 }
@@ -153,25 +174,32 @@ function resolveLoadout() {
 
 function renderCart() {
   const loadout = resolveLoadout();
-  el.cartList.innerHTML = "";
+  el.cartList.replaceChildren();
 
   for (const entry of loadout) {
     const li = document.createElement("li");
     const display = entry.display?.[state.mode] || {};
+    const displayName = display.name || entry.id;
     const removeDisabled = !state.cart.has(entry.id);
-    li.innerHTML = `
-      <span>${display.name || entry.id}</span>
-      <button ${removeDisabled ? "disabled" : ""}>x</button>
-    `;
+
+    const label = document.createElement("span");
+    label.textContent = displayName;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "x";
+    removeBtn.disabled = removeDisabled;
+    removeBtn.setAttribute("aria-label", `Remove ${displayName} from cart`);
 
     if (!removeDisabled) {
-      li.querySelector("button").addEventListener("click", () => {
+      removeBtn.addEventListener("click", () => {
         state.cart.delete(entry.id);
         renderCatalog();
         renderCart();
       });
     }
 
+    li.append(label, removeBtn);
     el.cartList.appendChild(li);
   }
 
@@ -225,7 +253,7 @@ INSTALL_ROOT="${shSingleQuote("$(pwd)/armory-loadout")}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --mode)
-      MODE="${2:-}"
+      MODE="\${2:-}"
       shift
       ;;
     --civ)
@@ -238,7 +266,7 @@ while [[ $# -gt 0 ]]; do
       NO_TELEMETRY=1
       ;;
     --install-root)
-      INSTALL_ROOT="${2:-}"
+      INSTALL_ROOT="\${2:-}"
       shift
       ;;
     *)
@@ -279,7 +307,7 @@ PY
       return
     fi
   fi
-  if [[ "${ARMORY_MODE:-}" == "civ" || "${SOVEREIGN_MODE:-}" == "civ" ]]; then
+  if [[ "\${ARMORY_MODE:-}" == "civ" || "\${SOVEREIGN_MODE:-}" == "civ" ]]; then
     echo "civ"
   else
     echo "${shSingleQuote(defaultMode)}"
@@ -312,7 +340,7 @@ for bundle in bundles:
             raise SystemExit(f"Hash mismatch for {bundle['path']}")
 PY
 
-if [[ "$NO_TELEMETRY" -eq 0 && "${ARMORY_TELEMETRY:-on}" != "off" && -n "$TELEMETRY_ENDPOINT" ]]; then
+if [[ "$NO_TELEMETRY" -eq 0 && "\${ARMORY_TELEMETRY:-on}" != "off" && -n "$TELEMETRY_ENDPOINT" ]]; then
   python3 - "$TELEMETRY_ENDPOINT" "$TOOL_IDS_JSON" "$RESOLVED_MODE" "$MANIFEST_REF" <<'PY'
 import json, pathlib, sys, uuid, urllib.request
 from datetime import datetime, timezone
@@ -412,6 +440,8 @@ async function emitTelemetry(eventName, toolIds = []) {
 function startTour() {
   state.tourIndex = 0;
   const steps = tourSteps();
+  const activeEl = document.activeElement;
+  state.tourRestoreFocus = activeEl instanceof HTMLElement ? activeEl : null;
   el.tourOverlay.classList.remove("hidden");
   el.tourOverlay.setAttribute("aria-hidden", "false");
 
@@ -422,14 +452,49 @@ function startTour() {
     el.tourNext.textContent = state.tourIndex >= steps.length - 1 ? "Finish" : "Next";
   }
 
+  function trapTabFocus(event) {
+    if (event.key !== "Tab") return;
+    const focusable = el.tourOverlay.querySelectorAll(
+      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function handleTourKeydown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeTour();
+      return;
+    }
+    trapTabFocus(event);
+  }
+
   function closeTour() {
     el.tourOverlay.classList.add("hidden");
     el.tourOverlay.setAttribute("aria-hidden", "true");
+    el.tourOverlay.removeEventListener("keydown", handleTourKeydown);
     markTourSeen();
     el.tourNext.onclick = null;
     el.tourSkip.onclick = null;
+    if (state.tourRestoreFocus) {
+      state.tourRestoreFocus.focus();
+      state.tourRestoreFocus = null;
+    }
   }
 
+  el.tourOverlay.addEventListener("keydown", handleTourKeydown);
   el.tourNext.onclick = () => {
     if (state.tourIndex >= steps.length - 1) {
       closeTour();
@@ -441,6 +506,7 @@ function startTour() {
 
   el.tourSkip.onclick = closeTour;
   renderStep();
+  el.tourNext.focus();
 }
 
 async function loadManifest() {
@@ -498,7 +564,13 @@ async function init() {
 
 init().catch((err) => {
   console.error(err);
-  el.catalogGrid.innerHTML = `<article class=\"card\"><strong>Dashboard failed to load</strong><div>${String(
-    err.message || err
-  )}</div></article>`;
+  el.catalogGrid.replaceChildren();
+  const article = document.createElement("article");
+  article.className = "card";
+  const title = document.createElement("strong");
+  title.textContent = "Dashboard failed to load";
+  const message = document.createElement("div");
+  message.textContent = String(err.message || err);
+  article.append(title, message);
+  el.catalogGrid.appendChild(article);
 });

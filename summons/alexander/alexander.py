@@ -52,6 +52,11 @@ def gate_checks() -> list[dict[str, object]]:
             "command": ["python3", "scripts/ci/secret_hygiene.py"],
         },
         {
+            "name": "dashboard-security",
+            "description": "Ensure dashboard renderer avoids unsafe HTML injection APIs",
+            "command": ["python3", "scripts/ci/validate_dashboard_security.py"],
+        },
+        {
             "name": "remote",
             "description": "Ensure git remotes do not embed credentials",
             "command": ["bash", "scripts/ci/check_remote_url.sh"],
