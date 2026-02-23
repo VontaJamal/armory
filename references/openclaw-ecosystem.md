@@ -21,6 +21,15 @@ A living collection of tools, CLIs, and patterns that make OpenClaw agents smart
 - **Why it matters:** Agents struggle with URLs that need JavaScript rendering. This handles it. Create an OpenClaw skill that always uses this when fetching URLs.
 - **Sovereign use:** Web research tasks, content scraping, competitor analysis, documentation fetching.
 
+### Scrapling
+- **What:** Undetectable web scraper that adapts when sites change structure. Bypasses Cloudflare Turnstile automatically. 774x faster than BeautifulSoup+lxml.
+- **URL:** `pip install "scrapling[ai]"` | [GitHub](https://github.com/D4Vinci/Scrapling) | BSD-3 license
+- **Source:** [@hasantoxr](https://x.com/hasantoxr/status/2025902150296236050)
+- **Why it matters:** Agents need real web data but sites block bots and change selectors constantly. Scrapling handles both — stealth + adaptive selectors. HTTP mode for speed, browser automation mode for JS-heavy sites. Zero selector maintenance.
+- **Sovereign use:** Sass list image harvesting (Pinterest/Tumblr), anime news scraping for daily briefs, crypto data fallback when APIs rate-limit, SyncLink button placement testing across sites.
+- **Status:** Installed on Windows. Scripts built: `scripts/anime-scraper.py`, `scripts/sass-restock.py`
+- **Build candidate:** Yes — could become an Armory item for any agent that needs web data. A "Scout" or "Recon" weapon.
+
 ---
 
 ## SEO & Marketing
