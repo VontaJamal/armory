@@ -66,6 +66,12 @@ Strategic testing pattern for validating system behavior under different conditi
 
 ## Community Knowledge
 
+### 13-Step OpenClaw Security Hardening Guide
+- **Author:** [@johann_sath](https://x.com/johann_sath/status/2025671363504337282)
+- **Key concepts:** Dedicated user (never root), custom port, Tailscale for invisibility, SSH keys + Fail2ban, UFW firewall, Telegram allowlists, DM-only policy, Docker sandboxing for subagents (capDrop ALL), daily security audit cron, self-audit prompt, config drift detection
+- **Why it matters:** Most thorough single-source security guide for OpenClaw deployments. Covers Linux VPS and home server setups.
+- **Our status:** Mostly covered (custom port, loopback, auth token, allowlists, non-root). Added security config drift to Sherlock's weekly rotation. Docker sandboxing deferred (Windows setup).
+
 ### 5 Days Fixing Agent Memory — Chiti's OpenClaw Memory Guide
 - **Author:** Unknown (shared via Telegram, OpenClaw community)
 - **Key concepts:** memory flush before compaction, hybrid search (BM25 + vectors), LEARNINGS.md pattern, marker test protocol, context pruning (cache-ttl), write discipline > read discipline, handover protocol for model switches, boot sequence placement in AGENTS.md
