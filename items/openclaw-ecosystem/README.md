@@ -50,6 +50,28 @@ Source: [blader/humanizer](https://github.com/blader/humanizer) — 5.7K stars
 - Potential Armory spell: "Glamour" — run content through before publishing
 - **Status:** 📋 Logged, not yet integrated
 
+### Write Discipline > Read Discipline
+Write things down immediately rather than trying to remember them. Files persist across sessions, memory doesn't.
+- **Core principle:** Text > Brain — if you want to remember it, write it to a file
+- **Examples:** Update MEMORY.md when learning lessons, capture decisions in daily files, document patterns in AGENTS.md
+- **Why it matters:** Agent memory is ephemeral; file-based memory is permanent and shareable across sessions
+
+### Marker Test Protocol
+Strategic testing pattern for validating system behavior under different conditions.
+- **Method:** Place markers/checkpoints in code/config, run test scenarios, verify markers behave as expected
+- **Use cases:** Memory management validation, context switching verification, agent handover testing
+- **Source:** Chiti's OpenClaw memory management guide (Feb 2026)
+
+---
+
+## Community Knowledge
+
+### 5 Days Fixing Agent Memory — Chiti's OpenClaw Memory Guide
+- **Author:** Unknown (shared via Telegram, OpenClaw community)
+- **Key concepts:** memory flush before compaction, hybrid search (BM25 + vectors), LEARNINGS.md pattern, marker test protocol, context pruning (cache-ttl), write discipline > read discipline, handover protocol for model switches, boot sequence placement in AGENTS.md
+- **Why it matters:** Most comprehensive single-user writeup on OpenClaw memory management. Practical, battle-tested advice.
+- **Status:** Implemented (Feb 23, 2026)
+
 ---
 
 ## People to Watch
