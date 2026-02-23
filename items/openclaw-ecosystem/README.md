@@ -62,6 +62,12 @@ Strategic testing pattern for validating system behavior under different conditi
 - **Use cases:** Memory management validation, context switching verification, agent handover testing
 - **Source:** Chiti's OpenClaw memory management guide (Feb 2026)
 
+### Readonly Access by Default
+When integrating with external data (email, messages, calendars, bookmarks), default to readonly access. The agent can READ and analyze but cannot send, delete, or modify. Reduces blast radius if agent gets confused or prompt-injected. Upgrade to write access only for specific, well-tested actions.
+
+### Nightly Conversation Archiving
+Set up a cron that auto-distills the day's chat into key decisions, action items, and learnings. Write to daily memory log. Reduces manual memory maintenance and ensures nothing falls through the cracks even if the human forgets to ask for a summary.
+
 ---
 
 ## Community Knowledge
@@ -77,6 +83,22 @@ Strategic testing pattern for validating system behavior under different conditi
 - **Key concepts:** memory flush before compaction, hybrid search (BM25 + vectors), LEARNINGS.md pattern, marker test protocol, context pruning (cache-ttl), write discipline > read discipline, handover protocol for model switches, boot sequence placement in AGENTS.md
 - **Why it matters:** Most comprehensive single-user writeup on OpenClaw memory management. Practical, battle-tested advice.
 - **Status:** Implemented (Feb 23, 2026)
+
+### Felix's OpenClaw Automation Setup (Feb 2026)
+- **Author:** Felix (ContextSDK founder, OpenClaw power user)
+- **Source:** Personal blog, shared via Telegram
+- **Key concepts:**
+  - Travel bot with readonly access to booking confirmations (parsed from email, stored as structured markdown)
+  - Beeper CLI for cross-messenger search (Telegram, WhatsApp, iMessage unified)
+  - Nightly cron to archive key learnings from conversations automatically
+  - ContextSDK phone awareness: agent knows if user is walking, at desk, in car — adjusts response style
+  - Smart home automation via Homey based on calendar (shift-based heating, lighting, ventilation)
+  - Readonly access pattern as security principle for all integrations
+  - Voice messages for natural rambling input (Telegram voice + OpenClaw transcription)
+- **What we can steal:**
+  - Nightly conversation archiving cron — auto-distill daily chat into key decisions
+  - Readonly access as formal design principle
+  - Voice message workflow for capturing ideas on-the-go
 
 ---
 
