@@ -46,10 +46,11 @@ jobs:
             --version "${{ inputs.version }}" \
             --repo "${{ github.repository }}" \
             --commit-sha "${{ steps.sha.outputs.value }}" \
+            --required-check "docs-validate" \
             --required-check "catalog-validate" \
             --required-check "secret-hygiene" \
-            --required-check "powershell-smoke" \
-            --required-check "fixture-tests" \
+            --required-check "seven-shadow-trust-guard" \
+            --required-check "mac-runtime-smoke" \
             --required-check "release-validate"
 
       - name: Build release notes from changelog

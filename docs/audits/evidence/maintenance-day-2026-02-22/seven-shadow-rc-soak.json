@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-02-22T20:48:18.244Z",
+  "iterations": 3,
+  "cases": [
+    {
+      "id": "github-pr-review",
+      "provider": "github",
+      "eventName": "pull_request_review",
+      "baselineHash": "ee4029ec923ab5b62b7616a9d3d57907fed5c7fa56bc16a02ba9e3741ddac0da",
+      "decision": "pass",
+      "targetsScanned": 2
+    },
+    {
+      "id": "gitlab-merge-request",
+      "provider": "gitlab",
+      "eventName": "Merge Request Hook",
+      "baselineHash": "9eb069a05060d29d962f6fb21c1d07906b7021fa773f6a557b49275e05345a34",
+      "decision": "pass",
+      "targetsScanned": 1
+    },
+    {
+      "id": "gitlab-note-hook",
+      "provider": "gitlab",
+      "eventName": "Note Hook",
+      "baselineHash": "9bf43cb396a0269de11d3d71f86ffc05c28efdcd1c59204f88d6053b0a4c8154",
+      "decision": "pass",
+      "targetsScanned": 1
+    },
+    {
+      "id": "bitbucket-pullrequest-created",
+      "provider": "bitbucket",
+      "eventName": "pullrequest:created",
+      "baselineHash": "1142fe1fb841ad23a4598caac688d2ca3f0d01551d6b80bea58bbabe0f0736aa",
+      "decision": "pass",
+      "targetsScanned": 1
+    }
+  ],
+  "failClosedProviders": [
+    "github",
+    "gitlab",
+    "bitbucket"
+  ]
+}

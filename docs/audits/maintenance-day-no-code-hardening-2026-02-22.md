@@ -12,6 +12,8 @@
 - Ran release workflow dry-run probe with semver not present in changelog (expected failure captured).
 - Performed local clone sweep for `armory` remotes in accessible user directories and verified local clone hygiene.
 - Recorded pending operator follow-ups (token rotation and manual VoiceOver pass).
+- Synced release/branch-protection policy docs and release workflow required-check lists to match the active `Armory-Ward` ruleset.
+- Archived transient `/tmp` maintenance artifacts into tracked repo audit evidence.
 
 ## Release Dry-Run Probe (Expected Failure)
 - Workflow: `Armory Release`
@@ -58,6 +60,8 @@
   - Complete VoiceOver manual spot-check and append PASS/FAIL outcomes to this note.
 
 ## Evidence Artifacts
-- `/tmp/armory-maintenance-note-2026-02-22.md`
-- `/tmp/armory-accessibility-evidence-2026-02-22.json`
-- `/tmp/seven-shadow-rc-soak.json`
+- `docs/audits/evidence/maintenance-day-2026-02-22/armory-maintenance-note-2026-02-22.md`
+- `docs/audits/evidence/maintenance-day-2026-02-22/armory-accessibility-evidence-2026-02-22.json`
+- `docs/audits/evidence/maintenance-day-2026-02-22/armory-dashboard-keyboard-walkthrough.json`
+- `docs/audits/evidence/maintenance-day-2026-02-22/armory-ruleset-13066848.json`
+- `docs/audits/evidence/maintenance-day-2026-02-22/seven-shadow-rc-soak.json`
