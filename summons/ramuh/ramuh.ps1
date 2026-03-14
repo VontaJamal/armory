@@ -38,10 +38,10 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 $config = @{
     machines = @(
         @{ name = "local"; host = "127.0.0.1" },
-        @{ name = "mac"; host = "192.168.1.165"; sshUser = "vonta" }
+        @{ name = "mac"; host = "your-mac-ip"; sshUser = "youruser" }
     )
     sshHosts = @(
-        @{ name = "mac"; user = "vonta"; host = "192.168.1.165" }
+        @{ name = "mac"; user = "youruser"; host = "your-mac-ip" }
     )
     services = @("OpenClawGateway", "ServiceA", "ServiceB", "ServiceC")
     apiKeys = @("ANTHROPIC_API_KEY", "GITHUB_TOKEN", "OPENAI_API_KEY")
