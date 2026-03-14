@@ -32,7 +32,7 @@ $config = @{
     telegramChatId = $env:TELEGRAM_CHAT_ID
     reposFile = "~/.armory/repos.json"
     apiKeyEnvVars = @("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GITHUB_TOKEN", "GOOGLE_API_KEY")
-    serviceNames = @("OpenClawGateway", "CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard")
+    serviceNames = @("OpenClawGateway", "ServiceA", "ServiceB", "ServiceC")
 }
 
 function Show-Help {

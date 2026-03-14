@@ -20,7 +20,7 @@ powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1
 
 ```powershell
 # Monitor specific services
-powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1 -Services "OpenClawGateway,CryptoPipeline"
+powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1 -Services "OpenClawGateway,ServiceA"
 
 # Silent mode for scheduler
 powershell -ExecutionPolicy Bypass -File .\weapons\aegis\aegis.ps1 -Silent

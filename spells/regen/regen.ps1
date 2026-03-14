@@ -32,7 +32,7 @@ $config = @{
     telegramChatId = $env:TELEGRAM_CHAT_ID
     gitRepoDirs = @("D:\Code Repos")
     optionalCalendarCredsPath = "$env:USERPROFILE\.armory\calendar\credentials.json"
-    serviceNames = @("OpenClawGateway", "CryptoPipeline")
+    serviceNames = @("OpenClawGateway", "ServiceA")
 }
 
 function Show-Help {

@@ -27,7 +27,7 @@ if (Get-Command Initialize-ArmorySound -ErrorAction SilentlyContinue) {
 }
 
 $config = @{
-    services = @("CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard", "OpenClawGateway")
+    services = @("ServiceA", "ServiceB", "ServiceC", "OpenClawGateway")
     telegramBotToken = $env:TELEGRAM_BOT_TOKEN
     telegramChatId = $env:TELEGRAM_CHAT_ID
 }
@@ -39,7 +39,7 @@ function Show-Help {
     Write-Host ""
     Write-Host "  Usage:"
     Write-Host "    .\\aegis.ps1"
-    Write-Host "    .\\aegis.ps1 -Services \"OpenClawGateway,CryptoPipeline\""
+    Write-Host "    .\\aegis.ps1 -Services \"OpenClawGateway,ServiceA\""
     Write-Host "    .\\aegis.ps1 -Silent"
     Write-Host ""
 }

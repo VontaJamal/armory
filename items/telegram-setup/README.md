@@ -17,7 +17,7 @@ Look for `"chat": {"id": YOUR_ID}` in the response.
 1. Add your bot to the group
 2. Send a message in the group
 3. Hit the same `getUpdates` URL
-4. Group IDs are negative numbers (e.g., `-5290373854`)
+4. Group IDs are negative numbers (e.g., `-1234567890`)
 
 ### Quick Script
 ```bash
@@ -36,7 +36,7 @@ You can route different agents to different Telegram channels:
 
 Set the `to` field in cron jobs or `message` tool calls:
 ```
-"to": "channel:-5290373854"
+"to": "channel:-1234567890"
 ```
 
 ## Common Issues
