@@ -43,6 +43,7 @@ Source: [@johann_sath](https://x.com/johann_sath/status/2025440759416045702)
 - MEMORY.md as external brain — read/write, don't remember in-context
 - Heartbeats as fast check-ins (<3s), no file loading unless idle
 - Target: main session under 30K context
+- **Lossless Claw (LCM):** Plugin that replaces sliding-window compaction with a DAG-based summarization system. Every message persists in SQLite; agents recall details via `lcm_grep`, `lcm_expand`, `lcm_describe`. Install: `openclaw plugins install @martian-engineering/lossless-claw` | [GitHub](https://github.com/martian-engineering/lossless-claw) | [Visualization](https://losslesscontext.ai)
 
 ### Humanizer — AI Detection Removal
 Source: [blader/humanizer](https://github.com/blader/humanizer) — 5.7K stars
