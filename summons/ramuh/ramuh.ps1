@@ -43,7 +43,7 @@ $config = @{
     sshHosts = @(
         @{ name = "mac"; user = "vonta"; host = "192.168.1.165" }
     )
-    services = @("OpenClawGateway", "CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard")
+    services = @("OpenClawGateway", "ServiceA", "ServiceB", "ServiceC")
     apiKeys = @("ANTHROPIC_API_KEY", "GITHUB_TOKEN", "OPENAI_API_KEY")
     diskWarningPercent = 15
     gatewayPort = 18789

@@ -96,8 +96,8 @@ warp set-default <name>      # Change default machine
 {
   "default": "windows",
   "machines": {
-    "windows": { "host": "192.168.1.188", "user": "devon", "key": "~/.ssh/id_ed25519" },
-    "pi": { "host": "192.168.1.50", "user": "pi" },
+    "windows": { "host": "10.0.0.100", "user": "youruser", "key": "~/.ssh/id_ed25519" },
+    "pi": { "host": "10.0.0.50", "user": "pi" },
     "vps": { "host": "my.server.com", "user": "root", "port": 2222 }
   }
 }

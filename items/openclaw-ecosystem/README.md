@@ -12,9 +12,8 @@ Third-party tools, libraries, and patterns that make OpenClaw agents sharper. Ev
 - **What:** Undetectable scraper that adapts when sites change structure. Bypasses Cloudflare Turnstile automatically. 774x faster than BeautifulSoup+lxml.
 - **Install:** `pip install "scrapling[ai]"` + `python -m playwright install chromium`
 - **Source:** [@hasantoxr](https://x.com/hasantoxr/status/2025902150296236050) | [GitHub](https://github.com/D4Vinci/Scrapling) | BSD-3
-- **Our scripts:** `scripts/anime-scraper.py`, `scripts/sass-restock.py`
-- **Use cases:** Image harvesting (Pinterest/Tumblr), anime news for daily briefs, crypto data fallback, SyncLink button placement testing
-- **Status:** ✅ Installed on Windows. Playwright Chromium ready.
+- **Use cases:** Image harvesting (Pinterest/Tumblr), news scraping, data fallback, UI testing
+- **Status:** ✅ Ready to use
 
 ### keep.md — Bookmark-to-Markdown API
 - **What:** Save bookmarks from anywhere, access them as markdown through an API
@@ -77,13 +76,13 @@ Set up a cron that auto-distills the day's chat into key decisions, action items
 - **Author:** [@johann_sath](https://x.com/johann_sath/status/2025671363504337282)
 - **Key concepts:** Dedicated user (never root), custom port, Tailscale for invisibility, SSH keys + Fail2ban, UFW firewall, Telegram allowlists, DM-only policy, Docker sandboxing for subagents (capDrop ALL), daily security audit cron, self-audit prompt, config drift detection
 - **Why it matters:** Most thorough single-source security guide for OpenClaw deployments. Covers Linux VPS and home server setups.
-- **Our status:** Mostly covered (custom port, loopback, auth token, allowlists, non-root). Added security config drift to Sherlock's weekly rotation. Docker sandboxing deferred (Windows setup).
+- **Takeaway:** Comprehensive guide — covers everything from firewall rules to Docker sandboxing for subagents.
 
 ### 5 Days Fixing Agent Memory — Chiti's OpenClaw Memory Guide
 - **Author:** Unknown (shared via Telegram, OpenClaw community)
 - **Key concepts:** memory flush before compaction, hybrid search (BM25 + vectors), LEARNINGS.md pattern, marker test protocol, context pruning (cache-ttl), write discipline > read discipline, handover protocol for model switches, boot sequence placement in AGENTS.md
 - **Why it matters:** Most comprehensive single-user writeup on OpenClaw memory management. Practical, battle-tested advice.
-- **Status:** Implemented (Feb 23, 2026)
+- **Status:** 📋 Documented
 
 ### Felix's OpenClaw Automation Setup (Feb 2026)
 - **Author:** Felix (ContextSDK founder, OpenClaw power user)
@@ -96,7 +95,7 @@ Set up a cron that auto-distills the day's chat into key decisions, action items
   - Smart home automation via Homey based on calendar (shift-based heating, lighting, ventilation)
   - Readonly access pattern as security principle for all integrations
   - Voice messages for natural rambling input (Telegram voice + OpenClaw transcription)
-- **What we can steal:**
+- **Key takeaways:**
   - Nightly conversation archiving cron — auto-distill daily chat into key decisions
   - Readonly access as formal design principle
   - Voice message workflow for capturing ideas on-the-go

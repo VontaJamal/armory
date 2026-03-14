@@ -1,7 +1,7 @@
 # Trust Rollout Bootstrap PR
 
 Generated at: `2026-02-21T20:46:25Z`  
-Target repository: `/Users/vonta/Documents/Code Repos/armory`  
+Target repository: `~/armory`  
 Submodule path: `governance/seven-shadow-system`
 
 ## Summary

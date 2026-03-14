@@ -1,7 +1,7 @@
 # Public Logic Audit - 2026-02-22
 
 ## Repo
-- VontaJamal/armory
+- armory
 
 ## Scope
 - Deep quality-control on existing public-facing logic only.
@@ -12,7 +12,7 @@
 - Default branch: main
 - Latest default-branch run (at start):
   - Armory CI (success)
-  - https://github.com/VontaJamal/armory/actions/runs/22278810812
+  - (CI run link)
 
 ## Public Surface Inventory
 - README command references and policy docs

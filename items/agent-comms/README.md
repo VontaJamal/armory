@@ -32,10 +32,10 @@ In your `openclaw.json`:
 ```json
 {
   "agents": {
-    "list": ["main", "cipher", "poly", "kai"]
+    "list": ["main", "agent-a", "agent-b", "agent-c"]
   },
   "agentToAgent": {
-    "allow": ["main", "cipher", "poly", "kai"]
+    "allow": ["main", "agent-a", "agent-b", "agent-c"]
   }
 }
 ```
@@ -45,7 +45,7 @@ In your `openclaw.json`:
 From your main agent to a sub-agent:
 
 ```
-sessions_send(sessionKey="agent:cipher:main", message="Scout Armory for this repo issue and report a shortlist")
+sessions_send(sessionKey="agent:agent-a:main", message="Scout Armory for this repo issue and report a shortlist")
 ```
 
 Quartermaster command pattern:
@@ -88,7 +88,7 @@ Agent-to-agent messages can time out but still deliver. Validate by checking tar
 
 ### Session Keys Are Specific
 
-`agent:cipher:main` is not the same as `cipher`.
+`agent:agent-a:main` is not the same as `agent-a`.
 
 ### Dedicated Workspaces
 

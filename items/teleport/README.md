@@ -55,9 +55,9 @@ Now you can `sc stop/start` from SSH without elevation.
 ```bash
 #!/bin/bash
 # Mac â†’ Windows workspace sync (runs every 60s via launchd/cron)
-REMOTE="devon@192.168.1.188"
+REMOTE="youruser@your-server-ip"
 LOCAL="$HOME/.openclaw/workspace/"
-REMOTE_PATH="/C/Users/Devon/.openclaw/workspace/"
+REMOTE_PATH="/path/to/.openclaw/workspace/"
 
 rsync -avz --delete \
   --exclude '.git' \

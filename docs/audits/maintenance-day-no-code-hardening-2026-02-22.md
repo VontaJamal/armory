@@ -27,15 +27,15 @@
 
 ## Clone Sweep (Local Machine)
 - Discovery scope:
-  - `/Users/vonta/Documents`
-  - `/Users/vonta/Desktop`
-  - `/Users/vonta/Code Repos`
-  - `/Users/vonta/Repos`
-  - `/Users/vonta/Projects`
+  - `~/Documents`
+  - `~/Desktop`
+  - `~/Code Repos`
+  - `~/Repos`
+  - `~/Projects`
 - Discovered clone(s):
-  - `/Users/vonta/Documents/Code Repos/armory`
+  - `~/Documents/Code Repos/armory`
 - Remote hygiene result:
-  - `origin https://github.com/VontaJamal/armory.git` (tokenless)
+  - `origin` remote URL (tokenless)
   - `scripts/ci/check_remote_url.sh` -> PASS
 - Other machines:
   - Pending: repeat remote scrub + hygiene check on each additional machine.

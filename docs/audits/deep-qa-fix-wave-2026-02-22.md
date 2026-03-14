@@ -7,7 +7,7 @@
 - Mac runtime is mandatory; Windows remains courtesy coverage.
 
 ## Required Sequence
-1. `git -C /Users/vonta/Documents/Code Repos/armory pull --ff-only` -> PASS (`Already up to date.`)
+1. `git -C ~/armory pull --ff-only` -> PASS (`Already up to date.`)
 2. Baseline Armory-native checks (pre-change) -> PASS
 3. Logic fixes -> completed
 4. Security fixes -> completed
@@ -28,7 +28,7 @@
 
 ## Logic Fixes Shipped
 ### 1) Jutsu vault mutation hardening
-- File: `/Users/vonta/Documents/Code Repos/armory/weapons/jutsu/jutsu.sh`
+- File: `~/armory/weapons/jutsu/jutsu.sh`
 - Changes:
   - Removed unsafe inline Python string interpolation from `add/remove/swap`.
   - Switched to argument-safe Python calls (`sys.argv`) for provider/name/key inputs.
@@ -40,12 +40,12 @@
   - Malformed vault JSON now fails with exit `1` and no false success message.
 
 ### 2) Dispatcher help contract
-- File: `/Users/vonta/Documents/Code Repos/armory/scripts/lib/dispatch_routes.sh`
+- File: `~/armory/scripts/lib/dispatch_routes.sh`
 - Change:
   - Added `-h|--help` routing to the normal help path with exit `0`.
 
 ### 3) Mac smoke coverage extension
-- File: `/Users/vonta/Documents/Code Repos/armory/scripts/ci/mac-smoke.sh`
+- File: `~/armory/scripts/ci/mac-smoke.sh`
 - Changes:
   - Added `dispatcher --help` assertion.
   - Added zsh Jutsu help smoke.
@@ -53,7 +53,7 @@
 
 ## Security Fixes Shipped
 ### 1) Dashboard HTML injection hardening
-- File: `/Users/vonta/Documents/Code Repos/armory/docs/assets/app.js`
+- File: `~/armory/docs/assets/app.js`
 - Changes:
   - Replaced manifest-driven card/cart `innerHTML` rendering with DOM node creation and `textContent`.
   - Replaced error-state `innerHTML` with safe text-node rendering.
@@ -61,23 +61,23 @@
   - Manifest text can no longer be interpreted as HTML in dashboard card/cart/error rendering paths.
 
 ### 2) CI guard for unsafe dashboard HTML APIs
-- File: `/Users/vonta/Documents/Code Repos/armory/scripts/ci/validate_dashboard_security.py` (new)
+- File: `~/armory/scripts/ci/validate_dashboard_security.py` (new)
 - Behavior:
   - Fails if `docs/assets/app.js` contains `innerHTML=`, `outerHTML=`, or `insertAdjacentHTML(`.
 - Wiring:
   - Added to CI workflow step:
-    - `/Users/vonta/Documents/Code Repos/armory/.github/workflows/armory-ci.yml`
+    - `~/armory/.github/workflows/armory-ci.yml`
   - Added to Alexander preflight checks:
-    - `/Users/vonta/Documents/Code Repos/armory/summons/alexander/alexander.py`
+    - `~/armory/summons/alexander/alexander.py`
   - Updated Alexander docs to include new skip/check name:
-    - `/Users/vonta/Documents/Code Repos/armory/summons/alexander/README.md`
+    - `~/armory/summons/alexander/README.md`
 
 ## Accessibility Fixes Shipped
 ### Dashboard semantics and keyboard support
 - Files:
-  - `/Users/vonta/Documents/Code Repos/armory/docs/index.html`
-  - `/Users/vonta/Documents/Code Repos/armory/docs/assets/app.js`
-  - `/Users/vonta/Documents/Code Repos/armory/docs/assets/styles.css`
+  - `~/armory/docs/index.html`
+  - `~/armory/docs/assets/app.js`
+  - `~/armory/docs/assets/styles.css`
 - Changes:
   - Added explicit labels for search/status/division controls.
   - Added explicit `type="button"` on button controls.
@@ -138,7 +138,7 @@ Walkthrough assertions:
 - Mode switch semantic state (`aria-pressed`) -> PASS
 
 Issue discovered during walkthrough and fixed in this wave:
-- A runtime parse defect in `/Users/vonta/Documents/Code Repos/armory/docs/assets/app.js` blocked dashboard JS execution in Chromium.
+- A runtime parse defect in `~/armory/docs/assets/app.js` blocked dashboard JS execution in Chromium.
 - Cause: unescaped shell-style `${...}` expansions inside a JavaScript template literal used for installer generation.
 - Fix: escaped shell expansions (`\${...}`) where literal bash parameter expansion is intended.
 - Verification after fix: card render restored (`5` cards / `5` action buttons), no page errors, keyboard walkthrough passed.

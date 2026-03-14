@@ -16,10 +16,10 @@
 221b --path D:\Code Repos\armory
 
 # Analyze a running service
-221b --service CryptoPipeline
+221b --service MyService
 
 # Analyze a remote machine
-221b --ssh devon@192.168.1.188
+221b --ssh user@your-server
 
 # Focus on specific deduction categories
 221b --focus config        # Config contradictions only
@@ -85,13 +85,13 @@
      → These are different services, but the docs don't clarify this
 
   2. STALE BRANCH
-     Branch 'sovereign-badge' last commit: 4 days ago
+     Branch 'feature-badge' last commit: 4 days ago
      Main has moved 23 commits ahead
      → This branch is likely abandoned. Delete or merge.
 
   3. GHOST REFERENCE
-     scripts/deploy.ps1 line 14 references 'CryptoBot' service
-     No service named 'CryptoBot' exists (did you mean 'CryptoPipeline'?)
+     scripts/deploy.ps1 line 14 references 'OldService' service
+     No service named 'OldService' exists (did you mean 'NewService'?)
      → Renamed service, script not updated
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -131,8 +131,8 @@ Every deduction cites its evidence. No hunches. Just facts that lead to conclusi
 # Add to PATH or call directly
 .\221b.ps1
 
-# Or through Faye CLI
-faye 221b
+# Or through your agent CLI
+armory 221b
 ```
 
 ---

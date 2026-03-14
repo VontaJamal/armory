@@ -1,4 +1,4 @@
-﻿# Running Bots as Windows Services with NSSM
+# Running Bots as Windows Services with NSSM
 
 NSSM (Non-Sucking Service Manager) lets you run any script or process as a Windows service that auto-starts on boot and restarts on crash.
 
@@ -71,7 +71,7 @@ This grants Built-in Users read/control permissions.
 ## Health Check Script
 
 ```powershell
-$services = @("CryptoPipeline", "CryptoAlertForwarder", "TradingDashboard", "OpenClawGateway")
+$services = @("ServiceA", "ServiceB", "TradingDashboard", "OpenClawGateway")
 
 foreach ($svc in $services) {
     $status = (sc.exe query $svc | Select-String "STATE").ToString().Trim()

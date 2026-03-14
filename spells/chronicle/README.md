@@ -52,8 +52,8 @@ Allowlist config file format:
 ```json
 {
   "repos": [
-    "D:/Code Repos/faye",
-    "D:/Code Repos/armory"
+    "D:/Projects/my-agent",
+    "D:/Projects/armory"
   ]
 }
 ```
